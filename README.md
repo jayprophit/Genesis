@@ -1,2 +1,2 @@
-# Genisis
+# Genesis
 A.I
