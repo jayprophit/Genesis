@@ -1,0 +1,25 @@
+id	title	status	depends_on	evidence
+REQ-REG-001	Permanent requirement registry	operational	-	tests:registry_load
+REQ-PROV-001	Append-only provenance ledger	operational	REQ-REG-001	tests:ledger_chain
+REQ-RUN-001	Deterministic runtime substrate	contract	REQ-PROV-001	docs:build_order
+REQ-PHY-001	Digital physics and causality	planned	REQ-RUN-001	-
+REQ-CHEM-001	Measured digital chemistry	gated	REQ-PHY-001	benchmark_required
+REQ-ID-001	Unique organism identity	operational	REQ-PROV-001	tests:identity
+REQ-LIN-001	Lineage and divergence semantics	operational	REQ-ID-001	tests:lineage
+REQ-GEN-001	Persistent versioned genome	operational	REQ-ID-001	tests:genome
+REQ-HELIX-001	Structural strand	operational	REQ-GEN-001	tests:genome
+REQ-HELIX-002	Regulatory strand	operational	REQ-GEN-001	tests:genome
+REQ-HELIX-003	Lineage identity strand	operational	REQ-LIN-001,REQ-GEN-001	tests:genome
+REQ-RNA-001	Transient expression lifecycle	operational	REQ-GEN-001	tests:rna_lifecycle
+REQ-REPRO-001	Two-parent deterministic reproduction	planned	REQ-GEN-001,REQ-LIN-001	-
+REQ-BIRTH-001	Immutable birth boundary	contract	REQ-REPRO-001	tests:identity
+REQ-INH-001	Origin-labelled inherited knowledge	planned	REQ-BIRTH-001	-
+REQ-CELL-001	Computational cell lifecycle	planned	REQ-RNA-001	-
+REQ-TISSUE-001	Tissue formation	planned	REQ-CELL-001	-
+REQ-HOME-001	Resource-backed homeostasis	planned	REQ-RUN-001	-
+REQ-IMM-001	Self and non-self recognition	gated	REQ-ID-001,REQ-PROV-001	crypto_provider_required
+REQ-COG-001	Limited conscious workspace	planned	REQ-TISSUE-001	-
+REQ-DEV-001	Competency-based development	operational	REQ-ID-001	tests:development
+REQ-PAR-001	Teaching separated from inheritance	contract	REQ-BIRTH-001,REQ-DEV-001	docs:master_spec
+REQ-MODAL-001	Multimodal adapters	planned	REQ-COG-001	-
+REQ-CRYPTO-001	Cryptographic identity and key custody	gated	REQ-PROV-001	provider_and_threat_model_required
