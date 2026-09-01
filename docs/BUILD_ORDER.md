@@ -2,6 +2,8 @@
 
 Each layer needs contracts, tests, measurable evidence, and truthful registry status before higher layers rely on it.
 
+Authorized legacy information enters through `docs/research/SOURCE_ABSTRACTIONS.md` and the provenance manifest. Source programs remain unchanged during Genesis abstraction.
+
 1. Requirements, dependency graph, provenance, replay, and evidence gates.
 2. Runtime: time, events, resources, causality, state transition, accounting, recovery.
 3. Identity and lineage; distinguish restore, clone, fork, and child.

@@ -1,0 +1,18 @@
+source_id	path	bytes	sha256	role	decision
+SRC-AETH-LICENSE	F:\Aetherius OS\LICENSE	1285	C6076D6E49897ABAF1B03ED87BDEC006A8E26799D9E6D978D90B711774F086E8	license evidence	owner authorization recorded
+SRC-AETH-ARCH	F:\Aetherius OS\docs\ARCHITECTURE.md	14554	9DC3DC44508E0C67A73A06B8F8446DFB1AE5BD03C85C294B605F6BAB7D65DCE7	architecture research	abstract only
+SRC-AETH-CORE	F:\Aetherius OS\docs\CORE_ARCHITECTURE.md	3144	B2016000E676F402DFB5BF9F062C990A0547DD34DDA203D39F316A4B01B7EC7D	AI architecture research	abstract only
+SRC-TWIN-CAP	F:\AI Digital Twin\ai-digital-clone\app\brain\capability_registry.py	10999	F7D4BDBC32BD9657D5276EE3CC440D8B263096458021B5E44A6A51298217080A	capability truth model	candidate abstraction
+SRC-TWIN-MEM	F:\AI Digital Twin\ai-digital-clone\app\brain\memory_system.py	16286	64D94C2E74AF61E0767B7A0394A4ED267A24780C768F1833E2312512BF52C800	memory research	candidate abstraction
+SRC-TWIN-TEST-CORE	F:\AI Digital Twin\ai-digital-clone\tests\test_core.py	2860	647F09B45621F3B403913E6D981C29E2E1928B7D0C4D90259C4B2DD568CBECAF	legacy test evidence	abstract only
+SRC-TWIN-TEST-ALL	F:\AI Digital Twin\ai-digital-clone\tests\test_all.py	4473	3A28D166E59DBFA322B959EC5352FD050C2C111AB588D5C76ECE9A03EA304938	legacy test evidence	abstract only
+SRC-CHAT-SELFBUILD	F:\ai chat conversations\claude\claude - Building a Self-Improving AI System.txt	20436	87C7FD009D71AE1C38D575CAD4BE41CC61F793A7C57D64C6FEA1D1D22ACB182E	self-improvement research	requirements only
+SRC-AETH-EVENTBUS	F:\Aetherius OS\src\core\events\EventBus.ts	1397	774EA10D3E3F9FEE4B2B056809C619497C2A07A0190793D8FF6E60BCA188E465	event vocabulary	C++ rewrite candidate
+SRC-AETH-SERVICE	F:\Aetherius OS\src\application\services\service_runtime.py	4430	8BFC5AF217313CBA97BDA8BA6173EDC81809651F747524263145150B293690C7	service lifecycle	C++ rewrite candidate
+SRC-AETH-SERVICE-TEST	F:\Aetherius OS\tests\test_service_runtime.py	1152	E206BE886369D4012F8FE63F569F2437D8FEFEDE729FAED094987561A6237781	legacy lifecycle test	test-design input
+SRC-AETH-KERNEL	F:\Aetherius OS\src\infrastructure\os_core\kernel.py	21736	A00BDFBCCAF67409F82ABC8C33F03AD2D0EB1FFC3BD45095D4BC35A081615801	resource accounting	C++ rewrite candidate
+SRC-AETH-MEMGRAPH	F:\Aetherius OS\src\infrastructure\os_core\memory_graph.py	15734	C22A3B6397AAE2315BA180D63010C94A1A4B4740EA0EFA98507A3894F7E10C2F	memory graph	C++ rewrite candidate
+SRC-AETH-METRICS	F:\Aetherius OS\src\infrastructure\monitoring\metrics_runtime.py	6691	7469BBE6CA2B1CD8BF213DC59864CA87662991DCB047B5AA4E21E5E7B4EB04FC	telemetry vocabulary	rewrite; legacy deadlock found
+SRC-AETH-ADAPTER	F:\Aetherius OS\src\application\inference\adapter_backend.py	9593	3FCCCC1AD196E57DEC182EE6D5AB380490781BEF1A657CED0C8021D4F7090DB7	local-first inference adapter	deferred sidecar candidate
+SRC-AETH-ZEROTRUST	F:\Aetherius OS\src\core\security\ZeroTrustFramework.ts	2470	EE7EB94DD6CB013AC75D9B0F7F209E46F6A67F0ADFD4D67325DC86201F428D70	policy request vocabulary	security rewrite input
+SRC-AETH-GENEALOGY	F:\Aetherius OS\src\core\genealogy\GenealogySystem.ts	4653	03DBE1B6CF8D0DC7208B13DA482D577825BA05046830556A216F79D8F8B4AC74	ancestry graph vocabulary	lineage rewrite input

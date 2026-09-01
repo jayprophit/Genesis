@@ -23,3 +23,13 @@ REQ-DEV-001	Competency-based development	operational	REQ-ID-001	tests:developmen
 REQ-PAR-001	Teaching separated from inheritance	contract	REQ-BIRTH-001,REQ-DEV-001	docs:master_spec
 REQ-MODAL-001	Multimodal adapters	planned	REQ-COG-001	-
 REQ-CRYPTO-001	Cryptographic identity and key custody	gated	REQ-PROV-001	provider_and_threat_model_required
+REQ-SRC-001	Owner-authorized source registry	operational	REQ-PROV-001	docs:source_audit
+REQ-CORPUS-001	Traceable research-corpus extraction	contract	REQ-SRC-001	docs:conversation_corpus
+REQ-EVAL-001	Claims require falsifiable evidence	contract	REQ-REG-001	tests_and_benchmarks_required
+REQ-EVT-001	Deterministic event envelope and dispatch	planned	REQ-RUN-001,REQ-PROV-001	-
+REQ-RES-001	Atomic resource reservation ledger	planned	REQ-EVT-001,REQ-PROV-001	-
+REQ-SVC-001	Explicit service lifecycle state machine	planned	REQ-EVT-001,REQ-RES-001	-
+REQ-TEL-001	Bounded telemetry and health derivation	planned	REQ-EVT-001,REQ-RES-001	-
+REQ-MEM-001	Identity and origin-labelled memory graph	planned	REQ-ID-001,REQ-PROV-001,REQ-INH-001	-
+REQ-POL-001	Deny-by-default policy decision contract	planned	REQ-ID-001,REQ-PROV-001,REQ-CRYPTO-001	-
+REQ-ADAPT-001	Truthful adapter capability states	planned	REQ-RUN-001,REQ-TEL-001	-

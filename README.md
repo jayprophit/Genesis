@@ -14,3 +14,7 @@ ctest --test-dir build --output-on-failure
 ```
 
 Read `docs/BUILD_ORDER.md`, `docs/audit/SOURCE_AUDIT.md`, and `registry/requirements.tsv` before extending Genesis.
+
+Authorized legacy research is curated in `docs/research/SOURCE_ABSTRACTIONS.md`; source files and hashes are tracked in `provenance/SOURCE_MANIFEST.tsv`.
+
+The detailed Aetherius disposition is in `docs/audit/AETHERIUS_COMPONENT_MAP.md`. Deferred work on the original programs is tracked separately in `docs/LEGACY_PROJECTS.md`.

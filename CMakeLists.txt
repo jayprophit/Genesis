@@ -9,6 +9,8 @@ enable_testing()
 add_executable(genesis_tests tests/genesis_tests.cpp)
 target_link_libraries(genesis_tests PRIVATE genesis_core)
 target_compile_options(genesis_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
-add_test(NAME genesis_tests COMMAND genesis_tests ${CMAKE_CURRENT_SOURCE_DIR}/registry/requirements.tsv)
+add_test(NAME genesis_tests COMMAND genesis_tests
+    ${CMAKE_CURRENT_SOURCE_DIR}/registry/requirements.tsv
+    ${CMAKE_CURRENT_SOURCE_DIR}/provenance/SOURCE_MANIFEST.tsv)
 add_executable(genesis_bench benchmarks/core_benchmark.cpp)
 target_link_libraries(genesis_bench PRIVATE genesis_core)
