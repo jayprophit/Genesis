@@ -1,0 +1,63 @@
+id	parent	name	requirements	design	implementation	unit_tests	integration_tests	benchmark	security	recovery	documentation	platform_qualification
+GENESIS	-	Genesis complete program	-	-	-	-	-	-	-	-	-	-
+FOUNDATION	GENESIS	Foundation and engineering	REQ-REG-001,REQ-DOM-001,REQ-FND-001	-	-	-	-	-	-	-	-	-
+FOUNDATION-REGISTRY	FOUNDATION	Permanent requirements and provenance	REQ-REG-001,REQ-PROV-001	1	1	1	1	0	1	1	1	1
+FOUNDATION-RUNTIME	FOUNDATION	Deterministic runtime and resources	REQ-RUN-001,REQ-RES-001	1	1	1	1	1	1	1	1	1
+FOUNDATION-CI	FOUNDATION	CI build and release assurance	REQ-CI-001	1	1	0	0	0	0	0	1	0
+ORGANISM	GENESIS	Digital organism anatomy	-	-	-	-	-	-	-	-	-	-
+ORGANISM-CELLS	ORGANISM	Cells and differentiation	REQ-CELL-001,REQ-CELL-DIFF-001	1	1	1	1	1	1	1	1	1
+ORGANISM-TISSUES	ORGANISM	Tissues and organs	REQ-TISSUE-001,REQ-ORGAN-001	1	1	1	1	0	1	1	1	1
+ORGANISM-REPAIR	ORGANISM	Repair and recycling	REQ-CELL-REPAIR-001,REQ-CELL-RECYCLE-001	1	1	1	1	0	1	1	1	1
+ORGANISM-HOMEOSTASIS	ORGANISM	Signalling metabolism and homeostasis	REQ-SIGNAL-001,REQ-METABOLISM-001,REQ-HOME-001	1	1	1	1	1	1	1	1	1
+ORGANISM-IMMUNE	ORGANISM	Immune boundaries and memory	REQ-IMM-001,REQ-IMMUNE-MEMORY-001	1	1	1	1	0	1	1	1	0
+MEMORY	GENESIS	Memory learning and cognition	-	-	-	-	-	-	-	-	-	-
+MEMORY-GRAPH	MEMORY	Identity-scoped memory graph	REQ-MEM-001	1	1	1	0	1	1	0	1	1
+MEMORY-PERSISTENCE	MEMORY	Crash-safe memory persistence	REQ-MEM-PERSIST-001	1	1	1	1	1	1	1	1	1
+MEMORY-ASSOCIATION	MEMORY	Associative activation and prediction	REQ-MEM-ASSOC-001,REQ-COG-PREDICT-001	1	1	1	0	1	1	0	1	1
+MEMORY-FORGETTING	MEMORY	Decay dormancy consolidation and relearning	REQ-MEM-TRACE-001	1	1	1	0	0	1	0	1	1
+MEMORY-LEARNING	MEMORY	Learning policy and interference control	-	1	0	0	0	0	0	0	0	0
+MEMORY-PERCEPTION	MEMORY	Perception grounding pipeline	REQ-ADAPT-001	1	0	0	0	0	0	0	0	0
+MEMORY-LANGUAGE	MEMORY	Language representation and grounding	-	1	0	0	0	0	0	0	0	0
+MEMORY-WORLD-MODEL	MEMORY	World model	REQ-MODELS-001	1	1	1	0	0	1	0	1	1
+MEMORY-SELF-MODEL	MEMORY	Self model	REQ-MODELS-001	1	1	1	0	0	1	0	1	1
+MEMORY-AFFECT	MEMORY	Affect integration and regulation	-	1	0	0	0	0	0	0	0	0
+MEMORY-WORKSPACE	MEMORY	Limited cognitive workspace	REQ-COG-001	1	1	1	0	0	1	0	1	1
+MEMORY-METACOGNITION	MEMORY	Metacognition and introspection	REQ-META-001	1	1	1	0	0	1	0	1	1
+DEVELOPMENT	GENESIS	Development and independence	-	-	-	-	-	-	-	-	-	-
+DEVELOPMENT-EMBRYOLOGY	DEVELOPMENT	Embryology orchestration	-	1	0	0	0	0	0	0	0	0
+DEVELOPMENT-CURRICULUM	DEVELOPMENT	Teaching curricula	REQ-PAR-001	1	0	0	0	0	0	0	0	0
+DEVELOPMENT-SLEEP	DEVELOPMENT	Sleep and consolidation scheduling	-	1	0	0	0	0	0	0	0	0
+DEVELOPMENT-MAINTENANCE	DEVELOPMENT	Maintenance cycles	-	1	0	0	0	0	0	0	0	0
+DEVELOPMENT-PLAY	DEVELOPMENT	Play and exploration	-	1	0	0	0	0	0	0	0	0
+DEVELOPMENT-COMPETENCY	DEVELOPMENT	Competency and maturity gates	REQ-DEV-001	1	1	1	1	0	1	1	1	1
+DEVELOPMENT-INDEPENDENCE	DEVELOPMENT	Progressive independence	-	1	0	0	0	0	0	0	0	0
+DEVELOPMENT-GUARDIAN	DEVELOPMENT	Guardian and operator boundaries	-	1	0	0	0	0	0	0	0	0
+EMBODIMENT	GENESIS	Models senses and embodiment	-	-	-	-	-	-	-	-	-	-
+EMBODIMENT-MODELS	EMBODIMENT	Local model discovery and routing	REQ-MODEL-001	1	0	0	0	0	0	0	1	0
+EMBODIMENT-MULTIMODAL	EMBODIMENT	Multimodal adapter ABI	REQ-ADAPT-001	1	0	0	0	0	0	0	1	0
+EMBODIMENT-BODY	EMBODIMENT	Body schema and avatar control	-	1	0	0	0	0	0	0	0	0
+EMBODIMENT-HARDWARE-SAFETY	EMBODIMENT	Hardware safety interlocks	-	1	0	0	0	0	0	0	0	0
+EMBODIMENT-DEVICE-ROUTES	EMBODIMENT	Observed and qualified device routes	REQ-PLAT-001	1	0	0	0	0	0	0	1	0
+NETWORK	GENESIS	Networking and distributed cognition	-	-	-	-	-	-	-	-	-	-
+NETWORK-IDENTITY	NETWORK	Network identity	REQ-NET-BOUNDARY-001	1	0	0	0	0	0	0	1	0
+NETWORK-SHARED	NETWORK	Shared domain and private-memory separation	REQ-SHARED-DOMAIN-001	1	0	0	0	0	0	0	1	0
+NETWORK-AGENTS	NETWORK	Specialist agent contracts	-	1	0	0	0	0	0	0	0	0
+NETWORK-RECOVERY	NETWORK	Partition recovery and replay	-	1	0	0	0	0	0	0	0	0
+NETWORK-RECONCILIATION	NETWORK	Distributed reconciliation	-	1	0	0	0	0	0	0	0	0
+SECURITY	GENESIS	Security and platform qualification	-	-	-	-	-	-	-	-	-	-
+SECURITY-CRYPTO	SECURITY	Approved cryptographic providers	REQ-CRYPTO-001	1	0	0	0	0	0	0	1	0
+SECURITY-KEYS	SECURITY	Key custody and rotation	REQ-CRYPTO-001	1	0	0	0	0	0	0	0	0
+SECURITY-MIGRATION	SECURITY	Migrations and recovery records	-	1	0	0	0	0	0	0	0	0
+SECURITY-FUZZ	SECURITY	Fuzzing	-	1	0	0	0	0	0	0	0	0
+SECURITY-SANITIZERS	SECURITY	Sanitizer qualification	-	1	0	0	0	0	0	0	0	0
+SECURITY-COVERAGE	SECURITY	Coverage thresholds	-	1	0	0	0	0	0	0	0	0
+SECURITY-PLATFORMS	SECURITY	Platform hardware and device evidence	REQ-PLAT-001	1	0	0	0	0	0	0	1	0
+EVOLUTION	GENESIS	Descendants and long-horizon evolution	-	-	-	-	-	-	-	-	-	-
+EVOLUTION-IDENTITY	EVOLUTION	Descendant identity boundaries	REQ-LIN-001,REQ-BIRTH-001	1	1	1	1	1	1	1	1	1
+EVOLUTION-POPULATION	EVOLUTION	Population management policy	-	1	0	0	0	0	0	0	0	0
+EVOLUTION-REPRODUCTION	EVOLUTION	Reproduction policy	REQ-REPRO-001	1	1	1	1	1	1	1	1	1
+EVOLUTION-FITNESS	EVOLUTION	Fitness and mutation outcome observation	REQ-MUT-001	1	1	1	0	1	1	0	1	1
+EVOLUTION-DIVERSITY	EVOLUTION	Diversity preservation	-	1	0	0	0	0	0	0	0	0
+EVOLUTION-CONTAINMENT	EVOLUTION	Simulation containment	-	1	0	0	0	0	0	0	0	0
+EVOLUTION-OPTIMIZATION	EVOLUTION	Long-horizon optimization	-	1	0	0	0	0	0	0	0	0
+EVOLUTION-REPLICATION-SAFETY	EVOLUTION	Prevention of uncontrolled self-replication	-	1	0	0	0	0	0	0	0	0

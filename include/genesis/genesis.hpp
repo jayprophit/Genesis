@@ -12,6 +12,7 @@
 #include "genesis/identity/lineage.hpp"
 #include "genesis/memory/origin.hpp"
 #include "genesis/memory/graph.hpp"
+#include "genesis/memory/persistence.hpp"
 #include "genesis/organism/anatomy.hpp"
 #include "genesis/organism/systems.hpp"
 #include "genesis/provenance/ledger.hpp"

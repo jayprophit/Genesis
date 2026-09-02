@@ -9,15 +9,17 @@ positive/negative affect valence, confidence, separate trace accessibility,
 declarative/procedural decay rates, dormancy, archival state, reinforcement,
 consolidation, relearning, evidence-linked uncertain outcome prediction,
 separated world/self/other belief categories, bounded workspace competition,
-inhibition, and numeric introspection.
+inhibition, numeric introspection, and bounded crash-safe snapshots with SHA-256
+corruption detection, immutable versions, owner binding, path safety, atomic
+commit and restore tests.
 
 The prediction system retrieves multiple experiences and reports confidence; it
 does not create categorical identity rules such as “person like this is bad.”
 The workspace name is architectural terminology and is not evidence of
 consciousness or subjective experience.
 
-Still open in Stage 5: durable crash-safe graph persistence, contradiction
-resolution, real perception adapters, language representation, learning-policy
+Still open in Stage 5: contradiction resolution, real perception adapters,
+language representation, learning-policy
 governance, affect regulation, benchmarks, fuzzing, and integration tests across
 the organism event fabric.
 

@@ -41,6 +41,11 @@ public:
     bool consolidate(std::string_view id, std::string* error = nullptr);
     [[nodiscard]] std::vector<OutcomePrediction> predict(const std::vector<std::string>& features, std::string_view context, std::size_t maximum) const;
     [[nodiscard]] const MemoryNode* find(std::string_view id) const noexcept;
+    [[nodiscard]] const std::string& organism_id() const noexcept;
+    [[nodiscard]] std::size_t node_capacity() const noexcept;
+    [[nodiscard]] std::size_t edge_capacity() const noexcept;
+    [[nodiscard]] const std::map<std::string, MemoryNode>& nodes() const noexcept;
+    [[nodiscard]] const std::vector<MemoryEdge>& edges() const noexcept;
     [[nodiscard]] bool verify() const;
     [[nodiscard]] std::size_t size() const noexcept;
 private:

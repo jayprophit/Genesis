@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Genesis VERSION 0.5.0 LANGUAGES CXX)
+project(Genesis VERSION 0.6.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -17,6 +17,7 @@ add_library(genesis_core STATIC
     src/identity/lineage.cpp
     src/memory/origin.cpp
     src/memory/graph.cpp
+    src/memory/persistence.cpp
     src/organism/anatomy.cpp
     src/organism/systems.cpp
     src/provenance/ledger.cpp
@@ -75,6 +76,8 @@ add_executable(genesis_memory_cognition_tests tests/memory_cognition_tests.cpp)
 target_link_libraries(genesis_memory_cognition_tests PRIVATE genesis_core)
 target_compile_options(genesis_memory_cognition_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
 add_test(NAME genesis_memory_cognition_tests COMMAND genesis_memory_cognition_tests)
+add_executable(genesis_memory_bench benchmarks/memory_benchmark.cpp)
+target_link_libraries(genesis_memory_bench PRIVATE genesis_core)
 
 install(TARGETS genesis_core EXPORT GenesisTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

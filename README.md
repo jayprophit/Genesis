@@ -17,9 +17,14 @@ ctest --test-dir build --output-on-failure
 pwsh -NoProfile -File tools/validate_registry.ps1
 pwsh -NoProfile -File tools/secret_scan.ps1
 pwsh -NoProfile -File tools/report_completion.ps1
+pwsh -NoProfile -File tools/report_program_completion.ps1
 ```
 
 Read `docs/BUILD_ORDER.md`, `docs/IMPLEMENTATION_STAGES.md`, `docs/STAGE_2_LIFE_INTEGRITY.md`, `docs/STAGE_3_4_ORGANISM_SUPPORT.md`, `docs/SPECIFICATION_COMPLETION_POLICY.md`, `docs/FOUNDATION_GAP_REPORT.md`, `docs/audit/SOURCE_AUDIT.md`, and `registry/requirements.tsv` before extending Genesis. The canonical source copy is `docs/specifications/source/genesis.txt`; the generated `registry/canonical_sections.tsv` preserves every numbered section and its exact source line. The technology-mining copy is `docs/specifications/source/technology_mining_addendum.txt`; its registry is research-only and does not trigger unrestricted crawling or experimental hardware implementation.
+
+Program percentages are derived from leaf-level evidence gates in
+`registry/completion_components.tsv`; run the program-completion report rather
+than estimating progress from file count or passing unit tests.
 
 Authorized legacy research is curated in `docs/research/SOURCE_ABSTRACTIONS.md`; source files and hashes are tracked in `provenance/SOURCE_MANIFEST.tsv`.
 
