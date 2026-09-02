@@ -2,6 +2,11 @@
 
 This document brings useful information from the user's authorized legacy data into Genesis without importing old programs wholesale. Exact evidence paths and digests are recorded in `provenance/SOURCE_MANIFEST.tsv`. These abstractions are inputs to original Genesis design and do not claim that the source implementations are production-ready.
 
+The user expanded authorization on 2026-09-02 to useful first-party files and
+data of any type within Aetherius OS, the AI conversation corpus and AI Digital
+Twin. `docs/research/SOURCE_AUTHORIZATION.md` records the boundary. The source
+trees remain read-only, and embedded third-party licenses still apply.
+
 ## Aetherius OS
 
 ### Retain as design input

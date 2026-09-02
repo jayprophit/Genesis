@@ -8,6 +8,8 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <unordered_map>
+#include <set>
 #include <vector>
 
 namespace genesis::memory {
@@ -53,6 +55,8 @@ private:
     std::size_t node_capacity_{}, edge_capacity_{};
     std::map<std::string, MemoryNode> nodes_;
     std::vector<MemoryEdge> edges_;
+    std::unordered_map<std::string, std::set<std::string>> feature_index_;
+    std::unordered_map<std::string, std::set<std::string>> context_index_;
 };
 
 } // namespace genesis::memory

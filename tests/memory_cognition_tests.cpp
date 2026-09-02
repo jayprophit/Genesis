@@ -15,6 +15,7 @@ int main()try{
  require(graph.add(positive)&&graph.add(negative),"add scoped memories");
  require(graph.connect({"party-positive","party-negative",.2,"same-event-class"}),"connect memories");
  auto activated=graph.activate({"party","music"},"birthday",4);require(activated.size()==2&&activated[0].id=="party-positive","associative activation");
+ require(graph.activate({"never-seen"},"unmatched",4).empty(),"unmatched features activated unrelated memories");
  auto predictions=graph.predict({"party","music"},"birthday",4);require(!predictions.empty(),"experience prediction");
  require(graph.decay(.5,.1)&&graph.find("party-negative")->state==ActivationState::dormant,"declarative decay");
  require(graph.reinforce("party-negative",.5,10)&&graph.find("party-negative")->state==ActivationState::available,"relearning trace recovery");
