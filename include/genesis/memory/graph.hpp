@@ -31,6 +31,7 @@ struct MemoryNode final {
 struct MemoryEdge final { std::string from, to; double weight{}; std::string relation; };
 struct ActivatedMemory final { std::string id; double score{}; };
 struct OutcomePrediction final { std::string outcome; double probability{}, confidence{}; std::vector<std::string> evidence_ids; };
+struct RelatedMemory final { std::string id; std::size_t depth{}; double path_weight{1.0}; std::vector<std::string> relations; };
 
 class MemoryGraph final {
 public:
@@ -42,6 +43,7 @@ public:
     bool decay(double declarative_rate, double procedural_rate);
     bool consolidate(std::string_view id, std::string* error = nullptr);
     [[nodiscard]] std::vector<OutcomePrediction> predict(const std::vector<std::string>& features, std::string_view context, std::size_t maximum) const;
+    [[nodiscard]] std::vector<RelatedMemory> related(std::string_view start_id, std::string_view relation, std::size_t maximum_depth, std::size_t maximum_results) const;
     [[nodiscard]] const MemoryNode* find(std::string_view id) const noexcept;
     [[nodiscard]] const std::string& organism_id() const noexcept;
     [[nodiscard]] std::size_t node_capacity() const noexcept;
@@ -57,6 +59,7 @@ private:
     std::vector<MemoryEdge> edges_;
     std::unordered_map<std::string, std::set<std::string>> feature_index_;
     std::unordered_map<std::string, std::set<std::string>> context_index_;
+    std::unordered_map<std::string, std::vector<std::size_t>> outgoing_edge_index_;
 };
 
 } // namespace genesis::memory

@@ -20,6 +20,14 @@ on-conflict writes and unscoped global singleton. On the 10,000-node local
 benchmark, 100 selective queries fell from approximately 0.73 seconds to 0.0099
 seconds. This is a development-machine result, not a production guarantee.
 
+Typed relationship traversal is bounded by depth and result count, filters by
+relation, prevents cycles and accumulates path weights. World/self/other belief
+records now carry claim keys, polarity and active/superseded/retracted state.
+Contradictions are retained as evidence rather than silently overwritten;
+supersession and retraction require explicit newer evidence. This adapts the
+authorized Digital Twin belief-revision and contradiction requirements without
+claiming that string claim keys provide general semantic understanding.
+
 The prediction system retrieves multiple experiences and reports confidence; it
 does not create categorical identity rules such as “person like this is bad.”
 The workspace name is architectural terminology and is not evidence of

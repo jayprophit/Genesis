@@ -9,11 +9,13 @@
 namespace genesis::cognition {
 
 enum class ModelKind { world, self, other_agent };
-struct Belief { std::string id, proposition, evidence_digest; ModelKind model{ModelKind::world}; double confidence{}, uncertainty{1.0}; std::uint64_t observed_at{}; };
+enum class BeliefState { active, superseded, retracted };
+struct Belief { std::string id, proposition, evidence_digest; ModelKind model{ModelKind::world}; double confidence{}, uncertainty{1.0}; std::uint64_t observed_at{}; std::string claim_key; bool affirmation{true}; BeliefState state{BeliefState::active}; std::string supersedes_id; };
 class BeliefModel final {
 public:
     BeliefModel(std::string owner_id, std::size_t capacity);
     bool update(Belief belief);
+    bool retract(std::string_view id, std::string_view evidence_digest, std::uint64_t observed_at);
     [[nodiscard]] const Belief* find(std::string_view id) const noexcept;
     [[nodiscard]] std::vector<Belief> contradictions(std::string_view proposition) const;
 private:
