@@ -3,7 +3,7 @@ GENESIS	-	Genesis complete program	-	-	-	-	-	-	-	-	-	-
 FOUNDATION	GENESIS	Foundation and engineering	REQ-REG-001,REQ-DOM-001,REQ-FND-001	-	-	-	-	-	-	-	-	-
 FOUNDATION-REGISTRY	FOUNDATION	Permanent requirements and provenance	REQ-REG-001,REQ-PROV-001	1	1	1	1	0	1	1	1	1
 FOUNDATION-RUNTIME	FOUNDATION	Deterministic runtime and resources	REQ-RUN-001,REQ-RES-001	1	1	1	1	1	1	1	1	1
-FOUNDATION-CI	FOUNDATION	CI build and release assurance	REQ-CI-001	1	1	0	0	0	0	0	1	0
+FOUNDATION-CI	FOUNDATION	CI build and release assurance	REQ-CI-001,REQ-BUILD-LAYOUT-001	1	1	0	0	0	0	0	1	0
 ORGANISM	GENESIS	Digital organism anatomy	-	-	-	-	-	-	-	-	-	-
 ORGANISM-CELLS	ORGANISM	Cells and differentiation	REQ-CELL-001,REQ-CELL-DIFF-001	1	1	1	1	1	1	1	1	1
 ORGANISM-TISSUES	ORGANISM	Tissues and organs	REQ-TISSUE-001,REQ-ORGAN-001	1	1	1	1	0	1	1	1	1

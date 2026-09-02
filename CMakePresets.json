@@ -1,0 +1,36 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "local-release",
+      "displayName": "Genesis local release",
+      "description": "Canonical local build tree. Reconfigure this preset instead of creating stage-named build folders.",
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "local-release",
+      "configurePreset": "local-release",
+      "jobs": 4
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "local-release",
+      "configurePreset": "local-release",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

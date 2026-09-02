@@ -51,6 +51,50 @@ not global mutable state.
 Generated build products stay in ignored build directories and never become a
 source of truth.
 
+The supported local workflow has one disposable top-level `build/` directory,
+configured by `CMakePresets.json`. Development stages are integrated continuously
+in the canonical source tree and separated by requirements, interfaces, tests and
+commits. They are not assembled later from parallel `build-final` or `build-next`
+trees. When simultaneous compiler or platform qualification becomes necessary,
+artifacts may be placed in explicit subdirectories such as `build/msvc-release`
+and `build/clang-sanitized`; those names describe a reproducible toolchain profile,
+not a feature branch or a claim of finality.
+
+## Programming-language policy
+
+Genesis is C++-first, not C++-only. C++20 owns the organism runtime, deterministic
+state, memory, cognition, safety-critical boundaries, persistence formats and
+hardware-facing contracts. Additional languages are admitted only when a defined
+layer benefits materially and the cross-language boundary is smaller and safer
+than implementing that layer in C++.
+
+Current approved roles are:
+
+- C++20: production runtime, libraries, simulations, adapters and performance tests.
+- CMake: portable build graph, installation and test registration.
+- PowerShell: Windows-local audits, registry generation and operator automation.
+- YAML: continuous-integration declarations only.
+- JSON/TSV/Markdown: configuration, registries, evidence and documentation; these
+  are data formats rather than executable product layers.
+
+Potential future languages require a registered decision before introduction:
+
+- Python may serve offline research, dataset preparation, evaluation and model
+  conversion, but must not become an implicit production runtime dependency.
+- Rust may own a narrowly defined memory-safe parser, cryptographic boundary or
+  network service only after ABI, supply-chain, build and recovery qualification.
+- TypeScript may own a local operator interface or visualization layer through a
+  versioned API; it must not duplicate organism state or business rules.
+- C or platform SDK languages may be used behind qualified device adapters when
+  a vendor ABI requires them.
+- Shader languages may be used for visualization or qualified accelerator kernels
+  with a deterministic CPU reference path where correctness requires one.
+
+Each added language must have an owner, pinned toolchain, license and dependency
+inventory, reproducible build, formatting and static-analysis rules, tests,
+security review, failure isolation, data/ABI contract, upgrade policy and removal
+path. Polyglot code is justified by capability evidence, never by fashion.
+
 ## Change acceptance gates
 
 An implementation is not complete because code exists. Its completion leaf reaches
