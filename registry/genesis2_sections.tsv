@@ -1,0 +1,89 @@
+id	line	heading	sha256	classification	status
+G2-0001	377	Chonkie — particularly relevant to your memory design	a57d1fc1d51731f54dc0c412754ea49d595f75aa21f583d605aa889ec742cde2	design-discussion	DISCOVERED
+G2-0002	414	Marker — one I think you genuinely should investigate	a575a21d5fb48beff123cdda1c0758a19a55eb650e8776a0a97443ec05c271fe	design-discussion	DISCOVERED
+G2-0003	471	Langfuse — this fits your 0–100 testing philosophy	a2a6f93ae61d0654922fed1688f067aa1884d4b8ab3405ad1df446a2addb4a98	design-discussion	DISCOVERED
+G2-0004	522	Qdrant — useful, but don't call it Genesis's memory	6259265b1ef9160f0a5c2bfe53e07c176408a77fa3ea385d2248ab70570ed001	research-evaluation	DISCOVERED
+G2-0005	578	Ollama — probably the easiest one for you to exploit immediately	950f770cbd6e51daf526c790570e64ac77d1b98c06fca91f5f4d5529d8580220	design-discussion	DISCOVERED
+G2-0006	619	DSPy — very interesting for your self-improvement experiments	9886de1f0d44ced2a0ba957fef590e7ca93dfb196f0d80822e39095fed19792d	design-discussion	DISCOVERED
+G2-0007	660	Crawl4AI — this is basically part of the researcher's eyes	42ac7ae610c2a65888ad5e23ac274702e38d65d3e69437133846515e7e4c8fdd	design-discussion	DISCOVERED
+G2-0008	722	Outlines — extremely relevant to the event fabric	1c930e222fb84e0f3c4beca3d7e0c73026509f01c008876a8b9dcb53d0da817a	design-discussion	DISCOVERED
+G2-0009	761	LiteLLM — useful plumbing, not intelligence	afa1dc3abb062a05526e03fe4445b4d5f246ac7b464e9e5e5af3b3e3f6b35eac	research-evaluation	DISCOVERED
+G2-0010	792	Instructor — similar goal to Outlines, different approach	b854f359d4cb2022cc5f6ecf90363210d0f811aef6058414d6fae19a6bab805b	design-discussion	DISCOVERED
+G2-0011	838	What I would actually use	6b0a30d81b3a677d94dda88757a323390a1ec91d76851d019240d80f6b70fb57	design-discussion	DISCOVERED
+G2-0012	996	What the video actually builds	c70ea8b2191264782e5267972c1176cdcb45dbde6451a71482e1d1029cee91cd	research-evaluation	DISCOVERED
+G2-0013	1036	1. The video strongly confirms that **the model must not be Genesis**	930cb4f51ff8038c4bbde13377e8c0ad728cee8af0ea4ae1cfcec1559b5d278d	research-evaluation	DISCOVERED
+G2-0014	1094	2. We should explicitly distinguish **five different kinds of state**	93c4c9c3e98e223ee438c5a3fa0864e370db8d64abcb2c4dd0ed68d6a3e594e7	design-discussion	DISCOVERED
+G2-0015	1152	3. We are missing a proper native **training engine**	8606cea214d9b5126258f98a386b67835d539f76f04ef38194f322a724072b55	design-discussion	DISCOVERED
+G2-0016	1208	4. We should build our own automatic differentiation/backpropagation system	c59ab6cc76ac00cf090900df2c6af764885768b3fd2f56b109e7c8fc34b69512	design-discussion	DISCOVERED
+G2-0017	1253	5. Add a native gradient checker	505c0cd55f3a7f451942df2e932d5a3c6a00a0c9a4f77d6640e29f652fd3c63a	design-discussion	DISCOVERED
+G2-0018	1282	6. Add a parameter-utility auditor	a59a58edce35af6fc32f618cbbb38733190f191a91ae6995c2226c5980e946c2	design-discussion	DISCOVERED
+G2-0019	1313	7. Tokenization should remain an **adapter**, not a law of cognition	7e700501eac85fcc8b0862c4c98cdb22bd73be71b021791466016d3c5843ae65	design-discussion	DISCOVERED
+G2-0020	1348	8. Embeddings are useful—but they are not concepts and they are not memories	a5936b13aeecc4ca227c3ba93ece8bd1f0ce38f68b084e11331e3c4a3dd9bd74	research-evaluation	DISCOVERED
+G2-0021	1395	9. We should version embeddings	e50c4ee88219904501af29bae33c20b44f29c7b95ef2360c392fbc55378c966b	design-discussion	DISCOVERED
+G2-0022	1446	10. The transformer should become **one candidate brain substrate**, not the brain architecture	2670521e1d36f6d163c8737b37eba77ddd750646be45a57a4c97b14400a27aed	design-discussion	DISCOVERED
+G2-0023	1500	11. The causal mask gives us an important lesson about **time**	3fb4a8133242fd5c0a7f2c8e0f20894cf883674e24e32557e3f86f353bb48d64	design-discussion	DISCOVERED
+G2-0024	1538	12. Tool calls should become **intent objects**, never direct execution	e0ec27fdc3949e2a971f82904969b8d90fe34efc0cad9956d4e8b51d3d1662ea	research-evaluation	DISCOVERED
+G2-0025	1586	13. Tool results should become observations, not just chat text	ada5f9842119b9f16f4deea827e9ce4882123f0b093bb2029505553bd7a7fb92	research-evaluation	DISCOVERED
+G2-0026	1619	14. Add a formal decoding policy	292e6ecc789183228a06b414c012f2568ec3608fae1a53231946fff41bdc231b	design-discussion	DISCOVERED
+G2-0027	1665	15. Training and live learning need different timescales	01c052c223e2b2cc86e97fc535013c353cfa3d3154ca23d1a4df6ff88566b6b8	design-discussion	DISCOVERED
+G2-0028	1719	16. Add overfitting/memorization detection	e2aca2059114e7585afa7537aa8a6d383e4e297ad72b57bf0c77692cfc1943c4	design-discussion	DISCOVERED
+G2-0029	1759	17. Add separate distributed **training**, not merely distributed inference	08ea968d9ea4ca162260ced0ab142534478f501c7207de2a09c02e14c7803c8a	design-discussion	DISCOVERED
+G2-0030	1784	18. Build a **glass-box model first**	cc65781b804ff9b8c67674e98a19c9658e096017d1d8ee16ba0b97bc9d935505	design-discussion	DISCOVERED
+G2-0031	1836	19. Don't blindly copy the video's code	da9ffbefc939bec0b6b27ef47a224e87780f715fa1a48435ee1b8cc02e514058	research-evaluation	DISCOVERED
+G2-0032	1868	What is genuinely new for the Genesis specification	4a837c83f689b4fdc1565f30ee30d06e95d96c6e0cbbead8bd33121b07f3a7cd	candidate-requirement	DISCOVERED
+G2-0033	1956	2041 — `MEM-TRACE-PERSISTENCE-001`	d51e1f3a572b91d37a9eb301b61036e797fbcb978bb94cdbb53483a3229fc784	design-discussion	DISCOVERED
+G2-0034	1977	2042 — Memory existence and memory accessibility SHALL be different properties	810c0d69c71bd73945a6e6bf48193bf11506c4c8f965c8396462903fff0647f9	design-discussion	DISCOVERED
+G2-0035	1996	2043 — Memory activation states	6747a07a60ef49a565fdef860f1fe1af37b6bb449ea29440abfaeb5f0e2a00f2	design-discussion	DISCOVERED
+G2-0036	2019	2044 — `MEM-ACTIVATION-STRENGTH-001`	52667d6b19d0e3bfe2338c26b3b605c0f0ad9ca02c4e02bfd43f2832a34ebbb0	design-discussion	DISCOVERED
+G2-0037	2037	2045 — Use strengthens accessibility	4968602e7d9c3894bea97ebce6a5c8fc14440bb01597778a6b7e447c126b59a6	design-discussion	DISCOVERED
+G2-0038	2051	2046 — Lack of use MAY weaken accessibility	7d297b398d35ae67a68bab5ec5ba714cc544e694d654867ecb4863b73b94dd2b	design-discussion	DISCOVERED
+G2-0039	2067	2047 — `MEM-SPACED-REINFORCEMENT-001`	2cd3d5e52ae9556e644df4b5fb1558cc35141ed1d7eaba6f0c163186f5affcaa	design-discussion	DISCOVERED
+G2-0040	2091	2048 — Procedural and declarative decay SHALL differ	bdc659578efbc35d1e0d126a410d1228ae12abbfcc05a761e753ff0e1be9e825	design-discussion	DISCOVERED
+G2-0041	2119	2049 — `SKL-PROCEDURAL-TRACE-001`	bf13c12401f79b6be75c8db7b7db8702d313cb18225ee3a6193d8eace54b9734	design-discussion	DISCOVERED
+G2-0042	2144	2050 — `LRN-RELEARNING-SAVINGS-001`	ea56a33216b607183dc6aa7782039e28f60fa742ff6f34b8d5666e0b5e2e7e04	design-discussion	DISCOVERED
+G2-0043	2177	2051 — Relearning should begin by recovering old traces	9a33c89a8aece8ebcec688c7ee1fad183bf80a709d7c8623a2439a4d6440950e	design-discussion	DISCOVERED
+G2-0044	2208	2052 — Relearning MAY improve beyond original competence	dbebe7430c67c34eeec918e6fea278741cf696bb81bf91c17c0f8aa060987326	design-discussion	DISCOVERED
+G2-0045	2242	2053 — Forgetting SHALL be useful, not merely failure	cfd89619960f6082565d10e931997bf8023c41e5db8a29780aae6d7be6251976	research-evaluation	DISCOVERED
+G2-0046	2260	2054 — `MEM-FORGETTING-CURVE-001`	66d35c6ba7a348551db0d97a1e15f4accbc044ae3fa63b902120f512bbbf0966	design-discussion	DISCOVERED
+G2-0047	2288	2055 — Rehearsal can be conscious or background	eecb993278acc3bd86527aa91695ca5dc36016929bf033c0e9ac3f8ad4a278d9	design-discussion	DISCOVERED
+G2-0048	2321	2056 — `LRN-INTERFERENCE-001`	fcd22ed378c6784e8ce14b183daf45086ba2bdb8fbdab3acfbc0dc34a98662b7	design-discussion	DISCOVERED
+G2-0049	2348	2057 — Skill version history	1a1e80b6b7047657503d8f5fd092e478abbdb940e36f42fe72cc306f46dfd0d1	design-discussion	DISCOVERED
+G2-0050	2372	2058 — Knowledge fossil vs active memory	04bbfb0f8f0271ec8e8f890c1af61f7be2f262f07c3e111bfa0c7dd1bb8f65d6	design-discussion	DISCOVERED
+G2-0051	2452	What the video actually builds	cb2a740a6e27a27b2f8d5c0a66d7f53bd00fe677ecc211b157c803d91bce3b4a	research-evaluation	DISCOVERED
+G2-0052	2492	1. The video strongly confirms that **the model must not be Genesis**	037b57fb215bb11a98371e3cf705564613af3e72bdb3afa55a4dae83170ff76e	research-evaluation	DISCOVERED
+G2-0053	2550	2. We should explicitly distinguish **five different kinds of state**	3e165dfe29a16d58a41eace9fc025e04653ba1d29267bf974d493c130ce8d705	design-discussion	DISCOVERED
+G2-0054	2608	3. We are missing a proper native **training engine**	c4a72cd76713f6ac817f88964b57d58f2350f0f23c57140caa5d0778e848f063	design-discussion	DISCOVERED
+G2-0055	2664	4. We should build our own automatic differentiation/backpropagation system	75cea62df250269b1b3df0a22bb9ef4d7b59e72205876a97f60d1abfa5652b26	design-discussion	DISCOVERED
+G2-0056	2709	5. Add a native gradient checker	acdbe94eb6e82f23acd18257e77961b55d850844efea88bd683ba2137563a357	design-discussion	DISCOVERED
+G2-0057	2738	6. Add a parameter-utility auditor	c17d195a41d95d9c3fdb33816c39635acb26ee70441401b685ab7c9524ffb1a6	design-discussion	DISCOVERED
+G2-0058	2769	7. Tokenization should remain an **adapter**, not a law of cognition	d95ba37ea74e70eeb32b55d293ec33d828d76a9f8dcd6e947667e14cbba7c46d	design-discussion	DISCOVERED
+G2-0059	2804	8. Embeddings are useful—but they are not concepts and they are not memories	e3852b857f46ecfcb376cbdb76ca9a2817c7d22352b2eb5843fe33ee8316c0a8	research-evaluation	DISCOVERED
+G2-0060	2851	9. We should version embeddings	88f643b7a74424dae5e7e04cc83f11feca8be70d9237d2633a928bb4225f2a2c	design-discussion	DISCOVERED
+G2-0061	2902	10. The transformer should become **one candidate brain substrate**, not the brain architecture	02ee40feeeb9a761abba22cd35feeaf2d86911596a2c11847a51744fec4a72e3	design-discussion	DISCOVERED
+G2-0062	2956	11. The causal mask gives us an important lesson about **time**	daa0b8a4f7d58d5f12e771c63194698490d35f3b405983efe7038a1245eb3b60	design-discussion	DISCOVERED
+G2-0063	2994	12. Tool calls should become **intent objects**, never direct execution	2bdb76ec4be5e8d8cd1da6d317e8aab1f156b5ee47c7c168ad166e4e7da92765	research-evaluation	DISCOVERED
+G2-0064	3042	13. Tool results should become observations, not just chat text	19ae793dd331bd16abd54fc4c26d8543ec060cf387991d70b3d1329823b0bf1b	research-evaluation	DISCOVERED
+G2-0065	3075	14. Add a formal decoding policy	99f9bf6ab45b1da2b41da0d34011aae85fa0f759d974ed3c86d342fa9d34118a	design-discussion	DISCOVERED
+G2-0066	3121	15. Training and live learning need different timescales	7f38409d25ade67405ec7ff3a65a3c33771513add487da023504dfdd3d6b6616	design-discussion	DISCOVERED
+G2-0067	3175	16. Add overfitting/memorization detection	6f6cdd9127c2cf50472820351cdbb0ec44908ec76035ae81a4e9f877712d057f	design-discussion	DISCOVERED
+G2-0068	3215	17. Add separate distributed **training**, not merely distributed inference	31ad8835ac4e4fbac0282b61a0f6bf9cbe89cb44f9df28f1ed747bf42f63d209	design-discussion	DISCOVERED
+G2-0069	3240	18. Build a **glass-box model first**	60bfc05785ca50028ced7e119ade1a298537ecfbd990cf07a9d2232206898b14	design-discussion	DISCOVERED
+G2-0070	3292	19. Don't blindly copy the video's code	625187087361a1208fa57de3a6ba7006a1a7d5189493506781acc5fdbe73b633	research-evaluation	DISCOVERED
+G2-0071	3324	What is genuinely new for the Genesis specification	414ecc74a1987034c3fbc1f9c097fcb43c447cb468f8be42c97ae22a359f231d	candidate-requirement	DISCOVERED
+G2-0072	3396	The repository gives us a very good **glass-box validation model**	3265ad59d311dbf2a6e89c86cb75cbd7fed7191fa106b50109061520b30976c4	research-evaluation	DISCOVERED
+G2-0073	3457	The source strengthens the case for a native autodiff engine	843643c9974d12cf77ec46645d46231f6e1bf26086a0964f06e37c42f5416e93	design-discussion	DISCOVERED
+G2-0074	3497	It also exposes why we need a **tensor operation registry**	eed0307db8490cdc78520c1b2bc1fd79c11d65d78f6bf3a04c71152311b1da8c	design-discussion	DISCOVERED
+G2-0075	3539	The training orchestrator gives us a useful **weight-layout architecture**	d5369a9aecc00f38760fcb9c7696e5aa3d55f43afbfa835e423b78b64909de0c	research-evaluation	DISCOVERED
+G2-0076	3592	The repo gives us a concrete distributed-training pattern	f0a015d0e0eec33fc73b0827ba4babb109d4d95d24241a1dfeecd4c11895399f	research-evaluation	DISCOVERED
+G2-0077	3637	Checkpointing deserves its own proper system	a1123043ccf97e1dabd98f09258ba6693e3c428632f5a8b37df4e7eab32b92b0	design-discussion	DISCOVERED
+G2-0078	3675	The tokenizer code reveals another good engineering principle: **train-time and run-time representation must match**	a5c54c99ffe53aaf38193c0c3489c8926dd3bac01167ea3ea7cd8b5d53acbd88	design-discussion	DISCOVERED
+G2-0079	3719	BPE itself should remain replaceable	7ed92217a227f70a37c8831065d81eeec235f964d617e50415a537e39034ccff	design-discussion	DISCOVERED
+G2-0080	3746	There is another important lesson from the way training data is constructed	eb07b51fcfabe272e5ad3b35d279ac85cc5235d427b5fc604e4ad463b05241a9	design-discussion	DISCOVERED
+G2-0081	3789	The repo reinforces the need to separate **model architecture** from **training objective**	564ecd1be5dc6efe0d7f75b2084ed01072bed3be48ebcab61d8f968c5ed2c02e	research-evaluation	DISCOVERED
+G2-0082	3827	Training metrics need to be richer than loss	0d22b94b76b97dae2afd9698e1441c028e43e0ea6cd6f0d5a11c2e4a9ffbced0	design-discussion	DISCOVERED
+G2-0083	3882	The repo also confirms something useful about determinism	489f6353d8ff7e96f649b99bccc9ebe5aae280c60e0d20eaab747e8faa8c39bc	research-evaluation	DISCOVERED
+G2-0084	3908	A few things I would **not copy into Genesis as final design**	6016da9ebc577a520a7c10571fe165923f0562402b5b083e1778fab200851e75	research-evaluation	DISCOVERED
+G2-0085	3935	The repository is best classified like this	e2ed3fa2194a543be674a5cbe4b0addc6b76e90bb4d2157f938e5362e4a984c3	research-evaluation	DISCOVERED
+G2-0086	3957	New build data I'd preserve from the actual repository	e27398114d98aa18789241c45987fed07be304bf9465fcf39b95149e22f27904	research-evaluation	DISCOVERED
+G2-0087	4329	What I would carry into the next canonical continuation	79a802ed8371cdcb2e3760dde5e5ff87770ed95536740727851c8c2a8a99de27	candidate-requirement	DISCOVERED
+G2-0088	4689	What I would carry into the next canonical continuation	520c33eb7d19d688cfe069b45c4b0f20c8d347e3ce432e444fa15e604e5d7ac6	candidate-requirement	DISCOVERED

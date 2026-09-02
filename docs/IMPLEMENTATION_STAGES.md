@@ -11,9 +11,9 @@ exists.
 | 0 | Repository, canonical ingest, source audit, schemas, CI and licensing | COMPLETE | Commit `1abf6b5`; clean C++20 build, tests, registry and secret checks |
 | 1 | Deterministic runtime: logical time, envelopes, dispatch, resources, causal state | COMPLETE | Runtime tests and dispatcher/provenance benchmarks |
 | 2 | Life integrity and genetics: immutable genome persistence, lineage, deterministic recombination, mutation audit, birth cutoff and inherited-origin snapshots | COMPLETE | `genesis_genetics_tests`, `genesis_genetics_bench`, immutable-store conflict test and registry evidence |
-| 3 | Computational cells, differentiation, tissues, organs, repair and controlled recycling | IN PROGRESS | Module contracts plus lifecycle, failure-injection and resource tests |
-| 4 | Signalling, metabolism, energy, homeostasis and immune boundaries | PLANNED | Bounded-state tests, overload/recovery tests and measured health derivation |
-| 5 | Memory, learning, evidence graph, perception, world/self models, affect and cognitive workspace | PLANNED | Origin-labelled persistence, contradiction tests, learning/retention benchmarks and capability gates |
+| 3 | Computational cells, differentiation, tissues, organs, repair and controlled recycling | COMPLETE | `genesis_organism_tests`, lifecycle audit, transactional composition and recycling tests |
+| 4 | Signalling, metabolism, energy, homeostasis and immune boundaries | COMPLETE | `genesis_organism_tests`, bounded queue/resource tests and 100,000-signal benchmark |
+| 5 | Memory, learning, evidence graph, perception, world/self models, affect and cognitive workspace | IN PROGRESS | Associative identity-scoped graph, decay/reinforcement, prediction, belief models and bounded workspace tests; persistence/perception/language integration remains |
 | 6 | Embryology, curriculum, teaching, play, sleep/maintenance and progressive independence | PLANNED | Developmental vector tests, teaching/inheritance separation tests and maturity benchmarks |
 | 7 | Language, multimodal adapters, body schema, avatar, hardware safety and qualified device routes | PLANNED | Adapter evidence matrix, simulation-before-action tests and platform qualification |
 | 8 | Tools, specialist agents, networking, shared domains, distributed cognition and recovery | PLANNED | Protocol/security tests, offline/online boundary tests and replay/recovery evidence |
