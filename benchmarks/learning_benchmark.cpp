@@ -1,0 +1,7 @@
+#include "genesis/learning/consolidation.hpp"
+#include "genesis/runtime/runtime.hpp"
+#include <chrono>
+#include <iostream>
+#include <string>
+
+int main(){using namespace genesis;constexpr std::size_t count=10000,batch=256;learning::ConsolidationScheduler scheduler(count,count);memory::MemoryGraph graph("benchmark-organism",count,1);for(std::size_t i=0;i<count;++i){const auto id="trace-"+std::to_string(i);scheduler.register_trace({id,learning::TraceKind::declarative,.7,.4,.3,1,0,1,false});graph.add({id,"benchmark-organism",runtime::sha256(id),runtime::sha256("provenance-"+id),"benchmark",memory::MemoryKind::fact,memory::Origin::direct_experience,memory::IdentityScope::organism_private,memory::ActivationState::available,.5,.2,0,1,1,0,{"learning"}});}runtime::ResourceAccounts resources{{{"consolidation_units",batch}}};learning::ConsolidationExecutor executor(1);const auto start=std::chrono::steady_clock::now();const auto plan=scheduler.plan(1000,batch,batch);const auto planned=std::chrono::steady_clock::now();const auto result=executor.execute(plan,graph,resources);const auto end=std::chrono::steady_clock::now();if(!result.applied()||!executor.verify())return 1;std::cout<<"traces="<<count<<" batch="<<batch<<" plan_seconds="<<std::chrono::duration<double>(planned-start).count()<<" execute_seconds="<<std::chrono::duration<double>(end-planned).count()<<" record_changes="<<executor.records().front().changes.size()<<'\n';}

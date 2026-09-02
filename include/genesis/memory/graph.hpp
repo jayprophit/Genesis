@@ -32,6 +32,12 @@ struct MemoryEdge final { std::string from, to; double weight{}; std::string rel
 struct ActivatedMemory final { std::string id; double score{}; };
 struct OutcomePrediction final { std::string outcome; double probability{}, confidence{}; std::vector<std::string> evidence_ids; };
 struct RelatedMemory final { std::string id; std::size_t depth{}; double path_weight{1.0}; std::vector<std::string> relations; };
+struct ReinforcementRequest final { std::string id; double amount{}; std::string expected_state_digest; };
+struct ReinforcementChange final {
+    std::string id, before_state_digest, after_state_digest;
+    double before_strength{}, after_strength{};
+    ActivationState before_state{ActivationState::available}, after_state{ActivationState::available};
+};
 
 class MemoryGraph final {
 public:
@@ -40,11 +46,16 @@ public:
     bool connect(MemoryEdge edge, std::string* error = nullptr);
     [[nodiscard]] std::vector<ActivatedMemory> activate(const std::vector<std::string>& features, std::string_view context, std::size_t maximum) const;
     bool reinforce(std::string_view id, double amount, std::uint64_t now);
+    bool reinforce_batch(const std::vector<ReinforcementRequest>& requests,
+                         std::uint64_t now,
+                         std::vector<ReinforcementChange>* changes = nullptr,
+                         std::string* error = nullptr);
     bool decay(double declarative_rate, double procedural_rate);
     bool consolidate(std::string_view id, std::string* error = nullptr);
     [[nodiscard]] std::vector<OutcomePrediction> predict(const std::vector<std::string>& features, std::string_view context, std::size_t maximum) const;
     [[nodiscard]] std::vector<RelatedMemory> related(std::string_view start_id, std::string_view relation, std::size_t maximum_depth, std::size_t maximum_results) const;
     [[nodiscard]] const MemoryNode* find(std::string_view id) const noexcept;
+    [[nodiscard]] static std::string state_digest(const MemoryNode& node);
     [[nodiscard]] const std::string& organism_id() const noexcept;
     [[nodiscard]] std::size_t node_capacity() const noexcept;
     [[nodiscard]] std::size_t edge_capacity() const noexcept;

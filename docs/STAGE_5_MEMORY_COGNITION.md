@@ -33,18 +33,22 @@ traces. The consolidation scheduler produces a deterministic, cost-bounded plan
 from importance, uncertainty, accessibility, strongest interference, logical
 disuse, and trace kind. It never mutates memory merely because a trace ranks
 highly. Duplicate/reversed pairs, self-conflicts, unknown traces, invalid ratios,
-budget overflow and logical-time reversal are rejected. Applying a plan and
-measuring retention remain separate integration work.
+budget overflow and logical-time reversal are rejected. The separate executor
+now validates the complete plan and current trace-state digests, reserves bounded
+runtime resources, atomically applies a reinforcement batch, verifies graph
+invariants and appends a bounded SHA-256-linked execution record. Resource denial,
+duplicate items and stale state leave memory unchanged. Retention and interference
+outcome measurement remain separate work and are tracked as their own completion
+leaf so execution evidence cannot conceal that gap.
 
 The prediction system retrieves multiple experiences and reports confidence; it
 does not create categorical identity rules such as “person like this is bad.”
 The workspace name is architectural terminology and is not evidence of
 consciousness or subjective experience.
 
-Still open in Stage 5: contradiction resolution, real perception adapters,
-language representation, learning-policy
-governance, affect regulation, benchmarks, fuzzing, and integration tests across
-the organism event fabric.
+Still open in Stage 5: persistent belief-model storage, evidence-source quality,
+real perception adapters, language representation, affect regulation, retention
+evaluation, fuzzing, and broader integration across the organism event fabric.
 
 `genesis2.txt` is preserved losslessly and indexed by all 88 Markdown heading
 occurrences. Repeated passages remain traceable; referenced tools and repositories
