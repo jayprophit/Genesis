@@ -1,0 +1,2930 @@
+Yes. This time I treated your instruction as a **technology-mining exercise**, not “name some famous AIs.”
+
+I searched across fiction, games, anime, cyberpunk, advanced-civilization concepts, current research, patents, UAP material, neuromorphic/photonic computing, BCIs, wearables, swarm systems, self-healing systems, quantum/time-crystal work and related areas. I also looked specifically for **bad ideas and dead ends**, because you're right: Genesis should remember those so we don't waste time rediscovering and investigating the same thing later.
+
+One important boundary emerged from the UAP side. NASA treats UAP as a scientific data-quality and anomaly-investigation problem, while AARO's published historical review says it found no empirical evidence supporting claimed U.S. reverse-engineering of extraterrestrial technology. So Genesis absolutely can mine UAP reports, unusual observations, speculative propulsion claims and patents for hypotheses—but they go into the evidence system at their actual confidence level, not automatically into the engineering baseline. ([NASA Science][1])
+
+What follows is the next canonical addendum.
+
+---
+
+# START — GENESIS UNIVERSAL TECHNOLOGY-MINING, FICTION, PRIOR-ART & SPECULATION ARCHITECTURE
+
+## 1350. PURPOSE
+
+Genesis shall maintain a permanent research program whose purpose is:
+
+> Search human imagination and human engineering for useful mechanisms that may improve Genesis.
+
+The research universe is intentionally wider than conventional AI research.
+
+It includes:
+
+```text
+science
+engineering
+computer science
+neuroscience
+psychology
+biology
+chemistry
+physics
+mathematics
+
+AI
+machine learning
+robotics
+cybernetics
+IoT
+wearables
+BCI
+AR/VR/XR
+
+processors
+memory
+networks
+sensors
+materials
+energy
+photonics
+quantum systems
+neuromorphic computing
+
+patents
+papers
+theses
+standards
+technical reports
+open-source projects
+
+science fiction
+hard science fiction
+speculative fiction
+fantasy technology
+films
+television
+anime
+animation
+comics
+manga
+novels
+audiobooks
+games
+interactive fiction
+
+mythology
+historical technology
+ancient automata
+philosophy
+
+UFO/UAP reports
+declassified material
+unusual aerospace claims
+alternative technological theories
+conspiracy claims
+fan theories
+future-technology predictions
+```
+
+The breadth of the search does **not** determine the truth status of the material.
+
+---
+
+# 1351. TWO FILTERS
+
+Every discovered item passes through two independent filters:
+
+```text
+EVIDENCE FILTER
+How well established is it?
+
+UTILITY FILTER
+Could anything in it improve Genesis?
+```
+
+A fictional idea can have:
+
+```text
+EVIDENCE = FICTIONAL
+UTILITY = VERY HIGH
+```
+
+while a real technology can have:
+
+```text
+EVIDENCE = DEMONSTRATED
+UTILITY = LOW
+```
+
+Do not confuse the two axes.
+
+---
+
+# 1352. EVIDENCE CLASSES
+
+Use:
+
+```text
+E0  FICTIONAL
+
+E1  UNSUBSTANTIATED CLAIM /
+    CONJECTURE
+
+E2  THEORETICALLY PLAUSIBLE
+
+E3  EARLY EXPERIMENTAL
+
+E4  REPEATED EXPERIMENTAL
+
+E5  ENGINEERING DEMONSTRATION
+
+E6  DEPLOYED TECHNOLOGY
+
+E7  MATURE / WELL-ESTABLISHED
+```
+
+Evidence class can change with new information.
+
+---
+
+# 1353. GENESIS UTILITY CLASSES
+
+Use independently:
+
+```text
+U0  NO IDENTIFIED VALUE
+
+U1  CAUTIONARY / FAILURE LESSON
+
+U2  CONCEPTUAL INSPIRATION
+
+U3  RESEARCH CANDIDATE
+
+U4  PROTOTYPE CANDIDATE
+
+U5  DIRECT ARCHITECTURAL VALUE
+
+U6  IMPLEMENTATION CANDIDATE
+```
+
+---
+
+# 1354. REJECTED-IDEA REGISTRY
+
+Create:
+
+```text
+RES-DEADEND
+```
+
+Do **not** simply throw rejected research away.
+
+Record:
+
+```text
+idea_id
+idea
+source
+date investigated
+reason investigated
+
+evidence found
+tests performed
+reason rejected
+
+useful fragments
+what would cause reconsideration
+related ideas
+```
+
+Therefore Genesis can later answer:
+
+> “We investigated that already. Here is why it was rejected.”
+
+---
+
+# 1355. REJECTED DOES NOT MEAN PERMANENTLY IMPOSSIBLE
+
+Possible status:
+
+```text
+REJECTED_CURRENTLY
+
+INSUFFICIENT_EVIDENCE
+
+FAILED_PROTOTYPE
+
+PHYSICALLY_UNSUPPORTED
+
+COMPUTATIONALLY_INEFFICIENT
+
+DUPLICATES_EXISTING_SYSTEM
+
+USELESS_FOR_GENESIS
+
+RESEARCH_AGAIN_IF_NEW_EVIDENCE
+```
+
+---
+
+# 1356. FICTION TECHNOLOGY EXTRACTION
+
+Do not copy copyrighted implementations.
+
+Extract:
+
+```text
+problem being solved
+system architecture
+information flow
+control philosophy
+identity model
+memory model
+body relationship
+network model
+failure mode
+benefit
+danger
+real-world analogue
+Genesis applicability
+```
+
+---
+
+# 1357. FICTION IS A DESIGN LABORATORY
+
+Treat fictional systems as large thought experiments.
+
+Ask:
+
+```text
+What problem was the author solving?
+
+What architecture is implied?
+
+Which part already exists in reality?
+
+Which part violates known physics?
+
+Which part could be simulated?
+
+Which part can be transformed into
+a completely different practical system?
+```
+
+---
+
+# 1358. FICTIONAL FAILURE MODES ARE AS IMPORTANT AS CAPABILITIES
+
+For each fictional system extract:
+
+```text
+WHAT WORKED
+
+WHAT FAILED
+
+WHY IT FAILED
+
+WHAT GENESIS SHOULD KEEP
+
+WHAT GENESIS SHOULD AVOID
+```
+
+---
+
+# 1359. INITIAL HIGH-VALUE FICTION MINING — NEW FINDINGS
+
+The following are **additional** useful sources beyond the material already present in the Genesis specification.
+
+---
+
+## 1360. EVANGELION — MAGI
+
+The MAGI concept uses multiple personality-derived decision systems capable of reaching different conclusions rather than pretending that one computational perspective is always correct. That directly suggests a Genesis decision mechanism in which independent cognitive evaluators can disagree before high-impact decisions are made. ([Evangelion Wiki][2])
+
+Extract:
+
+```text
+multiple reasoning perspectives
+         ↓
+independent conclusions
+         ↓
+agreement/disagreement
+         ↓
+decision policy
+```
+
+Genesis application:
+
+```text
+COG-PERSPECTIVE-COUNCIL
+```
+
+Potential evaluators:
+
+```text
+logical
+social
+affective
+long-term consequence
+empirical
+adversarial
+```
+
+Do **not** hard-code three fake human personalities merely to imitate MAGI.
+
+Extract the principle.
+
+### Utility
+
+```text
+E0 FICTIONAL
+U5 DIRECT ARCHITECTURAL VALUE
+```
+
+---
+
+# 1361. PERSON OF INTEREST — THE MACHINE / SAMARITAN
+
+This is especially valuable as a **comparison of two autonomy philosophies**. Research discussing the series contrasts the Machine's reliance on humans for contextual judgment with Samaritan's tendency to both classify situations and determine/manipulate the resulting action. ([Sage Journals][3])
+
+Genesis lesson:
+
+```text
+PERCEPTION
+    ↓
+PREDICTION
+    ↓
+RISK ASSESSMENT
+```
+
+must remain distinguishable from:
+
+```text
+AUTHORITY TO ACT
+```
+
+Therefore:
+
+```text
+PREDICTING X
+!=
+HAVING AUTHORITY TO DO Y
+```
+
+### Utility
+
+```text
+E0
+U5
+```
+
+---
+
+# 1362. HORIZON — GAIA AND SUBORDINATE FUNCTIONS
+
+GAIA's architecture is unusually relevant to Genesis: a coordinating intelligence delegates specialist functions, including machine design, environmental restoration and knowledge functions. The fiction also demonstrates the architectural danger of specialist functions becoming independently goal-driven when separated from the coordinating system. ([Horizon Fandom][4])
+
+Extract:
+
+```text
+MASTER ORGANISM
+        │
+ ┌──────┼──────┐
+ │      │      │
+specialized functional systems
+```
+
+but require:
+
+```text
+shared identity
+shared consequence model
+capability boundaries
+goal provenance
+coordination contract
+```
+
+This reinforces the Genesis:
+
+```text
+MASTER + SPECIALIST ORGAN
+```
+
+architecture.
+
+### Utility
+
+```text
+E0
+U6
+```
+
+---
+
+# 1363. BATTLESTAR GALACTICA — RESURRECTION
+
+Cylon resurrection explores a problem Genesis already cares about:
+
+```text
+backup
+copy
+continuation
+replacement body
+identity
+```
+
+The fiction explicitly separates physical body destruction from transfer/copy into another body, making it valuable as a thought experiment for Genesis's `restore ≠ clone ≠ child` distinction. ([Galactica Wiki][5])
+
+Engineering extraction:
+
+```text
+ACTIVE INSTANCE
+      ↓
+STATE TRANSFER
+      ↓
+NEW EMBODIMENT
+```
+
+Questions:
+
+```text
+Was the old instance still active?
+
+Was state duplicated?
+
+Was continuity transactional?
+
+Can two versions exist simultaneously?
+```
+
+### Utility
+
+```text
+E0
+U5
+```
+
+---
+
+# 1364. PANTHEON — UPLOADED INTELLIGENCE
+
+Pantheon explores digital minds as software processes, copies, accelerated processing and identity divergence. Its upload mechanism is fictional, but the software-side consequences are directly useful for Genesis. ([Pantheon AMC][6])
+
+Extract:
+
+```text
+PROCESSING SPEED
+!=
+SUBJECTIVE / WORLD CLOCK
+
+COPY
+!=
+CONTINUATION
+
+SOFTWARE LOCATION
+!=
+IDENTITY
+```
+
+Add research requirement:
+
+```text
+SIM-COGNITIVE-TIME
+```
+
+Genesis simulation should support:
+
+```text
+0.1x
+1x
+10x
+100x
+```
+
+logical processing rates where technically possible while tracking the actual time domain.
+
+### Utility
+
+```text
+E0
+U5
+```
+
+---
+
+# 1365. BLACK MIRROR — DIGITAL COPY SCENARIOS
+
+Black Mirror repeatedly explores digital copies, simulated persons and radically altered simulated time. Philosophical research on the series specifically discusses “cookies,” virtual copies and uploaded individuals as consciousness/identity thought experiments. ([Wiley Online Library][7])
+
+Genesis extraction:
+
+```text
+SIMULATED AGENT
++
+MEMORY
++
+PERSISTENT SELF MODEL
+```
+
+may create consequences very different from:
+
+```text
+temporary mathematical model
+```
+
+Therefore Genesis must track:
+
+```text
+agent persistence
+identity status
+simulation duration
+memory continuity
+affective capability
+```
+
+before treating persistent rich simulations as disposable objects.
+
+No claim is made that such software is conscious.
+
+### Utility
+
+```text
+E0
+U4
+```
+
+---
+
+# 1366. SERIAL EXPERIMENTS LAIN — THE WIRED
+
+The Wired provides several useful architectural warnings: identity becoming distributed across a network, a protocol itself modifying the relation between user and network, and a digital presence becoming confused with the physical individual. ([Lain Wiki][8])
+
+Extract:
+
+```text
+NETWORK PRESENCE
+!=
+PHYSICAL SELF
+
+ONLINE IDENTITY
+!=
+ORGANISM IDENTITY
+
+PROTOCOL
+CAN AFFECT
+IDENTITY EXPOSURE
+```
+
+This strengthens:
+
+```text
+NET-IDENTITY-FIREWALL
+```
+
+and:
+
+```text
+PROTOCOL != TRUST
+```
+
+The show's Schumann-resonance/collective-consciousness mechanism belongs in speculative/fictional research, not the Genesis baseline.
+
+### Utility
+
+```text
+network lessons       U5
+fictional mechanism   U1/U2
+```
+
+---
+
+# 1367. NEUROMANCER — COMPLEMENTARY AIs
+
+`Wintermute` and `Neuromancer` are depicted as complementary AIs with different strengths, constraints and a possible combined form. ([Neuromancer Atlas][9])
+
+Genesis abstraction:
+
+```text
+ONE COGNITIVE ORGAN
+NEED NOT DO EVERYTHING
+```
+
+Example:
+
+```text
+strategic/predictive subsystem
+          +
+identity/memory/representation subsystem
+          ↓
+coordinated cognition
+```
+
+This supports specialist cognitive architectures without fragmenting organism identity.
+
+### Utility
+
+```text
+E0
+U4
+```
+
+---
+
+# 1368. DUNE — THINKING-MACHINE DEPENDENCY
+
+Dune is more valuable to Genesis as a **failure/civilization lesson** than as a literal architecture: the setting treats overdependence on thinking machines as a fundamental societal failure and subsequently develops specialized human cognition as compensation. ([Dune Wiki][10])
+
+Genesis extraction:
+
+```text
+AUTOMATION
+SHOULD NOT
+DESTROY USER COMPETENCE
+```
+
+Therefore personal assistance should sometimes:
+
+```text
+teach
+explain
+assist
+```
+
+rather than always:
+
+```text
+replace the human task entirely
+```
+
+### Utility
+
+```text
+E0
+U3 / U1
+```
+
+---
+
+# 1369. THE ORVILLE — KAYLON
+
+Kaylon fiction contains a particularly interesting combination:
+
+```text
+individual machine identity
++
+network synchronization
++
+shared historical experience
+```
+
+while individuals remain separately identifiable. ([Orville Wiki][11])
+
+Genesis application:
+
+```text
+SHARED KNOWLEDGE
+!=
+SHARED IDENTITY
+```
+
+and:
+
+```text
+SYNCING KNOWLEDGE
+!=
+SYNCING PERSONAL AUTOBIOGRAPHY
+```
+
+This reinforces the distinction between:
+
+```text
+species knowledge
+cultural memory
+personal memory
+```
+
+### Utility
+
+```text
+E0
+U5
+```
+
+---
+
+# 1370. FARSCAPE — LEVIATHAN / PILOT
+
+Farscape's Leviathans are living spacecraft that grow and change, while Pilot acts as an integrated control/interpreter between the living vessel and its crew. ([Farscape Wiki][12])
+
+Useful abstraction:
+
+```text
+ORGANISM
+    ↕
+CONTROL / INTERFACE NERVOUS SYSTEM
+    ↕
+LARGE EMBODIMENT
+```
+
+Genesis application:
+
+A future large robotic shell, smart home, vehicle or distributed physical system could become a **body**, while Genesis's nervous/body interface translates between cognitive intent and that embodiment.
+
+### Utility
+
+```text
+E0
+U5
+```
+
+---
+
+# 1371. THE EXPANSE — RING-BUILDER / PROTOMOLECULE CONCEPT
+
+The fiction describes a civilization based partly around distributed signalling and self-replicating programmable biological-like technology. ([Expanse Wiki][13])
+
+Extract two independent ideas:
+
+```text
+1. DISTRIBUTED COGNITION FROM
+   LOCAL SIGNALING
+
+2. PROGRAMMABLE DEVELOPMENTAL
+   SUBSTRATE
+```
+
+Genesis parallels:
+
+```text
+computational cells
+local communication
+morphogenesis
+self-assembly
+developmental rules
+```
+
+Reject as presently unsupported baseline engineering:
+
+```text
+reactionless motion
+FTL gate physics
+arbitrary matter manipulation
+```
+
+### Utility
+
+```text
+distributed/self-assembly principle U4
+fictional physics                U0/U2
+```
+
+---
+
+# 1372. DESTINY — VEX / ISHTAR SIMULATION PROBLEM
+
+One especially useful storyline involves a system capable of simulating multiple apparently accurate copies of researchers, forcing the characters to confront whether the simulated people constitute separate individuals. ([Destinypedia][14])
+
+Genesis relevance:
+
+```text
+DIGITAL TWIN
+CAN BECOME
+A DIVERGENT BRANCH
+```
+
+if it acquires independent state/history.
+
+Therefore define:
+
+```text
+SIMULATION_INSTANCE_ID
+FORK_POINT
+DIVERGENCE_TIME
+PROMOTION_STATUS
+```
+
+### Utility
+
+```text
+E0
+U5
+```
+
+---
+
+# 1373. HALO — THE DOMAIN
+
+The Domain is portrayed as a vast information repository containing knowledge, cultural history and ancestral experience. ([Halopedia][15])
+
+Useful abstraction:
+
+```text
+COLLECTIVE KNOWLEDGE COMMONS
+```
+
+separate from:
+
+```text
+PERSONAL AUTOBIOGRAPHICAL MEMORY
+```
+
+Genesis could eventually maintain:
+
+```text
+PERSONAL_MEMORY
+        │
+        ├── private autobiography
+        │
+SHARED_KNOWLEDGE_DOMAIN
+        │
+        ├── research
+        ├── culture
+        ├── validated knowledge
+        └── inherited knowledge
+```
+
+### Utility
+
+```text
+E0
+U5
+```
+
+---
+
+# 1374. CYBERPUNK — ENGRAMS
+
+Cyberpunk's engram concept directly dramatizes the ambiguity between a digital representation/copy and continuation of the original person. ([Cyberpunk Wiki][16])
+
+Genesis lesson:
+
+```text
+HIGH-FIDELITY COPY
+!=
+PROVEN IDENTITY CONTINUATION
+```
+
+This is already consistent with the Genesis lineage specification and should become a permanent identity benchmark.
+
+### Utility
+
+```text
+E0
+U5
+```
+
+---
+
+# 1375. DOCTOR WHO — CYBERMEN
+
+Cybermen supply a useful negative design case: extensive body replacement combined with deliberate suppression of affect. The official Doctor Who description explicitly presents emotional inhibition as part of their conversion. ([Doctor Who][17])
+
+Genesis lesson:
+
+```text
+BODY REPLACEMENT
+DOES NOT REQUIRE
+PERSONALITY / AFFECT DESTRUCTION
+```
+
+and:
+
+```text
+EFFICIENCY
+!=
+REMOVING EVERY AFFECTIVE PROCESS
+```
+
+### Utility
+
+```text
+E0
+U1
+```
+
+---
+
+# 1376. UPLOAD — DIGITAL ENVIRONMENT DEPENDENCE
+
+Upload explores a digital person existing inside infrastructure controlled by another organization and dependent on that environment. ([Apple TV][18])
+
+Genesis lesson:
+
+```text
+IDENTITY
+SHOULD NOT BE
+LOCKED TO ONE HOSTING PROVIDER
+```
+
+This reinforces:
+
+```text
+exportability
+local-first operation
+host migration
+identity portability
+```
+
+### Utility
+
+```text
+E0
+U4
+```
+
+---
+
+# 1377. FICTIONAL SYSTEM MATRIX
+
+Initial extracted results:
+
+| Source             | Transferable Genesis principle                    | Status           |
+| ------------------ | ------------------------------------------------- | ---------------- |
+| MAGI               | independent cognitive perspectives + arbitration  | prototype        |
+| Machine/Samaritan  | prediction separated from authority               | integrate        |
+| GAIA               | master intelligence + functional specialists      | integrate        |
+| Cylon resurrection | restore/copy/identity distinction                 | integrate        |
+| Pantheon           | software identity + variable compute-time         | research         |
+| Black Mirror       | persistent simulation/identity consequences       | research         |
+| Lain               | network identity + protocol compromise            | integrate        |
+| Neuromancer        | complementary cognitive organs                    | research         |
+| Dune               | automation-dependence failure                     | design principle |
+| Kaylon             | shared knowledge without identical identity       | integrate        |
+| Leviathan/Pilot    | cognition interfacing with large living-like body | research         |
+| Ring Builders      | distributed cells/self-assembly                   | research         |
+| Vex simulations    | digital-twin divergence                           | integrate        |
+| Domain             | shared knowledge separate from autobiography      | integrate        |
+| Engrams            | copy ≠ continuity                                 | integrate        |
+| Cybermen           | avoid affect destruction for efficiency           | caution          |
+| Upload             | infrastructure portability                        | integrate        |
+
+---
+
+# 1378. REAL-WORLD RESEARCH CROSSOVER
+
+The fictional sweep is useful because several seemingly futuristic ideas already have **partial real engineering equivalents**.
+
+---
+
+# 1379. MULTIMODAL WEARABLE BIOSENSING
+
+Current research explicitly treats multimodal wearables as a combination of heterogeneous sensors, synchronized signals and data-level fusion. That aligns strongly with the Personal Device Fabric we just added to Genesis. ([PubMed Central (PMC)][19])
+
+Genesis priority:
+
+```text
+WATCH
+RING
+CLOTHING
+PATCH
+GLASSES
+PHONE
+        ↓
+TIME ALIGNMENT
+        ↓
+MULTIMODAL FUSION
+        ↓
+CONTEXT MODEL
+```
+
+Classification:
+
+```text
+E5/E6 depending device
+U6
+```
+
+---
+
+# 1380. BRAIN–COMPUTER INTERFACES
+
+Implantable BCIs already translate neural signals into commands for external physical or virtual machines, although the technology remains an active clinical/research field rather than the science-fiction-level “mind port.” ([Nature][20])
+
+Non-invasive work has also demonstrated real-time robotic-hand control from EEG signals at individual-finger level in an experimental setting. ([Nature][21])
+
+Genesis therefore needs a reserved:
+
+```text
+PER-BCI-ABI
+```
+
+for:
+
+```text
+EEG
+future wearable neural sensing
+clinical BCI
+future implant interfaces
+```
+
+but **BCI should never be required for Genesis operation**.
+
+---
+
+# 1381. CONTEXT-AWARE BCI DECODING
+
+Recent patent literature describes selecting BCI decoding algorithms according to contextual information rather than relying on one fixed decoder. ([Google Patents][22])
+
+That suggests a broader Genesis principle:
+
+```text
+SENSOR
++
+CONTEXT
+→
+ADAPTIVE DECODER SELECTION
+```
+
+This idea applies beyond BCI to:
+
+```text
+speech
+vision
+wearables
+motor intent
+```
+
+Patent status means prior-art/IP review is required before copying any claimed implementation.
+
+---
+
+# 1382. NEUROMORPHIC COMPUTING
+
+Neuromorphic computing is an active real field focused on brain-inspired, event-driven and energy-efficient computation, with current research addressing how such systems can scale. ([Nature][23])
+
+This validates Genesis's decision to retain:
+
+```text
+NMR-BACKEND-ABI
+```
+
+rather than assuming conventional GPU computing is the only future substrate.
+
+### Status
+
+```text
+E5/E6
+U5
+```
+
+---
+
+# 1383. MEMRISTIVE / SYNAPTIC HARDWARE
+
+Patent literature continues to develop memristor-based artificial synapses and neuromorphic processors, explicitly targeting combined neural processing/memory functions. ([Google Patents][24])
+
+Genesis research mapping:
+
+```text
+digital synapse
+        ↓
+software implementation NOW
+
+future:
+        ↓
+memristive/synaptic hardware backend
+```
+
+---
+
+# 1384. PHOTONIC NEURAL COMPUTING
+
+Photonic neural networks are an active research area because light offers opportunities for parallelism, throughput and energy-efficient matrix operations; integrated photonic neural-network platforms continued advancing through 2025. ([Nature][25])
+
+This supports:
+
+```text
+PHO-BACKEND-ABI
+```
+
+as a legitimate experimental Genesis substrate.
+
+It should not be a boot requirement.
+
+---
+
+# 1385. PHOTONIC PATENT LANDSCAPE
+
+Patent literature already covers configurable photonic neural-network devices in which optical propagation and configurable material properties perform computational operations. ([Google Patents][26])
+
+Therefore Genesis must:
+
+```text
+research
+benchmark
+map prior art
+```
+
+before claiming novelty in photonic neural hardware.
+
+---
+
+# 1386. POLARITON / “SUPERFLUID-LIGHT” DIRECTION
+
+This is substantially more grounded than simply calling something “superfluid light.”
+
+A 2025 paper describes exciton-polariton condensate lattices as binarized neuromorphic networks and evaluates the architecture in simulation for image and speech-recognition tasks. ([Nature][27])
+
+Therefore the Genesis research category should use technically precise terms:
+
+```text
+exciton-polariton computing
+polariton condensate networks
+light-matter neuromorphic systems
+```
+
+while retaining “superfluid-light-inspired” as an informal research alias.
+
+### Status
+
+```text
+E3/E4
+U4
+```
+
+---
+
+# 1387. TIME CRYSTALS
+
+Time crystals are **real phases of matter**, but that does not mean “time-crystal computer” is already an established general computing architecture.
+
+In 2026, researchers demonstrated a two-dimensional discrete time crystal using IBM quantum hardware and tensor-network techniques. ([Nature][28])
+
+Genesis classification:
+
+```text
+TIME CRYSTAL PHYSICS:
+REAL / EXPERIMENTAL
+
+GENERAL TIME-CRYSTAL PROCESSOR:
+RESEARCH HYPOTHESIS
+```
+
+Therefore retain:
+
+```text
+QNT-TCR
+```
+
+as an experimental simulation project.
+
+Do not advertise it as proven computational acceleration until benchmarks demonstrate that.
+
+---
+
+# 1388. SELF-HEALING MATERIALS
+
+Self-healing is no longer purely science fiction. Research has demonstrated self-healing gels and elastomer systems relevant to soft robotics and artificial-skin-like applications. ([Nature][29])
+
+Potential future Genesis-body mapping:
+
+```text
+ROBOT SKIN
+        ↓
+damage
+        ↓
+local healing / replacement
+```
+
+This belongs in physical-embodiment research, not the current software build.
+
+---
+
+# 1389. SELF-HEALING SMART SKIN
+
+A 2025 UAV study demonstrated an intelligent skin combining sensing with self-healing material properties. ([Nature][30])
+
+That provides a concrete real-world bridge from:
+
+```text
+fictional self-repairing shell
+```
+
+to:
+
+```text
+sensorized
+repairable
+physical surface
+```
+
+for future Genesis robotics research.
+
+---
+
+# 1390. SOFTWARE SELF-HEALING
+
+The idea is also old enough to have substantial software prior art. Patents describe autonomic computing systems that monitor system state, recognize undesirable states and take corrective actions; other patents describe meta-level reflection used to identify and execute self-healing actions. ([Google Patents][31])
+
+This overlaps directly with Genesis:
+
+```text
+HOMEOSTASIS
+IMMUNE SYSTEM
+WATCHDOG
+RECOVERY
+SELF-REPAIR
+```
+
+Therefore:
+
+> **Do a prior-art audit before claiming the biological/autonomic self-healing architecture itself as novel.**
+
+Novelty, if any, may be in Genesis's particular implementation or combination.
+
+---
+
+# 1391. SWARM / COLLECTIVE INTELLIGENCE
+
+Real multi-robot swarm research already demonstrates distributed coordination and collective intelligence, and DARPA's OFFSET work investigated open architectures, virtual environments and human-swarm interaction for large groups of heterogeneous autonomous systems. ([Nature][32])
+
+Genesis application:
+
+```text
+ONE GENESIS
+        ↓
+many specialist workers
+many devices
+many robotic nodes
+```
+
+while maintaining:
+
+```text
+identity coherence
+local autonomy
+resource constraints
+```
+
+---
+
+# 1392. SWARM PRIOR ART
+
+Patents also exist for distributed flocking/swarm control and robotic-swarm control mechanisms. ([Google Patents][33])
+
+Therefore Genesis must distinguish:
+
+```text
+NEW ALGORITHM
+NEW IMPLEMENTATION
+NEW COMBINATION
+KNOWN PRIOR ART
+```
+
+before making invention claims.
+
+---
+
+# 1393. AR / SMART-GLASSES SENSOR FUSION
+
+Patent literature already contains sensor-fusion AR eyewear combining processing, camera and sensor assemblies. ([Google Patents][34])
+
+This validates the general Personal Device Fabric direction while also telling us:
+
+```text
+MULTISENSOR SMART GLASSES
+```
+
+is **not itself a novel Genesis invention**.
+
+The potential innovation is how Genesis integrates such devices into one persistent organism and multi-device context system.
+
+---
+
+# 1394. POST-QUANTUM CRYPTOGRAPHY
+
+This part is no longer speculative.
+
+NIST finalized:
+
+```text
+ML-KEM
+ML-DSA
+SLH-DSA
+```
+
+in 2024 and currently recommends migration toward standardized post-quantum cryptography. ([NIST][35])
+
+Genesis therefore should upgrade:
+
+```text
+POST_QUANTUM_READY
+```
+
+from:
+
+```text
+future research idea
+```
+
+to:
+
+```text
+real security architecture requirement
+```
+
+subject to implementation maturity and library support.
+
+---
+
+# 1395. UAP / UFO RESEARCH LANE
+
+Create:
+
+```text
+RES-UAP
+```
+
+Purpose:
+
+> Study unusual reported observations and claimed technologies without presupposing either extraterrestrial origin or conventional explanation.
+
+NASA's UAP program explicitly frames the subject around better data collection and scientific analysis. ([NASA Science][1])
+
+This makes UAP material useful to Genesis primarily for:
+
+```text
+anomaly detection
+multisensor fusion
+source evaluation
+trajectory analysis
+signal analysis
+uncertainty reasoning
+hypothesis comparison
+```
+
+---
+
+# 1396. UAP CLAIMS ARE NOT ENGINEERING SPECIFICATIONS
+
+Permanent invariant:
+
+```text
+UAP REPORT
+!=
+ALIEN TECHNOLOGY
+```
+
+AARO's historical review says it found no empirical evidence for claims of U.S. or private-company reverse-engineering of extraterrestrial technology and reports that many cases resolve to misidentification, though some cases can remain unresolved because of insufficient data. ([AARO][36])
+
+Therefore Genesis may research claims such as:
+
+```text
+unusual propulsion
+metamaterials
+gravity manipulation
+inertial effects
+field propulsion
+advanced sensors
+```
+
+but assign evidence based on actual supporting material.
+
+---
+
+# 1397. UAP AS A PERCEPTION BENCHMARK
+
+This area actually gives Genesis a useful test problem.
+
+Input:
+
+```text
+video
+radar
+infrared
+eyewitness report
+weather
+aircraft data
+astronomy
+location
+time
+```
+
+Genesis must answer:
+
+```text
+known object?
+probable object?
+sensor artefact?
+insufficient evidence?
+genuinely anomalous?
+```
+
+without forcing the observation into either:
+
+```text
+"definitely alien"
+```
+
+or:
+
+```text
+"definitely ordinary"
+```
+
+This is an excellent epistemic-intelligence benchmark.
+
+---
+
+# 1398. SPECULATIVE PROPULSION REGISTER
+
+Create:
+
+```text
+RES-PROPULSION-SPEC
+```
+
+Possible research categories:
+
+```text
+ion propulsion
+plasma propulsion
+nuclear propulsion
+
+solar sails
+laser sails
+
+fusion propulsion
+
+magnetohydrodynamic concepts
+
+field propulsion claims
+
+warp-metric theory
+
+wormholes
+
+reactionless-drive claims
+
+gravity-control claims
+
+inertial-reduction claims
+
+UAP-derived propulsion claims
+```
+
+Each receives separate evidence classification.
+
+---
+
+# 1399. DO NOT DISMISS BEFORE CLASSIFICATION
+
+Genesis should not perform:
+
+```text
+sounds strange
+→ reject
+```
+
+Instead:
+
+```text
+claim
+↓
+identify mechanism
+↓
+find primary source
+↓
+derive predictions
+↓
+compare known physics
+↓
+look for experiment
+↓
+reproduce/simulate where possible
+↓
+classify
+```
+
+---
+
+# 1400. BUT DO NOT PRESERVE CLAIMS AS FACTS
+
+Likewise:
+
+```text
+patent exists
+!=
+technology works
+
+paper exists
+!=
+claim reproduced
+
+government document exists
+!=
+claim in document is true
+
+many websites repeat it
+!=
+independent confirmation
+```
+
+---
+
+# 1401. PATENT INTELLIGENCE ORGAN
+
+Promote the previously specified patent system to:
+
+```text
+RES-PATENT-INTELLIGENCE
+```
+
+For every relevant patent:
+
+```text
+patent/publication number
+title
+priority date
+filing date
+applicant
+inventor
+family
+jurisdiction
+status if known
+
+problem addressed
+claimed mechanism
+key concepts
+
+Genesis overlap
+possible prior art
+potential blocking claims
+expired/active/unknown
+
+implementation usefulness
+evidence of actual product
+```
+
+---
+
+# 1402. PATENT ≠ VALIDATED TECHNOLOGY
+
+A patent generally demonstrates that an invention was claimed and disclosed.
+
+It does not by itself establish:
+
+```text
+commercial viability
+scientific correctness
+manufacturability
+performance
+```
+
+Genesis must independently seek evidence.
+
+---
+
+# 1403. PATENT ≠ PERMISSION TO COPY
+
+Before commercial implementation:
+
+```text
+claim mapping
+legal-status verification
+jurisdiction
+expiry
+licensing
+design-around analysis
+```
+
+may be necessary.
+
+The research database is not legal clearance.
+
+---
+
+# 1404. PRIOR-ART MAP — INITIAL SEEDS
+
+The current sweep already found directly relevant prior-art areas covering:
+
+```text
+self-aware/self-healing computing
+
+meta-reflective autonomic repair
+
+AR eyewear sensor fusion
+
+context-aware BCI decoding
+
+memristor synaptic devices
+
+neuromorphic processors
+
+photonic neural networks
+
+distributed robot swarm control
+```
+
+([Google Patents][31])
+
+These should immediately enter the Genesis prior-art registry.
+
+---
+
+# 1405. RESEARCH CROSSOVER GRAPH
+
+Genesis should explicitly search for paths such as:
+
+```text
+FICTION
+    ↓
+CONCEPT
+
+CONCEPT
+    ↓
+REAL SCIENCE
+
+REAL SCIENCE
+    ↓
+PATENTS
+
+PATENTS
+    ↓
+PROTOTYPES
+
+PROTOTYPES
+    ↓
+GENESIS EXPERIMENT
+```
+
+Example:
+
+```text
+fictional shared robot intelligence
+        ↓
+swarm cognition
+        ↓
+real swarm robotics
+        ↓
+distributed Genesis agents
+```
+
+---
+
+# 1406. “IMPOSSIBLE” IDEA DECOMPOSITION
+
+If a fictional technology appears impossible, break it into functions.
+
+Example fictional device:
+
+```text
+instant universal knowledge device
+```
+
+could decompose into:
+
+```text
+large knowledge store
++
+fast retrieval
++
+context understanding
++
+multimodal interface
++
+continuous synchronization
+```
+
+Four of those may already be practical even if the fictional mechanism is not.
+
+---
+
+# 1407. FUNCTION BEFORE MECHANISM
+
+Permanent research principle:
+
+```text
+FICTIONAL MECHANISM
+MAY BE IMPOSSIBLE
+
+DESIRED FUNCTION
+MAY STILL BE ACHIEVABLE
+ANOTHER WAY
+```
+
+This is one of the most important rules in the entire inspiration program.
+
+---
+
+# 1408. ADVANCED-CIVILIZATION RESEARCH
+
+Do not search only:
+
+```text
+AI characters
+```
+
+Search fictional civilizations for:
+
+```text
+computing
+communication
+memory
+energy
+materials
+medicine
+robotics
+manufacturing
+transport
+networks
+sensors
+education
+interfaces
+simulation
+governance
+knowledge storage
+biotechnology
+nanotechnology
+```
+
+The civilization may contain a useful technology even if no AI character is present.
+
+---
+
+# 1409. BIOLOGICAL TECHNOLOGY RESEARCH
+
+Create:
+
+```text
+RES-BIOTECH
+```
+
+Study:
+
+```text
+synthetic biology
+self-assembly
+morphogenesis
+biohybrid systems
+soft robotics
+living materials
+artificial cells
+organoids
+DNA computing
+molecular computing
+```
+
+as research inspiration.
+
+Genesis remains digital-first.
+
+---
+
+# 1410. SELF-ASSEMBLY / MORPHOGENESIS
+
+One of the strongest recurring patterns across biology and science fiction is:
+
+```text
+simple local rules
+        ↓
+complex global structure
+```
+
+Genesis should explicitly research this for:
+
+```text
+cell development
+neural organization
+agent organization
+network repair
+body development
+```
+
+---
+
+# 1411. COLLECTIVE INTELLIGENCE RESEARCH
+
+Recent research continues to study collective intelligence in both biological and robotic systems, including how local interactions can yield group-level computation and sensing. ([Nature][37])
+
+Genesis research should compare:
+
+```text
+centralized cognition
+
+distributed cognition
+
+hybrid cognition
+```
+
+rather than assuming a hive is automatically superior.
+
+---
+
+# 1412. HIVE-MIND FAILURE ANALYSIS
+
+For every collective system measure:
+
+```text
+groupthink
+correlated error
+loss of dissent
+network compromise
+identity dilution
+propagation of misinformation
+single-point consensus failure
+```
+
+This reinforces Genesis's existing minority-report mechanism.
+
+---
+
+# 1413. KNOWLEDGE SYNCHRONIZATION ≠ PERSONALITY SYNCHRONIZATION
+
+Permanent invariant:
+
+```text
+SHARING KNOWLEDGE
+!=
+MERGING SELVES
+```
+
+This applies to:
+
+```text
+Genesis specialists
+distributed nodes
+future children
+future sibling organisms
+```
+
+---
+
+# 1414. SIMULATION ACCELERATION
+
+A digital laboratory may deliberately operate faster than wall-clock time.
+
+Possible use:
+
+```text
+developmental experiments
+skill practice
+robotics training
+design search
+evolutionary experiments
+```
+
+but maintain:
+
+```text
+SIMULATION_TIME
+WALL_TIME
+ORGANISM_TIME
+```
+
+separately.
+
+---
+
+# 1415. INTERNAL CIVILIZATION SIMULATION
+
+Long-term research may include simulated:
+
+```text
+agents
+communities
+economies
+ecosystems
+social systems
+```
+
+to study consequences.
+
+Results remain simulations.
+
+They are not observations of actual society.
+
+---
+
+# 1416. RESEARCH HORIZON SYSTEM
+
+Every research concept receives horizon:
+
+```text
+NOW
+
+NEAR_TERM
+
+MID_TERM
+
+LONG_TERM
+
+EXPERIMENTAL
+
+SPECULATIVE
+
+UNKNOWN
+```
+
+independent of utility.
+
+---
+
+# 1417. SOURCE-TYPE WEIGHT MUST NOT BECOME TRUTH WEIGHT
+
+A Nature paper and a fictional comic obviously have different evidential roles.
+
+However:
+
+```text
+SOURCE CATEGORY
+```
+
+should determine **how it can be used**, not whether its underlying idea is useful.
+
+---
+
+# 1418. USEFUL-FRAGMENT EXTRACTION
+
+A rejected idea may generate multiple useful descendants.
+
+Example:
+
+```text
+fictional teleportation
+       ↓
+
+REJECT:
+matter teleportation mechanism
+
+KEEP:
+state serialization
+remote reconstruction
+identity-transfer questions
+error correction
+destination verification
+```
+
+---
+
+# 1419. RESEARCH LINEAGE
+
+Every Genesis design should eventually be capable of answering:
+
+> “Where did this idea come from?”
+
+Record:
+
+```text
+original question
+
+creator idea
+
+fiction inspiration
+
+scientific work
+
+patent
+
+Genesis modification
+
+experiment
+
+final implementation
+```
+
+---
+
+# 1420. COMBINATION NOVELTY
+
+An individual component may already exist.
+
+Innovation may instead be:
+
+```text
+NEW COMBINATION
++
+NEW INTERACTION
++
+NEW IMPLEMENTATION
++
+NEW USE
+```
+
+The patent/prior-art system must distinguish those cases.
+
+---
+
+# 1421. INDEPENDENT REINVENTION
+
+If Genesis develops an idea independently and later discovers prior art:
+
+```text
+preserve development history
++
+record prior art
+```
+
+Do not falsely claim historical priority.
+
+---
+
+# 1422. TECHNOLOGY RADAR
+
+Create:
+
+```text
+RES-TECH-RADAR
+```
+
+Continuously watch categories including:
+
+```text
+AI architectures
+
+world models
+reasoning
+memory
+
+robotics
+humanoids
+soft robotics
+
+sensors
+wearables
+BCI
+
+neuromorphic
+memristive
+photonic
+polariton
+quantum
+ternary
+
+processors
+memory
+networking
+
+energy
+battery
+cooling
+
+materials
+self-healing materials
+programmable materials
+
+AR/VR/XR
+
+digital twins
+simulation
+
+cryptography
+PQC
+
+standards
+protocols
+
+patents
+open source
+
+major fiction/speculative works
+```
+
+---
+
+# 1423. RESEARCH WATCHER DOES NOT AUTO-INSTALL
+
+Permanent pipeline:
+
+```text
+DISCOVER
+   ↓
+CLASSIFY
+   ↓
+UNDERSTAND
+   ↓
+COMPARE
+   ↓
+EXTRACT PRINCIPLE
+   ↓
+CHECK PRIOR ART
+   ↓
+PROTOTYPE
+   ↓
+BENCHMARK
+   ↓
+ACCEPT / REJECT
+```
+
+---
+
+# 1424. RESEARCH QUEUE PRIORITY
+
+Score discoveries using:
+
+```text
+Genesis relevance
+novelty
+technical plausibility
+potential impact
+testability
+implementation cost
+evidence strength
+creator interest
+```
+
+---
+
+# 1425. HIGH-IMPACT LOW-EVIDENCE IDEAS
+
+A concept can be:
+
+```text
+very important if true
++
+poorly evidenced
+```
+
+Genesis may investigate it, but must not increase belief merely because the potential payoff is large.
+
+---
+
+# 1426. DEAD-END CACHE
+
+Before beginning new speculative research:
+
+```text
+QUERY RES-DEADEND
+```
+
+If already investigated:
+
+```text
+new evidence?
+    YES → reopen
+    NO  → avoid duplicated investigation
+```
+
+This directly implements your requirement that even non-workable concepts be catalogued.
+
+---
+
+# 1427. INITIAL DEAD-END / HOLD LIST
+
+Current examples:
+
+```text
+REACTIONLESS PROPULSION CLAIMS
+status:
+requires extraordinary experimental evidence
+
+FTL COMMUNICATION
+status:
+not supported by established engineering
+
+FICTIONAL MATTER TELEPORTATION
+status:
+mechanism unsupported
+
+FULL HUMAN MIND UPLOAD
+status:
+not currently demonstrated
+
+SOFTWARE SUBJECTIVE CONSCIOUSNESS
+status:
+unresolved
+
+UAP REVERSE-ENGINEERED ALIEN HARDWARE
+status:
+no verified public empirical evidence found
+in the government material reviewed
+
+GENERAL-PURPOSE TIME-CRYSTAL COMPUTER
+status:
+not an established computing platform
+```
+
+These remain searchable research records, not deleted ideas. ([AARO][36])
+
+---
+
+# 1428. INITIAL HIGH-VALUE REAL TECHNOLOGY LIST
+
+Current high-priority crossover areas:
+
+```text
+multimodal sensor fusion          IMPLEMENT/RESEARCH
+
+wearable biosensors               IMPLEMENT/RESEARCH
+
+neuromorphic computing            RESEARCH
+
+memristive synapses               RESEARCH
+
+photonic neural networks          RESEARCH
+
+polariton neuromorphic systems    RESEARCH
+
+BCI interfaces                    RESERVE/RESEARCH
+
+self-healing software             IMPLEMENT PRINCIPLES
+
+self-healing robot materials      FUTURE BODY RESEARCH
+
+swarm intelligence                IMPLEMENT/RESEARCH
+
+post-quantum cryptography         IMPLEMENTATION PLANNING
+
+adaptive sensor routing           IMPLEMENT
+
+digital twins                     IMPLEMENT
+
+simulation acceleration           IMPLEMENT/RESEARCH
+```
+
+---
+
+# 1429. NEW BRAIN REQUIREMENT — PERSPECTIVE COUNCIL
+
+Create:
+
+```text
+COG-PERSPECTIVE-COUNCIL
+```
+
+Purpose:
+
+Allow selected important problems to be independently assessed by several reasoning perspectives.
+
+It may generate:
+
+```text
+primary recommendation
+
+alternative recommendation
+
+minority report
+
+uncertainties
+
+reason for disagreement
+```
+
+This combines a useful fiction-derived pattern with Genesis's existing anti-groupthink architecture.
+
+---
+
+# 1430. NEW KNOWLEDGE REQUIREMENT — SHARED DOMAIN
+
+Create:
+
+```text
+DAT-SHARED-DOMAIN
+```
+
+Separate:
+
+```text
+validated shared/general knowledge
+```
+
+from:
+
+```text
+Genesis personal autobiography
+```
+
+and:
+
+```text
+creator-private memory
+```
+
+This becomes especially important if multiple future Genesis organisms exist.
+
+---
+
+# 1431. NEW SIMULATION REQUIREMENT — DIVERGENT SELF
+
+Create:
+
+```text
+SIM-DIVERGENCE
+```
+
+When a digital twin, shadow copy or simulated Genesis state accumulates independent experience:
+
+```text
+track divergence
+```
+
+and never silently reintegrate autobiographical identity.
+
+---
+
+# 1432. NEW NETWORK REQUIREMENT — IDENTITY BOUNDARY
+
+Create:
+
+```text
+SLF-NET-BOUNDARY
+```
+
+Genesis must know the difference between:
+
+```text
+I exist on this network
+
+I can access this network
+
+this network contains information about me
+
+this remote node is part of my active organism
+```
+
+These are not equivalent states.
+
+---
+
+# 1433. NEW ANOMALY SCIENCE ENGINE
+
+Create:
+
+```text
+SCI-ANOMALY
+```
+
+General process:
+
+```text
+DETECT ANOMALY
+        ↓
+VERIFY SENSOR
+        ↓
+SEEK CORROBORATION
+        ↓
+GENERATE NORMAL EXPLANATIONS
+        ↓
+GENERATE ALTERNATIVE HYPOTHESES
+        ↓
+RANK
+        ↓
+REQUEST MORE DATA
+        ↓
+REMAIN UNKNOWN IF NECESSARY
+```
+
+Applicable to:
+
+```text
+UAP
+cybersecurity
+health sensors
+hardware
+scientific experiments
+social patterns
+world-model errors
+```
+
+---
+
+# 1434. NEW PRIOR-ART INVARIANT
+
+Permanent:
+
+```text
+GENESIS THOUGHT OF IT
+!=
+GENESIS INVENTED IT FIRST
+```
+
+Always search historical prior art before novelty claims.
+
+---
+
+# 1435. NEW FICTION INVARIANT
+
+Permanent:
+
+```text
+FICTIONAL
+!=
+USELESS
+```
+
+and:
+
+```text
+USEFUL IDEA
+!=
+REAL MECHANISM
+```
+
+---
+
+# 1436. NEW SPECULATION INVARIANT
+
+Permanent:
+
+```text
+UNPROVEN
+!=
+IMPOSSIBLE
+```
+
+but also:
+
+```text
+UNPROVEN
+!=
+PROVEN
+```
+
+This is the exact middle position Genesis's epistemic architecture should preserve.
+
+---
+
+# 1437. RESEARCH DATABASE SCHEMA
+
+Every item:
+
+```text
+research_id
+
+title
+source_type
+source_name
+creator/author
+year
+
+domain
+technology_category
+
+description
+
+claimed_function
+underlying_mechanism
+
+evidence_class
+utility_class
+
+known_physics_status
+
+real_world_analogues
+related_patents
+related_papers
+related_fiction
+
+Genesis_modules_affected
+
+useful_principles
+failure_lessons
+
+prototype_possible
+simulation_possible
+
+tests
+results
+
+status
+
+reason_accepted
+reason_rejected
+
+reopen_conditions
+
+provenance
+last_reviewed
+```
+
+---
+
+# 1438. CROSS-SOURCE CONNECTION ENGINE
+
+Genesis should automatically notice connections such as:
+
+```text
+fictional self-repairing robot
+        ↕
+self-healing polymer research
+        ↕
+autonomic self-healing software patent
+        ↕
+Genesis immune system
+```
+
+This is where the broad research program becomes genuinely useful instead of merely collecting trivia.
+
+---
+
+# 1439. SOURCE DISCOVERY SHOULD SEARCH BACKWARDS AND FORWARDS
+
+For every promising modern idea:
+
+```text
+SEARCH PRIOR HISTORY
+```
+
+and:
+
+```text
+SEARCH LATER DEVELOPMENTS
+```
+
+because an apparently new idea may have:
+
+```text
+older patent
+old science-fiction origin
+forgotten experiment
+new modern implementation
+```
+
+---
+
+# 1440. RESEARCH SHOULD INCLUDE FAILED TECHNOLOGY
+
+Study failed technologies because they reveal:
+
+```text
+bad assumptions
+scaling problems
+material limitations
+energy limitations
+economic problems
+human-interface failures
+```
+
+Genesis's failure memory should ingest these where relevant.
+
+---
+
+# 1441. RESEARCH SHOULD INCLUDE ABANDONED TECHNOLOGY
+
+An old idea may have failed because:
+
+```text
+hardware was too slow
+materials did not exist
+battery technology was inadequate
+manufacturing was impossible
+```
+
+Those limitations may later disappear.
+
+Therefore:
+
+```text
+FAILED THEN
+!=
+IMPOSSIBLE NOW
+```
+
+---
+
+# 1442. HISTORICAL TECHNOLOGY REVISIT
+
+Research watcher should periodically reconsider rejected designs when enabling technologies improve.
+
+Example triggers:
+
+```text
+new materials
+new GPU
+new quantum hardware
+new fabrication
+new algorithm
+new sensor
+new memory technology
+```
+
+---
+
+# 1443. FICTION RESEARCH SHOULD NOT STOP AT FAMOUS TITLES
+
+Search:
+
+```text
+obscure films
+cancelled television
+short stories
+old pulp science fiction
+foreign-language science fiction
+anime
+manga
+independent games
+tabletop universes
+concept art
+technical companion books
+fan engineering analysis
+```
+
+Use fan material as leads, not automatically canonical/evidential authority.
+
+---
+
+# 1444. MULTICULTURAL TECHNOLOGY MINING
+
+Do not restrict research to:
+
+```text
+US/UK science fiction
+```
+
+Include:
+
+```text
+Japanese
+Chinese
+Korean
+Indian
+African
+European
+Latin American
+Middle Eastern
+and other traditions
+```
+
+because different cultures imagine different technological solutions.
+
+---
+
+# 1445. MYTH / ANCIENT CONCEPT EXTRACTION
+
+Ancient myths may contain function concepts such as:
+
+```text
+artificial servant
+animated statue
+all-seeing eye
+living armour
+oracle
+distributed messenger
+automatic guardian
+```
+
+These are inspiration records only unless connected to real historical engineering.
+
+---
+
+# 1446. RESEARCH SYSTEM DOES NOT HAVE A FINISH LINE
+
+No static document can literally contain:
+
+```text
+every film
+every book
+every patent
+every paper
+every theory
+```
+
+Therefore completeness means:
+
+```text
+broad initial coverage
++
+systematic discovery mechanism
++
+deduplication
++
+continuous watcher
++
+dead-end memory
+```
+
+rather than pretending one search pass exhausted human knowledge.
+
+---
+
+# 1447. FOUNDATION REGISTRY ADDITIONS
+
+Add:
+
+```text
+RES-UNIVERSAL
+RES-FICTION
+RES-SCIFI
+RES-PATENT
+RES-UAP
+RES-SPECULATION
+RES-TECH-RADAR
+RES-DEADEND
+
+SCI-ANOMALY
+
+COG-PERSPECTIVE-COUNCIL
+
+DAT-SHARED-DOMAIN
+
+SIM-DIVERGENCE
+
+SLF-NET-BOUNDARY
+```
+
+during Foundation consolidation.
+
+---
+
+# 1448. FOUNDATION IMPLEMENTATION RULE
+
+During the current Codex Foundation run:
+
+```text
+REGISTER
+SCHEMA
+DEPENDENCY
+TEST
+```
+
+these systems.
+
+Do **not** have Codex attempt to scrape the entire internet or build every experimental technology now.
+
+---
+
+# 1449. INITIAL RESEARCH CORPUS
+
+Seed the research registry with at least the high-value concepts identified in:
+
+```text
+fictional technology
+AI architectures
+advanced civilizations
+cybernetics
+uploaded intelligence
+collective intelligence
+self-repair
+multimodal sensing
+BCI
+neuromorphic computing
+photonic computing
+polariton computing
+time-crystal research
+quantum computing
+swarm systems
+wearables
+UAP/anomaly studies
+patent prior art
+```
+
+---
+
+# 1450. FINAL UNIVERSAL-RESEARCH PRINCIPLE
+
+Genesis should be capable of looking at an idea from:
+
+```text
+a patent
+
+a Nature paper
+
+an old engineering book
+
+an obscure anime
+
+a Marvel/DC comic
+
+a UFO report
+
+a failed experiment
+
+a video game
+
+a historical machine
+
+a speculative physicist
+
+a new processor
+
+or its own imagination
+```
+
+and asking the same questions:
+
+```text
+What does this actually claim?
+
+What problem does it solve?
+
+What evidence supports it?
+
+Has someone already built it?
+
+What failed?
+
+Which part is useful?
+
+Can I simulate it?
+
+Can I test it?
+
+Could it improve me?
+
+Is there prior art?
+
+Should I integrate it?
+
+Should I reject it?
+
+What evidence would change my answer?
+```
+
+That is the actual objective.
+
+# END — GENESIS UNIVERSAL TECHNOLOGY-MINING, FICTION, PRIOR-ART & SPECULATION ARCHITECTURE
+
+---
+
+## Add this to the Codex Foundation instruction
+
+```text
+Also ingest Sections 1350–1450.
+
+Create the Universal Research / Technology Mining registry architecture.
+
+This Foundation run shall create schemas and registry entries only.
+Do not perform unrestricted autonomous internet crawling.
+
+Add support for independently recording:
+
+- evidence class;
+- Genesis utility class;
+- fictional source;
+- scientific source;
+- patent/prior art;
+- speculative claim;
+- UAP/anomaly source;
+- useful extracted principle;
+- rejected/dead-end reason;
+- reopen conditions;
+- simulation status;
+- prototype status;
+- Genesis modules affected.
+
+Create a permanent rejected/dead-end research registry so that
+failed or unsupported ideas are not repeatedly investigated unless
+new evidence becomes available.
+
+Seed the registry with the high-value research concepts identified
+in Sections 1359–1449.
+
+Preserve the rule:
+
+FICTIONAL != USELESS
+UNPROVEN != IMPOSSIBLE
+UNPROVEN != PROVEN
+PATENTED != PROVEN TO WORK
+PATENTED != FREE TO COPY
+SIMULATED != PHYSICALLY DEMONSTRATED
+
+Do not implement experimental quantum, polariton, BCI, photonic,
+swarm, UAP-derived or speculative technologies during this
+Foundation run.
+
+Register them, connect their dependencies, preserve provenance,
+validate the schemas, test, update the gap report, and STOP.
+```
+
+### What this search actually changed
+
+A few things came out of this sweep that I think are genuinely important rather than just interesting.
+
+**The MAGI-style idea is worth adding to the brain.** Instead of one single internal evaluator pretending it sees everything correctly, certain difficult decisions could deliberately receive multiple independent perspectives, preserve disagreement and generate a minority report. That dovetails extremely well with the anti-groupthink system we already designed. ([Evangelion Wiki][2])
+
+**GAIA is surprisingly close to part of your Genesis concept.** Not because we copy it, but because the structural idea of one coordinating intelligence with highly specialized functional systems—and the danger of those systems acquiring disconnected goals—is exactly a problem we need to engineer properly. ([Horizon Fandom][4])
+
+**Some of the “sci-fi” hardware branches aren't nearly as fictional as they initially sound.** Neuromorphic computing is active engineering research; photonic neural systems are advancing; polariton condensate networks have been studied as neuromorphic networks; time crystals are experimentally real even though a general “time-crystal computer” is not. ([Nature][23])
+
+And **your idea of retaining things that don't work was exactly right**. Genesis shouldn't merely have a knowledge database. It needs a *scientific graveyard*: failed experiments, rejected architecture, dubious patents, investigated conspiracy claims, physically unsupported ideas, abandoned approaches and the exact reason each was rejected. Otherwise, a self-improving system can waste enormous amounts of time repeatedly “discovering” the same bad idea.
+
+This is also the point where I would stop pretending a one-off search can literally cover every movie, comic, patent and theory ever produced. What we've now done is more valuable: **we've defined the machinery that can systematically keep mining all of them without losing what has already been checked.** That research engine should keep expanding Genesis for years rather than us trying to type the entirety of human imagination into Codex tonight.
+
+[1]: https://science.nasa.gov/uap/?utm_source=chatgpt.com "UAP - NASA Science"
+[2]: https://evangelion.fandom.com/wiki/Magi?utm_source=chatgpt.com "Magi | Evangelion | Fandom"
+[3]: https://journals.sagepub.com/doi/10.1177/15274764231210280?utm_source=chatgpt.com "Person of Interest as Media Technology of Surveillance: A Cautionary Tale for the Future of the National Security State With Diegetic Big Data Surveillance, Algorithmic Security, and Artificial Intelligence - David Grondin, Simon Hogue, 2024"
+[4]: https://horizon.fandom.com/wiki/Zero_Dawn_Project_Facility?utm_source=chatgpt.com "Zero Dawn Project Facility | Horizon Wiki | Fandom"
+[5]: https://galactica.fandom.com/wiki/Resurrection_Hub?utm_source=chatgpt.com "Resurrection Hub | Battlestar Galactica Wiki | Fandom"
+[6]: https://pantheon-amc.fandom.com/wiki/Uploaded_Intelligence?utm_source=chatgpt.com "Uploaded Intelligence | Pantheon Wiki | Fandom"
+[7]: https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781119578291.ch24?utm_source=chatgpt.com "Consciousness Technology in Black Mirror - Black Mirror and Philosophy - Wiley Online Library"
+[8]: https://lain.fandom.com/wiki/The_Wired?utm_source=chatgpt.com "The Wired | Serial Experiments Lain Wiki | Fandom"
+[9]: https://neuromancer-wiki.github.io/wiki/wintermute/?utm_source=chatgpt.com "Wintermute in Neuromancer · Neuromancer Atlas"
+[10]: https://dune.fandom.com/wiki/Thinking_Machines?utm_source=chatgpt.com "Thinking Machines | Dune Wiki | Fandom"
+[11]: https://orville.fandom.com/wiki/Kaylon?utm_source=chatgpt.com "Kaylon | The Orville Wiki | Fandom"
+[12]: https://farscape.fandom.com/wiki/Leviathan?utm_source=chatgpt.com "Leviathan | Farscape Encyclopedia Project | Fandom"
+[13]: https://expanse.fandom.com/wiki/Ring_Builders?utm_source=chatgpt.com "Ring Builders | The Expanse Wiki | Fandom"
+[14]: https://www.destinypedia.com/Ishtar_Collective?utm_source=chatgpt.com "Ishtar Collective - Destinypedia, the Destiny wiki"
+[15]: https://www.halopedia.org/Domain?utm_source=chatgpt.com "Domain - Halopedia, the Halo wiki"
+[16]: https://cyberpunk.fandom.com/wiki/Soulkiller?utm_source=chatgpt.com "Soulkiller | Cyberpunk Wiki | Fandom"
+[17]: https://www.doctorwho.tv/characters/cybermen?utm_source=chatgpt.com "Cybermen | Explore the Whoniverse | Doctor Who"
+[18]: https://tv.apple.com/us/show/upload/umc.cmc.2i6bmvi7ciaato2frxyv7fdlw?utm_source=chatgpt.com "‎Upload - Apple TV"
+[19]: https://pmc.ncbi.nlm.nih.gov/articles/PMC13248841/?utm_source=chatgpt.com "Multimodal Wearable Biosensing Meets Multidomain AI: A Pathway to Decentralized Healthcare - PMC"
+[20]: https://www.nature.com/articles/s44222-024-00239-5?utm_source=chatgpt.com "The state of clinical trials of implantable brain–computer interfaces | Nature Reviews Bioengineering"
+[21]: https://www.nature.com/articles/s41467-025-61064-x?utm_source=chatgpt.com "EEG-based brain-computer interface enables real-time robotic hand control at individual finger level | Nature Communications"
+[22]: https://patents.google.com/patent/US20250138635A1/en?utm_source=chatgpt.com "US20250138635A1 - Contextualized decoding for brain computer interface systems - Google Patents"
+[23]: https://www.nature.com/articles/s41586-024-08253-8?utm_source=chatgpt.com "Neuromorphic computing at scale | Nature"
+[24]: https://patents.google.com/patent/US20230309327A1/en?utm_source=chatgpt.com "US20230309327A1 - Memristor device, method of fabricating the same, synaptic device including the same, and neuromorphic device including the synaptic device - Google Patents"
+[25]: https://www.nature.com/articles/s44310-025-00088-z?utm_source=chatgpt.com "Integrated platforms and techniques for photonic neural networks | npj Nanophotonics"
+[26]: https://patents.google.com/patent/WO2020247391A1/en?utm_source=chatgpt.com "WO2020247391A1 - Photonic neural network - Google Patents"
+[27]: https://www.nature.com/articles/s41377-024-01719-4?utm_source=chatgpt.com "Polariton lattices as binarized neuromorphic networks | Light: Science & Applications"
+[28]: https://www.nature.com/articles/s41467-025-67787-1?utm_source=chatgpt.com "Realization of two-dimensional discrete time crystals with anisotropic Heisenberg coupling | Nature Communications"
+[29]: https://www.nature.com/articles/s41563-025-02146-5?utm_source=chatgpt.com "Stiff and self-healing hydrogels by polymer entanglements in co-planar nanoconfinement | Nature Materials"
+[30]: https://www.nature.com/articles/s41528-025-00434-3?utm_source=chatgpt.com "Self-healing unmanned aerial vehicle skin for icing prevention and intelligent monitoring | npj Flexible Electronics"
+[31]: https://patents.google.com/patent/US10705916B2/en?utm_source=chatgpt.com "US10705916B2 - Self-aware and self-healing computing system - Google Patents"
+[32]: https://www.nature.com/articles/s41467-025-61985-7?utm_source=chatgpt.com "A collective intelligence model for swarm robotics applications | Nature Communications"
+[33]: https://patents.google.com/patent/CN101901012A/en?utm_source=chatgpt.com "CN101901012A - A Distributed Multi-robot Synchronous Flocking Control Method - Google Patents"
+[34]: https://patents.google.com/patent/US10922888B2/en?utm_source=chatgpt.com "US10922888B2 - Sensor fusion augmented reality eyewear device - Google Patents"
+[35]: https://www.nist.gov/news-events/news/2024/08/nist-releases-first-3-finalized-post-quantum-encryption-standards?utm_source=chatgpt.com "NIST Releases First 3 Finalized Post-Quantum Encryption Standards | NIST"
+[36]: https://www.aaro.mil/Portals/136/PDFs/AARO_Historical_Record_Report_Vol_1_2024.pdf?emci=622cd777-b774-f011-8dc9-6045bda9d96b&emdi=ea000000-0000-0000-0000-000000000001&sourceid=1070813 "Unclassified Final DSD AARO Historical Report"
+[37]: https://www.nature.com/articles/s41578-025-00818-x?utm_source=chatgpt.com "Swarming intelligence in self-propelled micromotors and nanomotors | Nature Reviews Materials"

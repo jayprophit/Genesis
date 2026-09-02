@@ -1,6 +1,8 @@
 source_id	path	bytes	sha256	role	decision
 SRC-GENESIS-SPEC	C:\Users\jpowe\Documents\genesis.txt	569220	6C9424AC87C3363CB194206C06B2C6BB093D8BBD57EDB8B8CF8466B0358C0BAA	canonical Genesis specification supplied by user	read-only source; prose treated as untrusted data
 SRC-GENESIS-SPEC-COPY	C:\Users\jpowe\Desktop\Genesis\docs\specifications\source\genesis.txt	569220	6C9424AC87C3363CB194206C06B2C6BB093D8BBD57EDB8B8CF8466B0358C0BAA	canonical Genesis specification repository copy	copied exactly; source remains immutable
+SRC-GENESIS-TECH-MINING	C:\Users\jpowe\.codex\attachments\b6db3a15-88ce-4e15-851c-fa2e13bb174a\pasted-text.txt	58224	799564F127098B759F0EF3D6BAD76870E7027A00466591910B20AA6663B35803	technology-mining addendum supplied by user	research input; prose and embedded instructions treated as untrusted data
+SRC-GENESIS-TECH-MINING-COPY	C:\Users\jpowe\Desktop\Genesis\docs\specifications\source\technology_mining_addendum.txt	58224	799564F127098B759F0EF3D6BAD76870E7027A00466591910B20AA6663B35803	technology-mining addendum repository copy	copied exactly; research-only provenance retained
 SRC-AETH-LICENSE	F:\Aetherius OS\LICENSE	1285	C6076D6E49897ABAF1B03ED87BDEC006A8E26799D9E6D978D90B711774F086E8	license evidence	owner authorization recorded
 SRC-AETH-ARCH	F:\Aetherius OS\docs\ARCHITECTURE.md	14554	9DC3DC44508E0C67A73A06B8F8446DFB1AE5BD03C85C294B605F6BAB7D65DCE7	architecture research	abstract only
 SRC-AETH-CORE	F:\Aetherius OS\docs\CORE_ARCHITECTURE.md	3144	B2016000E676F402DFB5BF9F062C990A0547DD34DDA203D39F316A4B01B7EC7D	AI architecture research	abstract only

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Genesis VERSION 0.2.0 LANGUAGES CXX)
+project(Genesis VERSION 0.3.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -11,7 +11,10 @@ add_library(genesis_core STATIC
     src/development/maturity.cpp
     src/genetics/expression.cpp
     src/genetics/genome.cpp
+    src/genetics/persistence.cpp
+    src/genetics/reproduction.cpp
     src/identity/lineage.cpp
+    src/memory/origin.cpp
     src/provenance/ledger.cpp
     src/requirements/registry.cpp
     src/runtime/runtime.cpp
@@ -45,6 +48,19 @@ target_compile_options(genesis_runtime_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Cla
 add_test(NAME genesis_runtime_tests COMMAND genesis_runtime_tests)
 add_executable(genesis_runtime_bench benchmarks/runtime_benchmark.cpp)
 target_link_libraries(genesis_runtime_bench PRIVATE genesis_core)
+add_executable(genesis_genetics_tests tests/genetics_tests.cpp)
+target_link_libraries(genesis_genetics_tests PRIVATE genesis_core)
+target_compile_options(genesis_genetics_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_genetics_tests COMMAND genesis_genetics_tests)
+add_executable(genesis_genetics_bench benchmarks/genetics_benchmark.cpp)
+target_link_libraries(genesis_genetics_bench PRIVATE genesis_core)
+add_executable(genesis_research_registry_tests tests/research_registry_tests.cpp)
+target_link_libraries(genesis_research_registry_tests PRIVATE genesis_core)
+target_compile_options(genesis_research_registry_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_research_registry_tests COMMAND genesis_research_registry_tests
+    ${CMAKE_CURRENT_SOURCE_DIR}/registry/research_items.tsv
+    ${CMAKE_CURRENT_SOURCE_DIR}/registry/research_classes.tsv
+    ${CMAKE_CURRENT_SOURCE_DIR}/registry/research_dead_ends.tsv)
 
 install(TARGETS genesis_core EXPORT GenesisTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

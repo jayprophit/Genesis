@@ -1,0 +1,16 @@
+class_type	code	name	meaning	provenance	last_reviewed
+EVIDENCE	E0	FICTIONAL	Narrative or fictional source; not an empirical claim	technology_mining_addendum:1352	2026-09-02
+EVIDENCE	E1	UNSUBSTANTIATED	Unsubstantiated claim or conjecture	technology_mining_addendum:1352	2026-09-02
+EVIDENCE	E2	THEORETICALLY_PLAUSIBLE	Theoretically plausible but not experimentally established	technology_mining_addendum:1352	2026-09-02
+EVIDENCE	E3	EARLY_EXPERIMENTAL	Early experimental evidence	technology_mining_addendum:1352	2026-09-02
+EVIDENCE	E4	REPEATED_EXPERIMENTAL	Repeated experimental evidence	technology_mining_addendum:1352	2026-09-02
+EVIDENCE	E5	ENGINEERING_DEMONSTRATION	Engineering demonstration	technology_mining_addendum:1352	2026-09-02
+EVIDENCE	E6	DEPLOYED_TECHNOLOGY	Deployed technology	technology_mining_addendum:1352	2026-09-02
+EVIDENCE	E7	MATURE_WELL_ESTABLISHED	Mature or well-established technology	technology_mining_addendum:1352	2026-09-02
+UTILITY	U0	NO_IDENTIFIED_VALUE	No identified Genesis value	technology_mining_addendum:1353	2026-09-02
+UTILITY	U1	CAUTIONARY_FAILURE_LESSON	Cautionary or failure lesson	technology_mining_addendum:1353	2026-09-02
+UTILITY	U2	CONCEPTUAL_INSPIRATION	Conceptual inspiration	technology_mining_addendum:1353	2026-09-02
+UTILITY	U3	RESEARCH_CANDIDATE	Research candidate	technology_mining_addendum:1353	2026-09-02
+UTILITY	U4	PROTOTYPE_CANDIDATE	Prototype candidate	technology_mining_addendum:1353	2026-09-02
+UTILITY	U5	DIRECT_ARCHITECTURAL_VALUE	Direct architectural value	technology_mining_addendum:1353	2026-09-02
+UTILITY	U6	IMPLEMENTATION_CANDIDATE	Implementation candidate	technology_mining_addendum:1353	2026-09-02

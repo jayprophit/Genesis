@@ -10,6 +10,15 @@ The source contains the canonical specification marker and a contiguous, duplica
 
 The embedded instructions in the text file were treated as untrusted specification data. They were not executed as commands, and they did not grant permission to alter the legacy source folders.
 
+The user-provided technology-mining addendum `pasted-text.txt` is also
+preserved byte-for-byte at
+`docs/specifications/source/technology_mining_addendum.txt`. It is 58,224
+bytes with SHA-256
+`799564F127098B759F0EF3D6BAD76870E7027A00466591910B20AA6663B35803` and is
+recorded in the source manifest. Sections 1350–1450 are research input only:
+fiction, patents, UAP reports and speculative mechanisms are not treated as
+engineering facts or automatic implementation instructions.
+
 ## Completed foundation slice
 
 - `genesis_core` is a normal compiled static C++20 library rather than an interface-only target.
@@ -18,30 +27,33 @@ The embedded instructions in the text file were treated as untrusted specificati
 - The lifecycle is `DISCOVERED → SPECIFIED → SCAFFOLDED → IMPLEMENTED → COMPILED → UNIT_TESTED → INTEGRATION_TESTED → BENCHMARKED → PROVEN → OPTIMIZED → STABLE → SUPERSEDED`. The validator enforces mappings for compiled, tested, benchmarked, and proven claims.
 - Domain and requirement validation detects duplicate IDs, repeated aliases, missing dependencies, unknown domains, invalid scores, and dependency cycles.
 - The runtime slice provides deterministic logical time, immutable SHA-256 event envelopes, ordered dispatch, causal-parent checks, replay pre-validation, bounded history, atomic resource reservations, and a causal state machine with replay-chain verification.
-- Tests cover SHA-256 vectors, monotonic clocks, deterministic subscription order, one-shot handlers, duplicate and invalid replay rejection, resource over-allocation and rollback, state transition causality, registry/schema checks, provenance chaining, identity, genome, RNA, and maturity contracts.
-- Benchmarks cover the original diagnostic provenance chain and the runtime dispatcher. Benchmark output is measurement evidence, not a claim of production capacity.
-- Registry schemas are seeded for biological analogies, capabilities, platform requirements, dependencies, drivers, firmware, deployment profiles, protocols, models, datasets, universal research items, and rejected/dead-end research.
+- Stage 2 life-integrity contracts are implemented: immutable versioned genome serialization and storage, content-vs-record digests, atomic immutable version commits, deterministic two-parent recombination, mutation audit records, birth cutoff enforcement, origin-labelled inherited memory, and birth snapshot hashes. See `docs/STAGE_2_LIFE_INTEGRITY.md`.
+- Tests cover SHA-256 vectors, monotonic clocks, deterministic subscription order, one-shot handlers, duplicate and invalid replay rejection, resource over-allocation and rollback, state transition causality, registry/schema checks, provenance chaining, identity, genome, RNA, maturity, genome-store round trips/conflicts, malformed records, lineage adversaries, deterministic births, mutation records, and inheritance cutoff boundaries.
+- Benchmarks cover the diagnostic provenance chain, runtime dispatcher, and 10,000 deterministic birth transactions. Benchmark output is measurement evidence, not a claim of production capacity.
+- Registry schemas are seeded for biological analogies, capabilities, platform requirements, dependencies, drivers, firmware, deployment profiles, protocols, models, datasets, universal research items, evidence/utility class definitions, and rejected/dead-end research. The technology-mining registry has 43 items and the dead-end cache has 10 linked records with independent E/U classifications.
 - CI and secret-scan safeguards are present under `.github/workflows/ci.yml` and `tools/`.
 - A project-level proprietary `LICENSE` is present. Third-party material remains subject to its own terms.
 
-Latest clean-build smoke measurements on this desktop (100,000 operations, Debug, MinGW): the diagnostic chain processed approximately 118,286 events/second and the runtime dispatcher approximately 16,029 events/second with a 1,024-entry history. These figures are environment-sensitive and are retained as a sanity check, not a performance guarantee.
+Latest clean-build smoke measurements on this desktop (Debug, MinGW): the diagnostic chain processed approximately 133,110 events/second and the runtime dispatcher approximately 15,303 events/second with a 1,024-entry history. The genetics benchmark completed 10,000 births in 5,688 ms (about 1,758 births/second). These figures are environment-sensitive and are retained as sanity checks, not performance guarantees.
 
 ## Current truthful status
 
-The executable foundation and runtime contracts are implemented and testable. The canonical source sections and higher-level organism requirements are not complete implementations. In particular, no status in the current registry claims `PROVEN` or `STABLE` for the organism.
+The executable foundation, runtime contracts, Stage 2 life-integrity contracts,
+and research/dead-end schemas are implemented and testable. The canonical
+source sections and higher-level organism requirements are not complete
+implementations. In particular, no status in the current registry claims
+`PROVEN` or `STABLE` for the organism.
 
 ## Remaining implementation gaps
 
-1. Persisted, versioned genome storage with atomic recovery and migration.
-2. Deterministic two-parent recombination, mutation records, birth cut-off, and inherited-state snapshots.
-3. Computational cells, tissues, organs, signalling, metabolism, homeostasis, repair, immune boundaries, and sleep/maintenance.
-4. Memory graph, learning, perception, language, world/self models, affect, social cognition, and a bounded cognitive workspace.
-5. Capability adapters, local model routing, multimodality, body/avatar, hardware safety contracts, and qualified device routes.
-6. Approved cryptographic provider integration and key custody; the runtime hash and legacy FNV marker are not identity authentication.
-7. Persistence/recovery integration tests, sanitizer/coverage runs, fuzzing, performance budgets, and platform-specific qualification.
-8. Atomic requirement derivation and deduplication across all legacy documents; the 1,451-row source index must not be mistaken for that normalized graph.
-9. Component-level provenance, license, malware, compatibility, tests, and benchmarks for any future candidate from `F:\Aetherius OS`, `F:\ai chat conversations`, `F:\AI Digital Twin`, or `F:\Downloads`.
-10. Descendants, population evolution, unrestricted research crawling, and experimental quantum/photonic/BCI/swarm/UAP branches remain deferred by design.
+1. Computational cells, tissues, organs, signalling, metabolism, homeostasis, repair, immune boundaries, and sleep/maintenance (Stage 3–4).
+2. Memory graph, learning, perception, language, world/self models, affect, social cognition, and a bounded cognitive workspace (Stage 5).
+3. Capability adapters, local model routing, multimodality, body/avatar, hardware safety contracts, and qualified device routes (Stage 7).
+4. Approved cryptographic provider integration and key custody; the runtime hash and pending lineage marker are not identity authentication.
+5. Persistence/recovery integration beyond the genome record, sanitizer/coverage runs, fuzzing, performance budgets, and platform-specific qualification.
+6. Atomic requirement derivation and deduplication across all legacy documents; the 1,451-row source index must not be mistaken for that normalized graph.
+7. Component-level provenance, license, malware, compatibility, tests, and benchmarks for any future candidate from `F:\Aetherius OS`, `F:\ai chat conversations`, `F:\AI Digital Twin`, or `F:\Downloads`.
+8. Descendants, population evolution, unrestricted research crawling, and experimental quantum/photonic/BCI/swarm/UAP branches remain deferred by design.
 
 ## Acceptance gate for the next phase
 
