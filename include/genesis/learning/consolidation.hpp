@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <map>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -20,12 +21,37 @@ struct ConsolidationRecord {
  std::vector<memory::ReinforcementChange> changes;
 };
 struct ConsolidationOutcome { ConsolidationStatus status{ConsolidationStatus::invalid_plan}; std::string message; std::string record_digest; [[nodiscard]] bool applied()const noexcept{return status==ConsolidationStatus::applied;} };
+enum class RetentionTrend { improved, stable, regressed };
+struct RetentionObservation {
+ std::string trace_id,evidence_digest,consolidation_record_digest;
+ TraceKind kind{TraceKind::declarative};
+ std::uint64_t logical_time{};
+ double recall_score{},latency_score{},confidence{};
+ std::vector<std::string> active_interference_ids;
+};
+struct RetentionRecord {
+ std::uint64_t sequence{};
+ RetentionObservation observation;
+ std::string previous_digest,digest;
+};
+struct RetentionReport {
+ std::string trace_id;
+ TraceKind kind{TraceKind::declarative};
+ std::uint64_t baseline_time{},follow_up_time{},elapsed{};
+ double baseline_score{},follow_up_score{},delta{};
+ std::optional<double> retention_ratio;
+ RetentionTrend trend{RetentionTrend::stable};
+ bool consolidation_observed{},interference_associated{};
+ std::vector<std::string> interference_ids;
+};
+struct RetentionFeedback { std::string trace_id; double accessibility_adjustment{},uncertainty_adjustment{},urgency{}; std::uint64_t observed_at{}; };
 class ConsolidationScheduler final {
 public:
  explicit ConsolidationScheduler(std::size_t trace_capacity,std::size_t interference_capacity);
  bool register_trace(LearningTrace trace,std::string* error=nullptr);
  bool record_interference(InterferenceEdge edge,std::string* error=nullptr);
  bool record_use(std::string_view trace_id,std::uint64_t logical_time);
+ bool apply_feedback(const RetentionFeedback& feedback,std::string* error=nullptr);
  [[nodiscard]] ConsolidationPlan plan(std::uint64_t logical_time,std::uint64_t budget,std::size_t maximum_items)const;
  [[nodiscard]] bool verify()const;
  [[nodiscard]] std::size_t trace_count()const noexcept;
@@ -33,6 +59,20 @@ private:
  std::size_t trace_capacity_{},interference_capacity_{};
  std::map<std::string,LearningTrace> traces_;
  std::vector<InterferenceEdge> interference_;
+};
+class RetentionEvaluator final {
+public:
+ explicit RetentionEvaluator(std::size_t record_capacity,double stable_tolerance=.02);
+ bool observe(RetentionObservation observation,std::string* error=nullptr);
+ [[nodiscard]] std::optional<RetentionReport> report(std::string_view trace_id)const;
+ [[nodiscard]] std::optional<RetentionFeedback> feedback(std::string_view trace_id)const;
+ [[nodiscard]] bool verify()const;
+ [[nodiscard]] const std::vector<RetentionRecord>& records()const noexcept;
+private:
+ std::size_t record_capacity_{};
+ double stable_tolerance_{};
+ std::vector<RetentionRecord> records_;
+ std::map<std::string,std::vector<std::size_t>> trace_index_;
 };
 class ConsolidationExecutor final {
 public:

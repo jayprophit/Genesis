@@ -37,9 +37,25 @@ budget overflow and logical-time reversal are rejected. The separate executor
 now validates the complete plan and current trace-state digests, reserves bounded
 runtime resources, atomically applies a reinforcement batch, verifies graph
 invariants and appends a bounded SHA-256-linked execution record. Resource denial,
-duplicate items and stale state leave memory unchanged. Retention and interference
-outcome measurement remain separate work and are tracked as their own completion
-leaf so execution evidence cannot conceal that gap.
+duplicate items and stale state leave memory unchanged. Retention evaluation is
+owned by a separate component so execution evidence cannot conceal its remaining
+persistence and migration gaps.
+
+Longitudinal retention evaluation now records bounded, evidence-linked baseline
+and follow-up observations for declarative, procedural, episodic and semantic
+traces. Recall, response-latency quality and confidence remain separate inputs;
+reports combine recall and latency using a documented deterministic score and
+retain the raw observations. Reports identify improvement, stability or regression,
+elapsed logical time, consolidation-record linkage and active interference. An
+interference flag means association at the follow-up observation, not proof that
+the interferer caused the regression. Feedback adjustments are bounded and must
+be explicitly validated by the scheduler before they can change accessibility or
+uncertainty. Observation records are sequence-ordered and SHA-256 chained.
+
+The 10,000-trace local benchmark recorded 20,000 observations and generated
+10,000 reports in approximately 0.173 seconds. This is machine-local development
+evidence, not a production latency guarantee. Crash-safe persistence and migration
+of retention records remain open, so the retention leaf is not marked complete.
 
 The prediction system retrieves multiple experiences and reports confidence; it
 does not create categorical identity rules such as “person like this is bad.”
@@ -48,7 +64,8 @@ consciousness or subjective experience.
 
 Still open in Stage 5: persistent belief-model storage, evidence-source quality,
 real perception adapters, language representation, affect regulation, retention
-evaluation, fuzzing, and broader integration across the organism event fabric.
+record persistence/migration, fuzzing, and broader integration across the organism
+event fabric.
 
 `genesis2.txt` is preserved losslessly and indexed by all 88 Markdown heading
 occurrences. Repeated passages remain traceable; referenced tools and repositories

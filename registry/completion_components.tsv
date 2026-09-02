@@ -18,7 +18,7 @@ MEMORY-FORGETTING	MEMORY	Decay dormancy consolidation and relearning	REQ-MEM-TRA
 MEMORY-LEARNING	MEMORY	Learning consolidation program	REQ-LRN-INTERFERENCE-001,REQ-LRN-CONSOLIDATE-001,REQ-LRN-EXECUTE-001	-	-	-	-	-	-	-	-	-
 MEMORY-LEARNING-PLANNING	MEMORY-LEARNING	Learning policy and interference planning	REQ-LRN-INTERFERENCE-001,REQ-LRN-CONSOLIDATE-001	1	1	1	1	1	1	1	1	1
 MEMORY-LEARNING-EXECUTION	MEMORY-LEARNING	Atomic resource-governed consolidation execution	REQ-LRN-EXECUTE-001	1	1	1	1	1	1	1	1	1
-MEMORY-LEARNING-RETENTION	MEMORY-LEARNING	Retention and interference outcome evaluation	-	1	0	0	0	0	0	0	0	0
+MEMORY-LEARNING-RETENTION	MEMORY-LEARNING	Retention and interference outcome evaluation	REQ-LRN-RETENTION-001	1	1	1	1	1	1	0	1	1
 MEMORY-PERCEPTION	MEMORY	Perception grounding pipeline	REQ-ADAPT-001	1	0	0	0	0	0	0	0	0
 MEMORY-LANGUAGE	MEMORY	Language representation and grounding	-	1	0	0	0	0	0	0	0	0
 MEMORY-WORLD-MODEL	MEMORY	World model	REQ-MODELS-001	1	1	1	0	0	1	0	1	1
