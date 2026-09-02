@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Genesis VERSION 0.3.0 LANGUAGES CXX)
+project(Genesis VERSION 0.4.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -15,6 +15,8 @@ add_library(genesis_core STATIC
     src/genetics/reproduction.cpp
     src/identity/lineage.cpp
     src/memory/origin.cpp
+    src/organism/anatomy.cpp
+    src/organism/systems.cpp
     src/provenance/ledger.cpp
     src/requirements/registry.cpp
     src/runtime/runtime.cpp
@@ -61,6 +63,12 @@ add_test(NAME genesis_research_registry_tests COMMAND genesis_research_registry_
     ${CMAKE_CURRENT_SOURCE_DIR}/registry/research_items.tsv
     ${CMAKE_CURRENT_SOURCE_DIR}/registry/research_classes.tsv
     ${CMAKE_CURRENT_SOURCE_DIR}/registry/research_dead_ends.tsv)
+add_executable(genesis_organism_tests tests/organism_tests.cpp)
+target_link_libraries(genesis_organism_tests PRIVATE genesis_core)
+target_compile_options(genesis_organism_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_organism_tests COMMAND genesis_organism_tests)
+add_executable(genesis_organism_bench benchmarks/organism_benchmark.cpp)
+target_link_libraries(genesis_organism_bench PRIVATE genesis_core)
 
 install(TARGETS genesis_core EXPORT GenesisTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

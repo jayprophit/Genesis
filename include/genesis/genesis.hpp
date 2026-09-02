@@ -10,6 +10,8 @@
 #include "genesis/genetics/reproduction.hpp"
 #include "genesis/identity/lineage.hpp"
 #include "genesis/memory/origin.hpp"
+#include "genesis/organism/anatomy.hpp"
+#include "genesis/organism/systems.hpp"
 #include "genesis/provenance/ledger.hpp"
 #include "genesis/requirements/registry.hpp"
 #include "genesis/runtime/runtime.hpp"
