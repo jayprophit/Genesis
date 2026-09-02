@@ -1,0 +1,4 @@
+platform_id	platform	minimum_toolchain	required_hardware	network_policy	deployment_class	status	provenance
+PLAT-WIN64	Windows 10/11 x64	C++20 compiler; CMake 3.24+	CPU; filesystem; optional RAM budget	offline-first; no network required	local-development	DECLARED	genesis.txt:1111
+PLAT-LINUX64	Linux x64	C++20 compiler; CMake 3.24+	CPU; filesystem; optional RAM budget	offline-first; no network required	local-development	DECLARED	genesis.txt:1111
+PLAT-MACOS	macOS supported by CMake toolchain	C++20 compiler; CMake 3.24+	CPU; filesystem; optional RAM budget	offline-first; no network required	local-development	DECLARED	genesis.txt:1111

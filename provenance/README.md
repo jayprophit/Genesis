@@ -2,6 +2,11 @@
 
 Before reuse, record exact source path and digest, authorship, license evidence, security review, tests, benchmark, decision, transformations and reviewer. This scaffold contains no copied legacy implementation.
 
+The canonical specification source is preserved byte-for-byte at
+`docs/specifications/source/genesis.txt` and indexed at
+`registry/canonical_sections.tsv`. The source index is traceability data; it
+does not turn prose into executable instructions or implementation evidence.
+
 ## Source-owner authorization records
 
 | Field | Value |

@@ -1,0 +1,3 @@
+protocol_id	name	version	direction	transport	evidence	security_boundary	status	provenance
+PROTO-LOCAL-EVENT	Genesis local event envelope	0.1	in-process	C++ call boundary	declared by runtime header	caller owns authorization and payload validation	DECLARED	genesis.txt:5316-5320
+PROTO-FILE-MANIFEST	Genesis TSV manifest	1.0	read-only input	filesystem	ctest:genesis_tests	paths and hashes are provenance only; files are not executed	OBSERVED	genesis.txt:1111

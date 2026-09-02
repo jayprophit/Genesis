@@ -1,0 +1,7 @@
+analogy_id	biological_system	digital_analogue	boundary	provenance	status	last_verified
+BIO-001	genome	versioned configuration and lineage contract	Digital data is not biological DNA and has no claim of biological equivalence	genesis.txt:90-450	REGISTERED	2026-09-02
+BIO-002	gene expression	bounded RNA-like activation lifecycle	Expression is a deterministic software state machine, not cellular biochemistry	genesis.txt:360-450	REGISTERED	2026-09-02
+BIO-003	cell	isolated computational unit	A cell has explicit resource and lifecycle semantics rather than metabolism	genesis.txt:1000-1500	REGISTERED	2026-09-02
+BIO-004	homeostasis	resource and health bounds	Bounds are engineering safety policies and require measured runtime evidence	genesis.txt:1800-2200	REGISTERED	2026-09-02
+BIO-005	immune recognition	input trust and ownership classification	Security policy must not be described as a biological immune system	genesis.txt:2200-2500	REGISTERED	2026-09-02
+BIO-006	sleep	maintenance and memory-consolidation phase	A scheduled software phase is not biological sleep	genesis.txt:7000-7600	REGISTERED	2026-09-02

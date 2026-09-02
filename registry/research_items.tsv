@@ -1,0 +1,5 @@
+research_id	title	source_class	evidence_class	utility_class	claim_or_principle	simulation_status	prototype_status	modules_affected	provenance	status	last_verified
+RES-001	Independent perspectives and minority reports	fictional_analogy	E0	U2	Preserve disagreement instead of collapsing difficult decisions into one view	not_started	not_started	cognition;research	genesis.txt:1350-1450	REGISTERED	2026-09-02
+RES-002	Neuromorphic compute substrate	scientific_source	E1	U3	Track as an experimental backend and require measured hardware evidence	not_started	not_started	compute;cognition	genesis.txt:1350-1450	REGISTERED	2026-09-02
+RES-003	Photonic neural systems	scientific_source	E1	U3	Track research claims without treating them as available local hardware	not_started	not_started	compute;cognition	genesis.txt:1350-1450	REGISTERED	2026-09-02
+RES-004	Scientific graveyard	useful_principle	E0	U4	Persist rejected ideas reasons and reopen conditions	not_started	not_started	research;memory	genesis.txt:34554-34575	REGISTERED	2026-09-02

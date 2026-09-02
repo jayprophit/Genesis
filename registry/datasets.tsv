@@ -1,0 +1,3 @@
+dataset_id	name	version	path_or_uri	sha256	license	retention	permitted_use	status	provenance
+DATA-SOURCE-MANIFEST	Genesis source manifest	1.0	provenance/SOURCE_MANIFEST.tsv	see file	owner-authorized local metadata	retain with repository	provenance and audit only	OBSERVED	genesis.txt:1111
+DATA-CANONICAL-SPEC	Genesis canonical specification	1.0	docs/specifications/source/genesis.txt	6C9424AC87C3363CB194206C06B2C6BB093D8BBD57EDB8B8CF8466B0358C0BAA	owner-provided source; license review pending	retain immutable source copy	requirements traceability and research only	OBSERVED	genesis.txt:1111

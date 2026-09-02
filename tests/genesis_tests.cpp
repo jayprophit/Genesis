@@ -1,5 +1,6 @@
 #include "genesis/genesis.hpp"
 
+#include <algorithm>
 #include <cctype>
 #include <cstdlib>
 #include <fstream>
@@ -60,20 +61,73 @@ void validate_source_manifest(const std::filesystem::path& path) {
     check(rows >= 10, "source manifest unexpectedly small");
 }
 
+void validate_cycle_detection() {
+    const auto path = std::filesystem::temp_directory_path() / "genesis_registry_cycle_test.tsv";
+    constexpr const char* header = "id\tname\tpurpose\tparent\tdependencies\tinterfaces\timplementation_files\ttests\tbenchmarks\tscore_0_100\tstatus\tversion\tevidence\tprovenance\tlast_verified\taliases\n";
+    {
+        std::ofstream output(path, std::ios::trunc);
+        check(output.good(), "cannot create registry cycle fixture");
+        output << header;
+        output << "A\tA\tcycle fixture\tDOMAIN-ENGINEERING\tB\t-\t-\t-\t-\t0\tSPECIFIED\t1.0.0\t-\ttest\t2026-09-02\t-\n";
+        output << "B\tB\tcycle fixture\tDOMAIN-ENGINEERING\tA\t-\t-\t-\t-\t0\tSPECIFIED\t1.0.0\t-\ttest\t2026-09-02\t-\n";
+    }
+    const auto fixture = genesis::RequirementRegistry::load(path);
+    const auto errors = fixture.validate();
+    check(std::any_of(errors.begin(), errors.end(), [](const std::string& error) {
+        return error.find("dependency cycle") != std::string::npos;
+    }), "dependency cycle was not detected");
+    std::filesystem::remove(path);
+
+    const auto duplicate_path = std::filesystem::temp_directory_path() / "genesis_registry_duplicate_test.tsv";
+    {
+        std::ofstream output(duplicate_path, std::ios::trunc);
+        check(output.good(), "cannot create registry duplicate fixture");
+        output << header;
+        output << "A\tA\tduplicate fixture\tDOMAIN-ENGINEERING\t-\t-\t-\t-\t-\t0\tSPECIFIED\t1.0.0\t-\ttest\t2026-09-02\t-\n";
+        output << "A\tA-again\tduplicate fixture\tDOMAIN-ENGINEERING\t-\t-\t-\t-\t-\t0\tSPECIFIED\t1.0.0\t-\ttest\t2026-09-02\t-\n";
+    }
+    bool duplicate_rejected = false;
+    try {
+        static_cast<void>(genesis::RequirementRegistry::load(duplicate_path));
+    } catch (const std::runtime_error&) {
+        duplicate_rejected = true;
+    }
+    check(duplicate_rejected, "duplicate requirement ID was not rejected");
+    std::filesystem::remove(duplicate_path);
+}
+
 } // namespace
 
 int main(int argc, char** argv) {
     try {
-        check(argc == 3, "requirement registry and source manifest paths required");
+        check(argc == 5, "requirement registry, source manifest, domain registry and canonical source paths required");
 
         const auto requirements = genesis::RequirementRegistry::load(argv[1]);
-        check(requirements.size() >= 30, "requirement registry unexpectedly small");
-        check(requirements.validate().empty(), "requirement registry invalid");
+        check(requirements.size() >= 40, "requirement registry unexpectedly small");
+        for (const auto* legacy_id : {"REQ-REG-001", "REQ-PROV-001", "REQ-RUN-001", "REQ-PHY-001",
+                                      "REQ-CHEM-001", "REQ-ID-001", "REQ-LIN-001", "REQ-GEN-001",
+                                      "REQ-HELIX-001", "REQ-HELIX-002", "REQ-HELIX-003", "REQ-RNA-001",
+                                      "REQ-REPRO-001", "REQ-BIRTH-001", "REQ-INH-001", "REQ-CELL-001",
+                                      "REQ-TISSUE-001", "REQ-HOME-001", "REQ-IMM-001", "REQ-COG-001",
+                                      "REQ-DEV-001", "REQ-PAR-001", "REQ-MODAL-001", "REQ-CRYPTO-001",
+                                      "REQ-SRC-001", "REQ-CORPUS-001", "REQ-EVAL-001", "REQ-EVT-001",
+                                      "REQ-RES-001", "REQ-SVC-001", "REQ-TEL-001", "REQ-MEM-001",
+                                      "REQ-POL-001", "REQ-ADAPT-001"}) {
+            check(requirements.find(legacy_id) != nullptr, "legacy requirement ID was dropped");
+        }
+        const auto domains = genesis::DomainRegistry::load(argv[3]);
+        check(domains.size() >= 10, "domain registry unexpectedly small");
+        check(domains.validate().empty(), "domain registry invalid");
+        check(requirements.validate(&domains).empty(), "requirement registry invalid");
+        const auto canonical = genesis::RequirementRegistry::load(argv[4]);
+        check(canonical.size() == 1451, "canonical source section count changed");
+        check(canonical.validate(&domains).empty(), "canonical source section registry invalid");
         validate_source_manifest(argv[2]);
+        validate_cycle_detection();
 
         genesis::ProvenanceLedger ledger;
-        ledger.append(1, "e1", "o", "birth", "p1");
-        ledger.append(2, "e2", "o", "experience", "p2");
+        static_cast<void>(ledger.append(1, "e1", "o", "birth", "p1"));
+        static_cast<void>(ledger.append(2, "e2", "o", "experience", "p2"));
         check(ledger.verify(), "ledger invalid");
 
         const auto id = identity();

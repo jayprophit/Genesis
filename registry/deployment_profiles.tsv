@@ -1,0 +1,3 @@
+profile_id	name	filesystem_root	network_mode	resource_limits	recovery_policy	telemetry_policy	status	provenance
+DEPLOY-LOCAL-DEV	Local development	user-selected Genesis checkout	offline-first	declared by host	preserve diagnostics and fail closed	bounded local diagnostics	DECLARED	genesis.txt:1111
+DEPLOY-LOCAL-RELEASE	Local release	user-selected installation directory	offline-only by default	declared by installer	atomic update and rollback required	bounded opt-in diagnostics	SPECIFIED	genesis.txt:1111

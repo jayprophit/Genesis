@@ -1,0 +1,2 @@
+driver_id	device_class	provider	version	sha256	capabilities	safety_status	provenance
+DRV-NONE	No required hardware driver	platform	-	-	software-only foundation	SAFE_FOR_LOCAL_BUILD	genesis.txt:1111

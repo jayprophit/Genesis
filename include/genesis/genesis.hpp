@@ -1,34 +1,12 @@
 #pragma once
-#include <algorithm>
-#include <array>
-#include <cstdint>
-#include <filesystem>
-#include <fstream>
-#include <iomanip>
-#include <sstream>
-#include <stdexcept>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
 
-namespace genesis {
-inline std::vector<std::string> split(const std::string&s,char d){std::vector<std::string>v;std::stringstream x(s);std::string i;while(std::getline(x,i,d))if(!i.empty()&&i!="-")v.push_back(i);return v;}
-inline std::vector<std::string> split_fields(const std::string&s,char d){std::vector<std::string>v;std::stringstream x(s);std::string i;while(std::getline(x,i,d))v.push_back(i);return v;}
-enum class RequirementStatus{planned,contract,operational,gated,deprecated};
-struct Requirement{std::string id,title;RequirementStatus status;std::vector<std::string>dependencies;std::string evidence;};
-class RequirementRegistry{std::unordered_map<std::string,Requirement>data_;public:static RequirementRegistry load(const std::filesystem::path&p){std::ifstream in(p);if(!in)throw std::runtime_error("cannot open registry");RequirementRegistry r;std::string line;std::getline(in,line);while(std::getline(in,line)){if(line.empty())continue;auto f=split_fields(line,'\t');if(f.size()!=5)throw std::runtime_error("invalid registry row");RequirementStatus s;if(f[2]=="planned")s=RequirementStatus::planned;else if(f[2]=="contract")s=RequirementStatus::contract;else if(f[2]=="operational")s=RequirementStatus::operational;else if(f[2]=="gated")s=RequirementStatus::gated;else if(f[2]=="deprecated")s=RequirementStatus::deprecated;else throw std::runtime_error("unknown status");Requirement q{f[0],f[1],s,split(f[3],','),f[4]};if(!r.data_.emplace(q.id,std::move(q)).second)throw std::runtime_error("duplicate id");}return r;}const Requirement*find(const std::string&id)const{auto i=data_.find(id);return i==data_.end()?nullptr:&i->second;}std::vector<std::string>validate()const{std::vector<std::string>e;for(const auto&[id,r]:data_){for(const auto&d:r.dependencies)if(!find(d))e.push_back(id+" missing "+d);if(r.status==RequirementStatus::operational&&(r.evidence.empty()||r.evidence=="-"))e.push_back(id+" lacks evidence");}return e;}std::size_t size()const{return data_.size();}};
-struct LedgerEvent{std::uint64_t sequence{};std::int64_t logical_time{};std::string event_id,actor_id,kind,payload_digest,previous_digest,digest;};
-inline std::string checksum(const std::string&s){std::uint64_t h=1469598103934665603ULL;for(unsigned char c:s){h^=c;h*=1099511628211ULL;}std::ostringstream o;o<<std::hex<<std::setw(16)<<std::setfill('0')<<h;return o.str();}
-inline std::string material(const LedgerEvent&e){return std::to_string(e.sequence)+'|'+std::to_string(e.logical_time)+'|'+e.event_id+'|'+e.actor_id+'|'+e.kind+'|'+e.payload_digest+'|'+e.previous_digest;}
-class ProvenanceLedger{std::vector<LedgerEvent>events_;public:const LedgerEvent&append(std::int64_t t,std::string id,std::string actor,std::string kind,std::string payload){LedgerEvent e;e.sequence=events_.size();e.logical_time=t;e.event_id=std::move(id);e.actor_id=std::move(actor);e.kind=std::move(kind);e.payload_digest=std::move(payload);e.previous_digest=events_.empty()?"GENESIS":events_.back().digest;e.digest=checksum(material(e));events_.push_back(std::move(e));return events_.back();}bool verify()const{for(std::size_t i=0;i<events_.size();++i){const auto&e=events_[i];if(e.sequence!=i)return false;auto p=i?events_[i-1].digest:"GENESIS";if(e.previous_digest!=p||e.digest!=checksum(material(e)))return false;}return true;}std::size_t size()const{return events_.size();}};
-enum class OriginKind{genesis,restore,clone,fork,child};
-struct LineageIdentity{std::string organism_id,genesis_id,lineage_id,birth_event_id,parent_a_id,parent_b_id,genome_hash,inherited_state_hash,birth_snapshot_hash,identity_seed,lineage_signature,cryptographic_provenance;std::uint64_t generation{};std::int64_t birth_timestamp{};std::vector<std::string>ancestor_root_ids;OriginKind origin{OriginKind::genesis};};
-inline std::vector<std::string>validate(const LineageIdentity&i){std::vector<std::string>e;if(i.organism_id.empty())e.push_back("organism_id required");if(i.genesis_id.empty())e.push_back("genesis_id required");if(i.lineage_id.empty())e.push_back("lineage_id required");if(i.birth_event_id.empty())e.push_back("birth_event_id required");if(i.origin==OriginKind::child&&(i.parent_a_id.empty()||i.parent_b_id.empty()))e.push_back("child requires two parents");if(i.origin==OriginKind::child&&i.generation==0)e.push_back("child generation must be positive");return e;}
-inline bool represents_continuation(OriginKind k){return k==OriginKind::genesis||k==OriginKind::restore;}
-struct Gene{std::string id,variant,payload_digest;};struct Regulation{std::string gene_id,stage,condition;double activation_threshold{};};struct Genome{std::string genome_id,schema_version;std::vector<Gene>structural_strand;std::vector<Regulation>regulatory_strand;LineageIdentity lineage_strand;};
-inline std::vector<std::string>validate(const Genome&g){std::vector<std::string>e;if(g.genome_id.empty())e.push_back("genome_id required");if(g.schema_version.empty())e.push_back("schema_version required");std::unordered_set<std::string>ids;for(const auto&x:g.structural_strand)if(!ids.insert(x.id).second)e.push_back("duplicate gene");for(const auto&r:g.regulatory_strand)if(!ids.contains(r.gene_id))e.push_back("missing regulated gene");auto x=validate(g.lineage_strand);e.insert(e.end(),x.begin(),x.end());return e;}
-enum class RnaState{created,expressing,modified,transported,consumed,decayed,removed};struct Expression{std::string expression_id,source_gene,target,provenance;double activation_strength{},confidence{};RnaState state{RnaState::created};};
-inline bool transition(Expression&e,RnaState n){bool ok=false;switch(e.state){case RnaState::created:ok=n==RnaState::expressing||n==RnaState::removed;break;case RnaState::expressing:ok=n==RnaState::modified||n==RnaState::transported||n==RnaState::consumed||n==RnaState::decayed;break;case RnaState::modified:ok=n==RnaState::expressing||n==RnaState::transported||n==RnaState::decayed;break;case RnaState::transported:ok=n==RnaState::expressing||n==RnaState::consumed||n==RnaState::decayed;break;case RnaState::consumed:case RnaState::decayed:ok=n==RnaState::removed;break;case RnaState::removed:break;}if(ok)e.state=n;return ok;}
-enum class Dimension:std::size_t{cognitive,linguistic,social,emotional,epistemic,operational,security,resource_management,tool_use,self_maintenance,planning,risk_assessment,world_model,self_model,count};struct MaturityVector{std::array<double,static_cast<std::size_t>(Dimension::count)>scores{};bool valid()const{return std::all_of(scores.begin(),scores.end(),[](double v){return v>=0&&v<=100;});}double minimum()const{return *std::min_element(scores.begin(),scores.end());}};inline bool independence_gate(const MaturityVector&m){return m.valid()&&m.minimum()>=90;}
-}
+// Stable public umbrella header. Implementations live in the compiled
+// genesis_core library; clients can include narrower module headers instead.
+#include "genesis/common/text.hpp"
+#include "genesis/development/maturity.hpp"
+#include "genesis/genetics/expression.hpp"
+#include "genesis/genetics/genome.hpp"
+#include "genesis/identity/lineage.hpp"
+#include "genesis/provenance/ledger.hpp"
+#include "genesis/requirements/registry.hpp"
+#include "genesis/runtime/runtime.hpp"

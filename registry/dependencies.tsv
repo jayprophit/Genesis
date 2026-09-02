@@ -1,0 +1,3 @@
+dependency_id	name	version_constraint	source	license	sha256	platforms	status	provenance
+DEP-CMAKE	CMake	>=3.24	toolchain	-	-	Windows;Linux;macOS	DECLARED	genesis.txt:1111
+DEP-CXX20	C++ standard library	C++20	toolchain	platform-provided	-	Windows;Linux;macOS	DECLARED	genesis.txt:1111

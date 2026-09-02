@@ -1,0 +1,2 @@
+model_id	name	version	artifact_path	sha256	license	route	score_0_100	status	provenance
+MODEL-NONE	No bundled model	-	-	-	-	no inference route	0	UNAVAILABLE	genesis.txt:1112

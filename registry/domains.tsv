@@ -1,0 +1,19 @@
+id	name	purpose	depends_on
+DOMAIN-GOVERNANCE	Governance and identity boundaries	Permanent rules, ownership, truth labels, self-description and requirement authority	-
+DOMAIN-ENGINEERING	Engineering assurance	Build, test, benchmark, evidence, release, dependency and lifecycle controls	DOMAIN-GOVERNANCE
+DOMAIN-RUNTIME	Deterministic runtime	Logical time, events, scheduling, resources, services, telemetry and state transitions	DOMAIN-ENGINEERING
+DOMAIN-STORAGE	Storage and recovery	Persistence, snapshots, migrations, retention, backup and disaster recovery	DOMAIN-RUNTIME
+DOMAIN-IDENTITY	Identity and continuity	Organism identity, continuity, divergence and restoration boundaries	DOMAIN-RUNTIME,DOMAIN-STORAGE
+DOMAIN-GENETICS	Genome and lineage	Genome, expression, birth, lineage, inheritance and reproduction	DOMAIN-IDENTITY,DOMAIN-STORAGE
+DOMAIN-ORGANISM	Cells, tissues and organs	Computational cells, tissue organization, organ interfaces, repair and recycling	DOMAIN-RUNTIME,DOMAIN-GENETICS
+DOMAIN-DEVELOPMENT	Development and learning	Embryology, maturation, curricula, teaching, play and learning systems	DOMAIN-ORGANISM
+DOMAIN-MEMORY	Memory and knowledge	Working and long-term memory, provenance, retrieval, consolidation and forgetting	DOMAIN-IDENTITY,DOMAIN-STORAGE
+DOMAIN-COGNITION	Cognition and digital brain	Signal flow, attention, workspace, reasoning, self/world models and plasticity	DOMAIN-ORGANISM,DOMAIN-MEMORY
+DOMAIN-AFFECT-SOCIAL	Affect and social cognition	Affect regulation, values, goals, social models and consequence reasoning	DOMAIN-COGNITION
+DOMAIN-PERCEPTION	Perception and language	Multimodal sensing, recognition, language, speech and grounding	DOMAIN-COGNITION
+DOMAIN-EMBODIMENT	Bodies and devices	Avatar, robotics, body schema, motor control, hardware and device fabric	DOMAIN-PERCEPTION,DOMAIN-RUNTIME
+DOMAIN-SECURITY	Security and privacy	Trust, authorization, cryptography, containment, privacy and recovery controls	DOMAIN-IDENTITY,DOMAIN-ENGINEERING
+DOMAIN-NETWORK	Network and distribution	Offline/online behavior, protocols, synchronization, sessions and distributed execution	DOMAIN-SECURITY,DOMAIN-RUNTIME
+DOMAIN-TOOLS	Tools, agents and automation	Tool bodies, plugins, specialist agents, workflows and application control	DOMAIN-SECURITY,DOMAIN-COGNITION
+DOMAIN-COMPUTE	Compute substrates and models	Model routing, precision, accelerators and experimental compute backends	DOMAIN-RUNTIME,DOMAIN-ENGINEERING
+DOMAIN-RESEARCH	Research and simulation	Scientific method, simulations, evidence classification, prior art and dead-end memory	DOMAIN-ENGINEERING,DOMAIN-MEMORY

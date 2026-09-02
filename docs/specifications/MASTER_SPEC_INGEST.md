@@ -6,4 +6,4 @@ Permanent areas include runtime/causality; identity/lineage; separately versione
 
 Inherited information must never claim direct experience. Post-birth parental input is teaching, not inheritance. Random choices require recorded seeds. Restore, clone, fork and child are distinct. Independence follows demonstrated competence rather than elapsed time alone.
 
-The permanent decomposition is `registry/requirements.tsv`; prose never substitutes for registry evidence.
+The permanent decomposition is `registry/requirements.tsv`; prose never substitutes for registry evidence. The complete source corpus is preserved at `docs/specifications/source/genesis.txt`, and `registry/canonical_sections.tsv` is its lossless 0–1450 section index. Canonical section rows remain conservative source-discovery records until their obligations are atomized and evidenced in the implementation registry.

@@ -1,0 +1,4 @@
+dead_end_id	research_id	reason	reopen_condition	evidence_needed	status	provenance
+DEAD-001	RES-002	No local neuromorphic device or measured adapter in foundation checkout	Qualified hardware adapter and reproducible benchmark	device specification; measured traces	DEFERRED	genesis.txt:34570-34575
+DEAD-002	RES-003	No local photonic hardware or qualified runtime backend in foundation checkout	Qualified hardware adapter and reproducible benchmark	device specification; measured traces	DEFERRED	genesis.txt:34570-34575
+DEAD-003	RES-004	Registry seed only; no claim of exhaustive research coverage	New source with provenance and evidence	source hash; evidence record	OPEN	genesis.txt:34554-34559

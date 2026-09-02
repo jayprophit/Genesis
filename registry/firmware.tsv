@@ -1,0 +1,2 @@
+firmware_id	device_id	version	sha256	update_policy	rollback_policy	status	provenance
+FW-NONE	No required hardware firmware	-	-	no firmware updates in foundation slice	no-op	NOT_APPLICABLE	genesis.txt:1111
