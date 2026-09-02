@@ -10,6 +10,7 @@
 #include "genesis/genetics/persistence.hpp"
 #include "genesis/genetics/reproduction.hpp"
 #include "genesis/identity/lineage.hpp"
+#include "genesis/learning/consolidation.hpp"
 #include "genesis/memory/origin.hpp"
 #include "genesis/memory/graph.hpp"
 #include "genesis/memory/persistence.hpp"

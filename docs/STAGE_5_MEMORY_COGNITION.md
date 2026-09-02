@@ -28,6 +28,14 @@ supersession and retraction require explicit newer evidence. This adapts the
 authorized Digital Twin belief-revision and contradiction requirements without
 claiming that string claim keys provide general semantic understanding.
 
+Learning interference is now an explicit evidence-linked graph over registered
+traces. The consolidation scheduler produces a deterministic, cost-bounded plan
+from importance, uncertainty, accessibility, strongest interference, logical
+disuse, and trace kind. It never mutates memory merely because a trace ranks
+highly. Duplicate/reversed pairs, self-conflicts, unknown traces, invalid ratios,
+budget overflow and logical-time reversal are rejected. Applying a plan and
+measuring retention remain separate integration work.
+
 The prediction system retrieves multiple experiences and reports confidence; it
 does not create categorical identity rules such as “person like this is bad.”
 The workspace name is architectural terminology and is not evidence of

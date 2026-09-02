@@ -15,7 +15,7 @@ MEMORY-GRAPH	MEMORY	Identity-scoped memory graph	REQ-MEM-001	1	1	1	0	1	1	0	1	1
 MEMORY-PERSISTENCE	MEMORY	Crash-safe memory persistence	REQ-MEM-PERSIST-001	1	1	1	1	1	1	1	1	1
 MEMORY-ASSOCIATION	MEMORY	Associative activation and prediction	REQ-MEM-ASSOC-001,REQ-COG-PREDICT-001	1	1	1	0	1	1	0	1	1
 MEMORY-FORGETTING	MEMORY	Decay dormancy consolidation and relearning	REQ-MEM-TRACE-001	1	1	1	0	0	1	0	1	1
-MEMORY-LEARNING	MEMORY	Learning policy and interference control	-	1	0	0	0	0	0	0	0	0
+MEMORY-LEARNING	MEMORY	Learning policy and interference control	REQ-LRN-INTERFERENCE-001,REQ-LRN-CONSOLIDATE-001	1	1	1	0	0	1	0	1	1
 MEMORY-PERCEPTION	MEMORY	Perception grounding pipeline	REQ-ADAPT-001	1	0	0	0	0	0	0	0	0
 MEMORY-LANGUAGE	MEMORY	Language representation and grounding	-	1	0	0	0	0	0	0	0	0
 MEMORY-WORLD-MODEL	MEMORY	World model	REQ-MODELS-001	1	1	1	0	0	1	0	1	1

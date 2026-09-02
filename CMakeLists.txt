@@ -15,6 +15,7 @@ add_library(genesis_core STATIC
     src/genetics/persistence.cpp
     src/genetics/reproduction.cpp
     src/identity/lineage.cpp
+    src/learning/consolidation.cpp
     src/memory/origin.cpp
     src/memory/graph.cpp
     src/memory/persistence.cpp
@@ -76,6 +77,10 @@ add_executable(genesis_memory_cognition_tests tests/memory_cognition_tests.cpp)
 target_link_libraries(genesis_memory_cognition_tests PRIVATE genesis_core)
 target_compile_options(genesis_memory_cognition_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
 add_test(NAME genesis_memory_cognition_tests COMMAND genesis_memory_cognition_tests)
+add_executable(genesis_learning_tests tests/learning_tests.cpp)
+target_link_libraries(genesis_learning_tests PRIVATE genesis_core)
+target_compile_options(genesis_learning_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_learning_tests COMMAND genesis_learning_tests)
 add_executable(genesis_memory_bench benchmarks/memory_benchmark.cpp)
 target_link_libraries(genesis_memory_bench PRIVATE genesis_core)
 
