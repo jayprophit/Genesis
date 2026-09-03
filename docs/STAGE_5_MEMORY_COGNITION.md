@@ -194,7 +194,24 @@ does not create categorical identity rules such as â€œperson like this is bad.â€
 The workspace name is architectural terminology and is not evidence of
 consciousness or subjective experience.
 
-Still open in Stage 5: real perception adapters, language representation, future
+Perception grounding now begins with provider-neutral adapter routes for text,
+image, audio, video, telemetry, proprioception and custom modalities. A route is
+only declared from an artifact digest, provider, licence label and declaration
+evidence. Successful measured probes advance it to observed; a separate evidence
+record and policy threshold are required for qualification. Failure-rate drift
+automatically demotes a qualified route to observed and clears stale qualification.
+No concrete camera, microphone, model or device is claimed by this generic ABI.
+
+Raw observations retain route, payload and provenance digests, capture and receive
+times, confidence and uncertainty. Derived features retain their observation and
+derivation evidence. Projection creates optional workspace and observed-memory
+candidates but commits neither a belief nor a memory and never authorizes action.
+The local benchmark ingested 10,000 observations and 10,000 derived features in
+approximately 0.108 seconds. Crash-safe pipeline persistence remains open, so the
+perception leaf is recorded at 95% rather than complete.
+
+Still open in Stage 5: concrete qualified perception adapters, perception persistence,
+language representation, future
 cross-schema migration implementations, fuzzing, and broader integration across
 the organism event fabric.
 
