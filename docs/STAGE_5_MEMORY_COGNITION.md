@@ -207,11 +207,20 @@ times, confidence and uncertainty. Derived features retain their observation and
 derivation evidence. Projection creates optional workspace and observed-memory
 candidates but commits neither a belief nor a memory and never authorizes action.
 The local benchmark ingested 10,000 observations and 10,000 derived features in
-approximately 0.108 seconds. Crash-safe pipeline persistence remains open, so the
-perception leaf is recorded at 95% rather than complete.
+approximately 0.104 seconds. Its 4,347,238-byte snapshot was serialized,
+checksummed, restored and fully revalidated in approximately 0.126 seconds.
 
-Still open in Stage 5: concrete qualified perception adapters, perception persistence,
-language representation, future
+Perception snapshots are organism-bound, schema-tagged, size-bounded and
+whole-record checksummed. Immutable versions commit through a temporary file and
+atomic rename. Exact floating-point values, route capacities, qualification policy,
+probe results, qualification and downgrade state, raw observations and derived
+features survive recovery. Projection after recovery remains candidate-only:
+belief commitment, memory commitment and action authorization are never serialized
+or inferred. Tests reject corruption, unsupported schemas, owner mismatch, unsafe
+identifiers and conflicting immutable versions. This closes the registered recovery
+gate; it does not qualify a concrete sensor or model.
+
+Still open in Stage 5: concrete qualified perception adapters, language representation, future
 cross-schema migration implementations, fuzzing, and broader integration across
 the organism event fabric.
 

@@ -9,6 +9,7 @@
 #include <string_view>
 #include <vector>
 namespace genesis::perception {
+class PerceptionStore;
 enum class Modality { text,image,audio,video,telemetry,proprioception,custom };
 enum class RouteEvidenceState { unavailable,declared,observed,qualified };
 struct QualificationPolicy { std::uint64_t minimum_successes{3};double maximum_failure_rate{.2}; };
@@ -28,9 +29,14 @@ public:
  [[nodiscard]] const AdapterRoute* find_route(std::string_view id)const noexcept;
  [[nodiscard]] const RawObservation* find_observation(std::string_view id)const noexcept;
  [[nodiscard]] bool verify()const;
+ [[nodiscard]] const std::string& organism_id()const noexcept{return organism_id_;}
+ [[nodiscard]] std::size_t route_capacity()const noexcept{return route_capacity_;}
+ [[nodiscard]] std::size_t observation_capacity()const noexcept{return observation_capacity_;}
+ [[nodiscard]] std::size_t feature_capacity()const noexcept{return feature_capacity_;}
+ [[nodiscard]] QualificationPolicy qualification_policy()const noexcept{return policy_;}
  [[nodiscard]] const std::map<std::string,AdapterRoute>& routes()const noexcept{return routes_;}
  [[nodiscard]] const std::map<std::string,RawObservation>& observations()const noexcept{return observations_;}
  [[nodiscard]] const std::map<std::string,DerivedFeature>& features()const noexcept{return features_;}
-private:std::string organism_id_;std::size_t route_capacity_{},observation_capacity_{},feature_capacity_{};QualificationPolicy policy_;std::map<std::string,AdapterRoute> routes_;std::map<std::string,RawObservation> observations_;std::map<std::string,DerivedFeature> features_;
+private:friend class PerceptionStore;std::string organism_id_;std::size_t route_capacity_{},observation_capacity_{},feature_capacity_{};QualificationPolicy policy_;std::map<std::string,AdapterRoute> routes_;std::map<std::string,RawObservation> observations_;std::map<std::string,DerivedFeature> features_;
 };
 }
