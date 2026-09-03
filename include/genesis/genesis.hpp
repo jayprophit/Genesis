@@ -4,6 +4,7 @@
 // genesis_core library; clients can include narrower module headers instead.
 #include "genesis/common/text.hpp"
 #include "genesis/cognition/workspace.hpp"
+#include "genesis/cognition/persistence.hpp"
 #include "genesis/development/maturity.hpp"
 #include "genesis/genetics/expression.hpp"
 #include "genesis/genetics/genome.hpp"

@@ -28,6 +28,29 @@ supersession and retraction require explicit newer evidence. This adapts the
 authorized Digital Twin belief-revision and contradiction requirements without
 claiming that string claim keys provide general semantic understanding.
 
+World, self and other-agent beliefs now carry an explicit evidence-source identity
+and bounded source-quality value. Assessed confidence is calculated only for active
+beliefs from original confidence, source quality and deterministic logical recency;
+the original confidence remains intact for audit and alternative policies. Wall
+clock time is not consulted. A zero freshness window, time reversal, inactive
+belief or unknown belief produces no assessment rather than a fabricated score.
+
+Belief models are now organism-bound and persist through schema-tagged, exact-value,
+whole-record-checksummed immutable snapshots. Atomic temporary-file rename, size
+limits and path-safe identifiers follow the existing persistence policy. Restore
+replays beliefs through the public update and retraction rules, then verifies that
+active, superseded and retracted states exactly match the stored model; derived
+state is not trusted. Corruption, version conflict, unsafe path and identity tests
+are included. On the local 10,000-belief benchmark, a 2,206,789-byte snapshot was
+serialized and fully restored in approximately 0.711 seconds. This is development
+evidence, not a production latency guarantee.
+
+Completion accounting now separates persistent belief state from the broader
+meaning of a world or self model. Evidence-qualified belief storage is complete
+against its registered gates. Causal/temporal dynamics, counterfactual simulation,
+capability calibration and autobiographical continuity remain separate incomplete
+leaves; persistence alone does not justify calling the whole model complete.
+
 Learning interference is now an explicit evidence-linked graph over registered
 traces. The consolidation scheduler produces a deterministic, cost-bounded plan
 from importance, uncertainty, accessibility, strongest interference, logical
@@ -71,8 +94,8 @@ does not create categorical identity rules such as â€œperson like this is bad.â€
 The workspace name is architectural terminology and is not evidence of
 consciousness or subjective experience.
 
-Still open in Stage 5: persistent belief-model storage, evidence-source quality,
-real perception adapters, language representation, affect regulation, future
+Still open in Stage 5: real perception adapters, language representation, affect
+regulation, future
 cross-schema migration implementations, fuzzing, and broader integration across
 the organism event fabric.
 
