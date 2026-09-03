@@ -92,6 +92,21 @@ unsupported schemas, owner mismatch, unsafe paths and conflicting versions. Rest
 clone, fork and child origins remain distinct after recovery. The autobiographical
 continuity leaf is complete against its registered schema-1 gates.
 
+Affect integration now records evidence-linked perception, memory, homeostasis,
+learning, social and operator-input signals as bounded valence, arousal and stress.
+Confidence controls how strongly a signal updates the current state. Logical-time
+decay moves the state toward neutral without consulting wall-clock time. Explicit
+reappraisal, calming, grounding and operator-support records retain before/after
+state and bounded regulation load. Homeostatic warning severity feeds stress and
+arousal through the existing controller types rather than a duplicate health model.
+
+The affect state may adjust a workspace item's salience by a bounded multiplier,
+but the influence result explicitly cannot authorize an action. Numeric affect is
+a control and prioritization model; it is not evidence of subjective emotion or
+conscious experience. The local benchmark processed 10,000 signals and 5,000
+regulations in approximately 0.485 seconds. Crash-safe persistence is still open,
+so the affect leaf is recorded at 95% rather than complete.
+
 Causal world dynamics now separate immutable state observations, causal hypotheses,
 time-bounded predictions and observed outcomes. Hypotheses retain prior confidence,
 support and counterevidence counts; confirmation and refutation update a bounded
@@ -175,7 +190,7 @@ The workspace name is architectural terminology and is not evidence of
 consciousness or subjective experience.
 
 Still open in Stage 5: real perception adapters, language representation, affect
-regulation, future
+persistence, future
 cross-schema migration implementations, fuzzing, and broader integration across
 the organism event fabric.
 
