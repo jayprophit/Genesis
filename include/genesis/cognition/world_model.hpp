@@ -7,6 +7,7 @@
 #include <string_view>
 #include <vector>
 namespace genesis::cognition {
+class WorldDynamicsStore;
 enum class PredictionState { pending, confirmed, refuted, expired };
 struct WorldStateObservation { std::string id,entity_id,property,value_digest,evidence_digest;std::uint64_t observed_at{};double confidence{}; };
 struct CausalHypothesis { std::string id,cause_property,cause_value_digest,effect_property,effect_value_digest,evidence_digest;std::uint64_t created_at{},updated_at{},support_count{},counterevidence_count{};double prior_confidence{},calibrated_confidence{}; };
@@ -28,7 +29,14 @@ public:
  [[nodiscard]] std::size_t state_count()const noexcept;
  [[nodiscard]] std::size_t hypothesis_count()const noexcept;
  [[nodiscard]] std::size_t prediction_count()const noexcept;
+ [[nodiscard]] std::size_t state_capacity()const noexcept;
+ [[nodiscard]] std::size_t hypothesis_capacity()const noexcept;
+ [[nodiscard]] std::size_t prediction_capacity()const noexcept;
+ [[nodiscard]] const std::vector<WorldStateObservation>& states()const noexcept;
+ [[nodiscard]] const std::map<std::string,CausalHypothesis>& hypotheses()const noexcept;
+ [[nodiscard]] const std::map<std::string,WorldPrediction>& predictions()const noexcept;
 private:
+ friend class WorldDynamicsStore;
  std::string organism_id_;std::size_t state_capacity_{},hypothesis_capacity_{},prediction_capacity_{};
  std::vector<WorldStateObservation> states_;std::map<std::string,CausalHypothesis> hypotheses_;std::map<std::string,WorldPrediction> predictions_;
 };

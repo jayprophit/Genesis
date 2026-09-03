@@ -64,9 +64,21 @@ matching hypotheses under a strict result limit. Every returned item is explicit
 marked simulated so it cannot be mistaken for an observation, autobiographical
 memory or fact. Multi-step search, intervention semantics, confounder handling and
 crash-safe persistence remain open and are tracked separately. The local benchmark
-built 10,000 observations, hypotheses and predictions in approximately 0.753
-seconds, resolved 10,000 outcomes in 0.063 seconds, and ran 1,000 bounded projections
-in 0.390 seconds. These are development-machine measurements only.
+built 10,000 observations, hypotheses and predictions in approximately 0.665
+seconds, resolved 10,000 outcomes in 0.047 seconds, and ran 1,000 bounded projections
+in 0.310 seconds. These are development-machine measurements only.
+
+Causal world state now persists in organism-bound schema-1 snapshots containing
+observations, calibrated hypotheses, predictions, deadlines, outcome evidence and
+resolution states. Exact numeric values and a whole-record SHA-256 checksum are
+preserved under bounded field, item and file sizes. Immutable versions commit by
+temporary-file rename. Restore rebuilds observations through their validator,
+validates hypothesis calibration from prior/support/counterevidence, checks every
+prediction against its hypothesis and rejects corruption, conflicts, unsafe paths,
+identity mismatch and unsupported schemas. The 30,000-record local benchmark
+produced a 7,783,499-byte snapshot and restored it in approximately 0.774 seconds.
+Bounded counterfactual projections are regenerated from restored hypotheses rather
+than serialized as facts.
 
 Learning interference is now an explicit evidence-linked graph over registered
 traces. The consolidation scheduler produces a deterministic, cost-bounded plan

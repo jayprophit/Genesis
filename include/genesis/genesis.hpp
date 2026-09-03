@@ -6,6 +6,7 @@
 #include "genesis/cognition/workspace.hpp"
 #include "genesis/cognition/persistence.hpp"
 #include "genesis/cognition/world_model.hpp"
+#include "genesis/cognition/world_persistence.hpp"
 #include "genesis/development/maturity.hpp"
 #include "genesis/genetics/expression.hpp"
 #include "genesis/genetics/genome.hpp"
