@@ -51,6 +51,18 @@ against its registered gates. Causal/temporal dynamics, counterfactual simulatio
 capability calibration and autobiographical continuity remain separate incomplete
 leaves; persistence alone does not justify calling the whole model complete.
 
+The self model now includes an organism-bound capability and competency ledger.
+Routes progress only through unavailable, declared, observed and qualified evidence
+levels. Declaring a route does not prove that it works; recorded success and failure
+outcomes establish a calibrated rate, and a separately supplied qualification
+record is accepted only after policy thresholds are met. Repeated post-qualification
+failures automatically demote a route, while explicit revocation makes it
+unavailable. Qualification never authorizes execution: authenticated identity,
+policy approval, safety approval and decision evidence must all pass independently.
+The local benchmark declared and qualified 10,000 capabilities from 50,000 measured
+outcomes in approximately 0.210 seconds. Persistence and migration of this ledger
+remain open, so the capability-calibration leaf is intentionally not complete.
+
 Causal world dynamics now separate immutable state observations, causal hypotheses,
 time-bounded predictions and observed outcomes. Hypotheses retain prior confidence,
 support and counterevidence counts; confirmation and refutation update a bounded
