@@ -51,6 +51,23 @@ against its registered gates. Causal/temporal dynamics, counterfactual simulatio
 capability calibration and autobiographical continuity remain separate incomplete
 leaves; persistence alone does not justify calling the whole model complete.
 
+Causal world dynamics now separate immutable state observations, causal hypotheses,
+time-bounded predictions and observed outcomes. Hypotheses retain prior confidence,
+support and counterevidence counts; confirmation and refutation update a bounded
+calibrated confidence without rewriting the originating evidence. Predictions are
+explicitly pending, confirmed, refuted or expired and use logical time. Invalid
+digests, duplicate IDs, missing hypotheses, reversed time, exhausted counters and
+over-capacity inputs are rejected.
+
+One-step counterfactual projection returns confidence-ranked consequences from
+matching hypotheses under a strict result limit. Every returned item is explicitly
+marked simulated so it cannot be mistaken for an observation, autobiographical
+memory or fact. Multi-step search, intervention semantics, confounder handling and
+crash-safe persistence remain open and are tracked separately. The local benchmark
+built 10,000 observations, hypotheses and predictions in approximately 0.753
+seconds, resolved 10,000 outcomes in 0.063 seconds, and ran 1,000 bounded projections
+in 0.390 seconds. These are development-machine measurements only.
+
 Learning interference is now an explicit evidence-linked graph over registered
 traces. The consolidation scheduler produces a deterministic, cost-bounded plan
 from importance, uncertainty, accessibility, strongest interference, logical

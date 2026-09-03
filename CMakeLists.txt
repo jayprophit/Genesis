@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Genesis VERSION 0.10.0 LANGUAGES CXX)
+project(Genesis VERSION 0.11.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -10,6 +10,7 @@ add_library(genesis_core STATIC
     src/common/text.cpp
     src/cognition/workspace.cpp
     src/cognition/persistence.cpp
+    src/cognition/world_model.cpp
     src/development/maturity.cpp
     src/genetics/expression.cpp
     src/genetics/genome.cpp
@@ -87,6 +88,8 @@ add_executable(genesis_memory_bench benchmarks/memory_benchmark.cpp)
 target_link_libraries(genesis_memory_bench PRIVATE genesis_core)
 add_executable(genesis_learning_bench benchmarks/learning_benchmark.cpp)
 target_link_libraries(genesis_learning_bench PRIVATE genesis_core)
+add_executable(genesis_world_model_bench benchmarks/world_model_benchmark.cpp)
+target_link_libraries(genesis_world_model_bench PRIVATE genesis_core)
 
 install(TARGETS genesis_core EXPORT GenesisTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
