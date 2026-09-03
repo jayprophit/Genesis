@@ -42,6 +42,10 @@ engineering facts or automatic implementation instructions.
 - Domain and requirement validation detects duplicate IDs, repeated aliases, missing dependencies, unknown domains, invalid scores, and dependency cycles.
 - The runtime slice provides deterministic logical time, immutable SHA-256 event envelopes, ordered dispatch, causal-parent checks, replay pre-validation, bounded history, atomic resource reservations, and a causal state machine with replay-chain verification.
 - Stage 2 life-integrity contracts are implemented: immutable versioned genome serialization and storage, content-vs-record digests, atomic immutable version commits, deterministic two-parent recombination, mutation audit records, birth cutoff enforcement, origin-labelled inherited memory, and birth snapshot hashes. See `docs/STAGE_2_LIFE_INTEGRITY.md`.
+- Typed entity addressability is implemented with deterministic type-prefixed
+  IDs, evidence-bearing append-only relationship revisions, typed endpoint
+  checks, explicit identity/authorization separation and immutable recovery.
+  See `docs/IDENTITY_ENTITY_ADDRESSING.md`.
 - Tests cover SHA-256 vectors, monotonic clocks, deterministic subscription order, one-shot handlers, duplicate and invalid replay rejection, resource over-allocation and rollback, state transition causality, registry/schema checks, provenance chaining, identity, genome, RNA, maturity, genome-store round trips/conflicts, malformed records, lineage adversaries, deterministic births, mutation records, and inheritance cutoff boundaries.
 - Benchmarks cover the diagnostic provenance chain, runtime dispatcher, and 10,000 deterministic birth transactions. Benchmark output is measurement evidence, not a claim of production capacity.
 - Registry schemas are seeded for biological analogies, capabilities, platform requirements, dependencies, drivers, firmware, deployment profiles, protocols, models, datasets, universal research items, evidence/utility class definitions, and rejected/dead-end research. The technology-mining registry has 43 items and the dead-end cache has 10 linked records with independent E/U classifications.

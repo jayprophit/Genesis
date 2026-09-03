@@ -3,10 +3,14 @@
 Stage 2 is the first executable boundary for a digital organism's inherited
 state. It does not claim biological equivalence, consciousness, or
 cryptographic identity. It provides deterministic, testable contracts for
-genome records, lineage metadata, birth snapshots and origin-labelled memory.
+typed entity addresses, genome records, lineage metadata, birth snapshots and
+origin-labelled memory.
 
 ## Public contracts
 
+- `genesis::identity::EntityRegistry` provides type-separated addresses and
+  append-only relationship revisions. Its persistence contract is documented
+  in `docs/IDENTITY_ENTITY_ADDRESSING.md`.
 - `genesis::genetics::GenomeStore` serializes a validated genome into a
   versioned binary record, reads it back with strict length and trailing-byte
   checks, and commits immutable versions with a temporary-file rename.

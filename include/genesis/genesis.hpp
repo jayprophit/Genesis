@@ -12,6 +12,8 @@
 #include "genesis/genetics/genome.hpp"
 #include "genesis/genetics/persistence.hpp"
 #include "genesis/genetics/reproduction.hpp"
+#include "genesis/identity/entity_persistence.hpp"
+#include "genesis/identity/entity_registry.hpp"
 #include "genesis/identity/lineage.hpp"
 #include "genesis/learning/consolidation.hpp"
 #include "genesis/learning/persistence.hpp"
