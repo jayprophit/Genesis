@@ -69,6 +69,23 @@ excluded from persistence, so recovery can never replay an old permission. Futur
 cross-schema migration remains a separate platform-wide migration requirement; the
 current capability-calibration leaf is complete against its registered schema-1 gates.
 
+Autobiographical continuity now uses a bounded SHA-256-linked life-event journal
+over the authoritative lineage and memory-origin contracts. Every event binds its
+organism, sequence, logical time, memory identity, content, provenance, origin,
+scope and previous event digest. Checkpoints bind the current head and sequence.
+Append rejects gaps, duplicate event or memory identities, reversed logical time,
+invalid evidence and capacity overflow. Segment audits report gaps, conflicts,
+origin violations and digest-chain tampering without silently merging histories.
+
+Genesis and child autobiographies begin without imported continuity. Restore must
+continue the same organism from an identified checkpoint. Clone and fork require a
+distinct source organism and remain divergent identities rather than continuations.
+A foreign or shared record labelled as direct experience is rejected; it can enter
+the journal only with its external, inherited, taught, observed, inferred or
+simulated origin preserved. The local benchmark appended 10,000 events and 100
+checkpoints in approximately 0.775 seconds. Crash-safe journal persistence remains
+open, so this leaf is intentionally recorded at 95% rather than complete.
+
 Causal world dynamics now separate immutable state observations, causal hypotheses,
 time-bounded predictions and observed outcomes. Hypotheses retain prior confidence,
 support and counterevidence counts; confirmation and refutation update a bounded
