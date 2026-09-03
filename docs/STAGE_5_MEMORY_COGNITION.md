@@ -104,8 +104,13 @@ The affect state may adjust a workspace item's salience by a bounded multiplier,
 but the influence result explicitly cannot authorize an action. Numeric affect is
 a control and prioritization model; it is not evidence of subjective emotion or
 conscious experience. The local benchmark processed 10,000 signals and 5,000
-regulations in approximately 0.485 seconds. Crash-safe persistence is still open,
-so the affect leaf is recorded at 95% rather than complete.
+regulations in approximately 0.519 seconds. Its schema-1 snapshot was 2,553,510
+bytes and completed exact serialization, checksum verification, restoration and
+full validation in approximately 0.094 seconds. The organism-bound store uses
+bounded sizes, immutable versions and atomic commit, and rejects corruption,
+unsupported schemas, owner mismatch, unsafe paths and conflicting versions. No
+authorization field exists in the schema, and restored salience influence remains
+explicitly unauthorized. The affect leaf is complete against its registered gates.
 
 Causal world dynamics now separate immutable state observations, causal hypotheses,
 time-bounded predictions and observed outcomes. Hypotheses retain prior confidence,
@@ -189,8 +194,7 @@ does not create categorical identity rules such as â€œperson like this is bad.â€
 The workspace name is architectural terminology and is not evidence of
 consciousness or subjective experience.
 
-Still open in Stage 5: real perception adapters, language representation, affect
-persistence, future
+Still open in Stage 5: real perception adapters, language representation, future
 cross-schema migration implementations, fuzzing, and broader integration across
 the organism event fabric.
 

@@ -7,6 +7,7 @@
 #include <string_view>
 #include <vector>
 namespace genesis::cognition {
+class AffectStore;
 enum class AffectSource { perception,memory,homeostasis,learning,social,operator_input };
 enum class RegulationKind { reappraisal,calming,grounding,operator_support };
 struct AffectSignal { std::string id,source_id,evidence_digest;AffectSource source{AffectSource::perception};double valence{},arousal{},stress{},confidence{};std::uint64_t observed_at{}; };
@@ -22,9 +23,10 @@ public:
  bool regulate(std::string id,RegulationKind kind,double intensity,std::string evidence_digest,std::uint64_t at,std::string* error=nullptr);
  [[nodiscard]] AffectInfluence influence(const WorkspaceItem& item,double memory_valence)const;
  [[nodiscard]] bool verify()const;
+ [[nodiscard]] const std::string& organism_id()const noexcept{return organism_id_;}
  [[nodiscard]] const AffectState& state()const noexcept{return state_;}
  [[nodiscard]] const std::vector<AffectSignal>& signals()const noexcept{return signals_;}
  [[nodiscard]] const std::vector<RegulationRecord>& regulations()const noexcept{return regulations_;}
-private:std::string organism_id_;std::size_t signal_capacity_{},regulation_capacity_{};AffectState state_;std::vector<AffectSignal> signals_;std::vector<RegulationRecord> regulations_;
+private:friend class AffectStore;std::string organism_id_;std::size_t signal_capacity_{},regulation_capacity_{};AffectState state_;std::vector<AffectSignal> signals_;std::vector<RegulationRecord> regulations_;
 };
 }
