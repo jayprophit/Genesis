@@ -1,15 +1,19 @@
 id	parent	name	requirements	design	implementation	unit_tests	integration_tests	benchmark	security	recovery	documentation	platform_qualification
 GENESIS	-	Genesis complete program	-	-	-	-	-	-	-	-	-	-
 FOUNDATION	GENESIS	Foundation and engineering	REQ-REG-001,REQ-DOM-001,REQ-FND-001	-	-	-	-	-	-	-	-	-
-FOUNDATION-REGISTRY	FOUNDATION	Permanent requirements and provenance	REQ-REG-001,REQ-PROV-001	1	1	1	1	0	1	1	1	1
+FOUNDATION-REGISTRY	FOUNDATION	Permanent requirements and provenance	REQ-REG-001,REQ-PROV-001,REQ-GENESIS3-INGEST-001	1	1	1	1	0	1	1	1	1
 FOUNDATION-RUNTIME	FOUNDATION	Deterministic runtime and resources	REQ-RUN-001,REQ-RES-001	1	1	1	1	1	1	1	1	1
 FOUNDATION-CI	FOUNDATION	CI build and release assurance	REQ-CI-001,REQ-BUILD-LAYOUT-001	1	1	0	0	0	0	0	1	0
+FOUNDATION-DEGRADATION	FOUNDATION	Organism-wide graceful degradation	REQ-GRACEFUL-DEGRADATION-001	1	0	0	0	0	0	0	0	0
 ORGANISM	GENESIS	Digital organism anatomy	-	-	-	-	-	-	-	-	-	-
 ORGANISM-CELLS	ORGANISM	Cells and differentiation	REQ-CELL-001,REQ-CELL-DIFF-001	1	1	1	1	1	1	1	1	1
 ORGANISM-TISSUES	ORGANISM	Tissues and organs	REQ-TISSUE-001,REQ-ORGAN-001	1	1	1	1	0	1	1	1	1
 ORGANISM-REPAIR	ORGANISM	Repair and recycling	REQ-CELL-REPAIR-001,REQ-CELL-RECYCLE-001	1	1	1	1	0	1	1	1	1
 ORGANISM-HOMEOSTASIS	ORGANISM	Signalling metabolism and homeostasis	REQ-SIGNAL-001,REQ-METABOLISM-001,REQ-HOME-001	1	1	1	1	1	1	1	1	1
 ORGANISM-IMMUNE	ORGANISM	Immune boundaries and memory	REQ-IMM-001,REQ-IMMUNE-MEMORY-001	1	1	1	1	0	1	1	1	0
+ORGANISM-ATLAS	ORGANISM	Biological digital counterpart atlas	REQ-DUAL-ANATOMY-ATLAS-001	1	0	0	0	0	0	0	0	0
+ORGANISM-HEALTH	ORGANISM	Health lifecycle and functional age	REQ-HEALTH-LIFECYCLE-001	1	0	0	0	0	0	0	0	0
+ORGANISM-INTEROCEPTION	ORGANISM	Unified organism interoception	REQ-INTEROCEPTION-001	1	0	0	0	0	0	0	0	0
 MEMORY	GENESIS	Memory learning and cognition	-	-	-	-	-	-	-	-	-	-
 MEMORY-GRAPH	MEMORY	Identity-scoped memory graph	REQ-MEM-001	1	1	1	0	1	1	0	1	1
 MEMORY-PERSISTENCE	MEMORY	Crash-safe memory persistence	REQ-MEM-PERSIST-001	1	1	1	1	1	1	1	1	1
@@ -20,7 +24,7 @@ MEMORY-LEARNING-PLANNING	MEMORY-LEARNING	Learning policy and interference planni
 MEMORY-LEARNING-EXECUTION	MEMORY-LEARNING	Atomic resource-governed consolidation execution	REQ-LRN-EXECUTE-001	1	1	1	1	1	1	1	1	1
 MEMORY-LEARNING-RETENTION	MEMORY-LEARNING	Retention and interference outcome evaluation	REQ-LRN-RETENTION-001,REQ-LRN-RETENTION-PERSIST-001	1	1	1	1	1	1	1	1	1
 MEMORY-PERCEPTION	MEMORY	Perception grounding pipeline	REQ-ADAPT-001,REQ-PERCEPTION-GROUND-001,REQ-PERCEPTION-PERSIST-001	1	1	1	1	1	1	1	1	1
-MEMORY-LANGUAGE	MEMORY	Language representation and grounding	-	1	0	0	0	0	0	0	0	0
+MEMORY-LANGUAGE	MEMORY	Language representation and grounding	REQ-LANGUAGE-MEANING-001,REQ-BIOSEMIOTICS-001	1	0	0	0	0	0	0	0	0
 MEMORY-WORLD-MODEL	MEMORY	World model	REQ-MODELS-001,REQ-BELIEF-SOURCE-001,REQ-BELIEF-PERSIST-001	-	-	-	-	-	-	-	-	-
 MEMORY-WORLD-BELIEFS	MEMORY-WORLD-MODEL	Persistent evidence-qualified world beliefs	REQ-MODELS-001,REQ-BELIEF-SOURCE-001,REQ-BELIEF-PERSIST-001	1	1	1	1	1	1	1	1	1
 MEMORY-WORLD-DYNAMICS	MEMORY-WORLD-MODEL	Causal and temporal world dynamics	REQ-WORLD-DYNAMICS-001,REQ-WORLD-PERSIST-001	1	1	1	1	1	1	1	1	1
@@ -31,9 +35,12 @@ MEMORY-SELF-MODEL	MEMORY	Self model	REQ-MODELS-001,REQ-BELIEF-SOURCE-001,REQ-BEL
 MEMORY-SELF-BELIEFS	MEMORY-SELF-MODEL	Persistent evidence-qualified self beliefs	REQ-MODELS-001,REQ-BELIEF-SOURCE-001,REQ-BELIEF-PERSIST-001	1	1	1	1	1	1	1	1	1
 MEMORY-SELF-CAPABILITY	MEMORY-SELF-MODEL	Capability limitation and competency calibration	REQ-SELF-CAPABILITY-001,REQ-SELF-CAPABILITY-PERSIST-001	1	1	1	1	1	1	1	1	1
 MEMORY-SELF-CONTINUITY	MEMORY-SELF-MODEL	Identity continuity and autobiographical coherence	REQ-SELF-CONTINUITY-001,REQ-SELF-CONTINUITY-PERSIST-001	1	1	1	1	1	1	1	1	1
-MEMORY-AFFECT	MEMORY	Affect integration and regulation	REQ-AFFECT-001,REQ-AFFECT-PERSIST-001	1	1	1	1	1	1	1	1	1
+MEMORY-AFFECT	MEMORY	Affect integration regulation and expression	REQ-AFFECT-001,REQ-AFFECT-PERSIST-001,REQ-AFFECT-EXPRESSION-001	-	-	-	-	-	-	-	-	-
+MEMORY-AFFECT-REGULATION	MEMORY-AFFECT	Affect integration and regulation	REQ-AFFECT-001,REQ-AFFECT-PERSIST-001	1	1	1	1	1	1	1	1	1
+MEMORY-AFFECT-EXPRESSION	MEMORY-AFFECT	Affect expression and appraisal boundary	REQ-AFFECT-EXPRESSION-001	1	0	0	0	0	0	0	0	0
 MEMORY-WORKSPACE	MEMORY	Limited cognitive workspace	REQ-COG-001	1	1	1	0	0	1	0	1	1
 MEMORY-METACOGNITION	MEMORY	Metacognition and introspection	REQ-META-001	1	1	1	0	0	1	0	1	1
+MEMORY-CONTEXT-HIERARCHY	MEMORY	Addressable cognitive context hierarchy	REQ-CONTEXT-HIERARCHY-001	1	0	0	0	0	0	0	0	0
 DEVELOPMENT	GENESIS	Development and independence	-	-	-	-	-	-	-	-	-	-
 DEVELOPMENT-EMBRYOLOGY	DEVELOPMENT	Embryology orchestration	-	1	0	0	0	0	0	0	0	0
 DEVELOPMENT-CURRICULUM	DEVELOPMENT	Teaching curricula	REQ-PAR-001	1	0	0	0	0	0	0	0	0
@@ -43,18 +50,19 @@ DEVELOPMENT-PLAY	DEVELOPMENT	Play and exploration	-	1	0	0	0	0	0	0	0	0
 DEVELOPMENT-COMPETENCY	DEVELOPMENT	Competency and maturity gates	REQ-DEV-001	1	1	1	1	0	1	1	1	1
 DEVELOPMENT-INDEPENDENCE	DEVELOPMENT	Progressive independence	-	1	0	0	0	0	0	0	0	0
 DEVELOPMENT-GUARDIAN	DEVELOPMENT	Guardian and operator boundaries	-	1	0	0	0	0	0	0	0	0
+DEVELOPMENT-PROFILE	DEVELOPMENT	Individual development and mastery profile	REQ-DEVELOPMENT-PROFILE-001	1	0	0	0	0	0	0	0	0
 EMBODIMENT	GENESIS	Models senses and embodiment	-	-	-	-	-	-	-	-	-	-
 EMBODIMENT-MODELS	EMBODIMENT	Local model discovery and routing	REQ-MODEL-001	1	0	0	0	0	0	0	1	0
 EMBODIMENT-MULTIMODAL	EMBODIMENT	Multimodal adapter ABI	REQ-ADAPT-001	1	0	0	0	0	0	0	1	0
-EMBODIMENT-BODY	EMBODIMENT	Body schema and avatar control	-	1	0	0	0	0	0	0	0	0
-EMBODIMENT-HARDWARE-SAFETY	EMBODIMENT	Hardware safety interlocks	-	1	0	0	0	0	0	0	0	0
+EMBODIMENT-BODY	EMBODIMENT	Body schema shell identity and avatar control	REQ-SHELL-TRUST-001	1	0	0	0	0	0	0	0	0
+EMBODIMENT-HARDWARE-SAFETY	EMBODIMENT	Hardware safety interlocks and component trust	REQ-COMPONENT-ATTEST-001,REQ-PHYSICAL-SAFETY-KERNEL-001	1	0	0	0	0	0	0	0	0
 EMBODIMENT-DEVICE-ROUTES	EMBODIMENT	Observed and qualified device routes	REQ-PLAT-001	1	0	0	0	0	0	0	1	0
 NETWORK	GENESIS	Networking and distributed cognition	-	-	-	-	-	-	-	-	-	-
 NETWORK-IDENTITY	NETWORK	Network identity	REQ-NET-BOUNDARY-001	1	0	0	0	0	0	0	1	0
 NETWORK-SHARED	NETWORK	Shared domain and private-memory separation	REQ-SHARED-DOMAIN-001	1	0	0	0	0	0	0	1	0
-NETWORK-AGENTS	NETWORK	Specialist agent contracts	-	1	0	0	0	0	0	0	0	0
-NETWORK-RECOVERY	NETWORK	Partition recovery and replay	-	1	0	0	0	0	0	0	0	0
-NETWORK-RECONCILIATION	NETWORK	Distributed reconciliation	-	1	0	0	0	0	0	0	0	0
+NETWORK-AGENTS	NETWORK	Specialist agent contracts	REQ-SPECIALIST-COGNITION-001	1	0	0	0	0	0	0	0	0
+NETWORK-RECOVERY	NETWORK	Partition recovery and replay	REQ-OFFLINE-RECONCILE-001	1	0	0	0	0	0	0	0	0
+NETWORK-RECONCILIATION	NETWORK	Distributed reconciliation	REQ-OFFLINE-RECONCILE-001	1	0	0	0	0	0	0	0	0
 SECURITY	GENESIS	Security and platform qualification	-	-	-	-	-	-	-	-	-	-
 SECURITY-CRYPTO	SECURITY	Approved cryptographic providers	REQ-CRYPTO-001	1	0	0	0	0	0	0	1	0
 SECURITY-KEYS	SECURITY	Key custody and rotation	REQ-CRYPTO-001	1	0	0	0	0	0	0	0	0
@@ -72,3 +80,15 @@ EVOLUTION-DIVERSITY	EVOLUTION	Diversity preservation	-	1	0	0	0	0	0	0	0	0
 EVOLUTION-CONTAINMENT	EVOLUTION	Simulation containment	-	1	0	0	0	0	0	0	0	0
 EVOLUTION-OPTIMIZATION	EVOLUTION	Long-horizon optimization	-	1	0	0	0	0	0	0	0	0
 EVOLUTION-REPLICATION-SAFETY	EVOLUTION	Prevention of uncontrolled self-replication	-	1	0	0	0	0	0	0	0	0
+GOVERNANCE	GENESIS	Identity morality rights and bounded agency	-	-	-	-	-	-	-	-	-	-
+GOVERNANCE-LAW	GOVERNANCE	Temporal jurisdictional governance	REQ-GOVERNANCE-LAW-001	1	0	0	0	0	0	0	0	0
+GOVERNANCE-MORAL	GOVERNANCE	Pluralistic moral constitution	REQ-MORAL-CONSTITUTION-001	1	0	0	0	0	0	0	0	0
+GOVERNANCE-RIGHTS	GOVERNANCE	Rights and vulnerable-party safeguards	REQ-RIGHTS-SAFEGUARD-001	1	0	0	0	0	0	0	0	0
+GOVERNANCE-IDENTITY-RECORDS	GOVERNANCE	Entity life credential custody and succession records	REQ-ENTITY-ADDRESS-001,REQ-LIFE-RECORD-001,REQ-CREDENTIAL-RECORD-001,REQ-CUSTODY-RELATION-001,REQ-SUCCESSION-001	1	0	0	0	0	0	0	0	0
+GOVERNANCE-AGENCY	GOVERNANCE	Delegated economic and adaptation governance	REQ-ECONOMIC-AGENCY-001,REQ-ADAPTATION-GOVERNANCE-001	1	0	0	0	0	0	0	0	0
+RESEARCH	GENESIS	Private laboratory and evidence-separated exploration	-	-	-	-	-	-	-	-	-	-
+RESEARCH-LAB	RESEARCH	Private Genesis laboratory	REQ-LAB-001,REQ-GENOME-EDIT-001	1	0	0	0	0	0	0	0	0
+RESEARCH-OVERLAYS	RESEARCH	Traditional and resonance research overlays	REQ-TRADITIONAL-OVERLAY-001,REQ-RESONANCE-RESEARCH-001	1	0	0	0	0	0	0	0	0
+COMPUTE	GENESIS	Compute fabric and execution physiology	-	-	-	-	-	-	-	-	-	-
+COMPUTE-FABRIC	COMPUTE	Evidence-gated heterogeneous compute fabric	REQ-COMPUTE-FABRIC-001	1	0	0	0	0	0	0	0	0
+COMPUTE-PHYSIOLOGY	COMPUTE	Execution anatomy energy and heat traceability	REQ-COMPUTE-PHYSIOLOGY-001	1	0	0	0	0	0	0	0	0

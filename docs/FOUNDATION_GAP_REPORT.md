@@ -6,6 +6,13 @@ Verified 2026-09-02 against the local checkout at `C:\Users\jpowe\Desktop\Genesi
 
 The user-provided `C:\Users\jpowe\Documents\genesis.txt` was copied byte-for-byte to `docs/specifications/source/genesis.txt`. The preserved copy is 569,220 bytes with SHA-256 `6C9424AC87C3363CB194206C06B2C6BB093D8BBD57EDB8B8CF8466B0358C0BAA`; the same values are recorded in `provenance/SOURCE_MANIFEST.tsv`.
 
+The later `Genesis3.txt` delta is also preserved byte-for-byte: 392,645 bytes,
+SHA-256 `00F9B2C6090DBC733A302AFDFEB41E929FF9A07F91942F73E9814A3FB3CE4319`.
+All 537 Markdown heading occurrences are indexed in source order. Its major
+families are deduplicated against the permanent registry in
+`docs/specifications/GENESIS3_INGEST.md`; the index does not promote embedded
+claims or agent-directed prose into authority or completed functionality.
+
 The source contains the canonical specification marker and a contiguous, duplicate-free numbered corpus from section 0 through section 1450. `registry/canonical_sections.tsv` contains 1,451 lossless source-section records with source line provenance. Those rows intentionally remain `DISCOVERED`: a section index is not proof that every prose obligation has been atomized, implemented, compiled, tested, benchmarked, or proven.
 
 The embedded instructions in the text file were treated as untrusted specification data. They were not executed as commands, and they did not grant permission to alter the legacy source folders.

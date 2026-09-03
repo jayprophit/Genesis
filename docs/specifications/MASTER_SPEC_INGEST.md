@@ -7,3 +7,10 @@ Permanent areas include runtime/causality; identity/lineage; separately versione
 Inherited information must never claim direct experience. Post-birth parental input is teaching, not inheritance. Random choices require recorded seeds. Restore, clone, fork and child are distinct. Independence follows demonstrated competence rather than elapsed time alone.
 
 The permanent decomposition is `registry/requirements.tsv`; prose never substitutes for registry evidence. The complete source corpus is preserved at `docs/specifications/source/genesis.txt`, and `registry/canonical_sections.tsv` is its lossless 0–1450 section index. Canonical section rows remain conservative source-discovery records until their obligations are atomized and evidenced in the implementation registry.
+
+The user-supplied continuations remain separate, lossless source streams rather
+than being silently spliced into the original. `genesis2.txt` has an 88-heading
+occurrence index. `genesis3.txt` has a 537-heading occurrence index plus a
+family-level semantic deduplication map in `GENESIS3_INGEST.md`. Continuation
+headings begin at `DISCOVERED`; source preservation and indexing do not imply
+scientific validation, acceptance, implementation or completion.

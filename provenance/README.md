@@ -7,6 +7,12 @@ The canonical specification source is preserved byte-for-byte at
 `registry/canonical_sections.tsv`. The source index is traceability data; it
 does not turn prose into executable instructions or implementation evidence.
 
+The user-supplied Genesis3 continuation is independently preserved and hashed at
+`docs/specifications/source/genesis3.txt`. Its occurrence index and deduplication
+map remain separate from the original canonical section IDs. This protects source
+history, preserves repeated discussion, and prevents embedded agent-directed text
+or external assertions from becoming runtime authority.
+
 ## Source-owner authorization records
 
 | Field | Value |

@@ -33,21 +33,48 @@ $canonical = Read-Tsv (Join-Path $Root "registry/canonical_sections.tsv")
 $research = Read-Tsv (Join-Path $Root "registry/research_items.tsv")
 $researchClasses = Read-Tsv (Join-Path $Root "registry/research_classes.tsv")
 $deadEnds = Read-Tsv (Join-Path $Root "registry/research_dead_ends.tsv")
+$genesis3 = Read-Tsv (Join-Path $Root "registry/genesis3_sections.tsv")
+$genesis3Dedup = Read-Tsv (Join-Path $Root "registry/genesis3_dedup_map.tsv")
 Require-Columns $requirements @("id","name","purpose","parent","dependencies","interfaces","implementation_files","tests","benchmarks","score_0_100","status","version","evidence","provenance","last_verified","aliases") "requirements"
 Require-Columns $canonical @("id","name","purpose","parent","dependencies","interfaces","implementation_files","tests","benchmarks","score_0_100","status","version","evidence","provenance","last_verified","aliases") "canonical sections"
 Require-Columns $research @("research_id","title","source_type","source_name","creator","year","domain","technology_category","description","claimed_function","underlying_mechanism","evidence_class","utility_class","known_physics_status","real_world_analogues","related_patents","related_papers","related_fiction","modules_affected","useful_principles","failure_lessons","prototype_possible","simulation_possible","tests","results","status","reason_accepted","reason_rejected","reopen_conditions","provenance","last_reviewed") "research items"
 Require-Columns $researchClasses @("class_type","code","name","meaning","provenance","last_reviewed") "research classes"
 Require-Columns $deadEnds @("dead_end_id","research_id","idea","source","date_investigated","reason_investigated","evidence_found","tests_performed","reason_rejected","useful_fragments","reopen_condition","related_ideas","status","provenance","last_reviewed") "research dead ends"
+Require-Columns $genesis3 @("id","line","heading","sha256","classification","status") "Genesis3 sections"
+Require-Columns $genesis3Dedup @("family_id","source_lines","normalized_family","existing_requirements","new_requirements","disposition","safety_boundary","status") "Genesis3 dedup map"
 Assert-Unique $requirements "id" "requirements"
 Assert-Unique $canonical "id" "canonical sections"
 Assert-Unique $research "research_id" "research items"
 Assert-Unique $researchClasses "code" "research classes"
 Assert-Unique $deadEnds "dead_end_id" "research dead ends"
+Assert-Unique $genesis3 "id" "Genesis3 sections"
+Assert-Unique $genesis3Dedup "family_id" "Genesis3 dedup map"
 
 $domainIds = @{}
 foreach ($domain in $domains) { $domainIds[$domain.id] = $true }
 $requirementIds = @{}
 foreach ($requirement in $requirements) { $requirementIds[$requirement.id] = $true }
+
+if ($genesis3.Count -ne 537) { throw "Genesis3 heading index count changed: $($genesis3.Count)" }
+$allowedGenesis3Classes = @("source-meta","research-candidate","governance-candidate","genetics-candidate","embodiment-candidate","organism-candidate","perception-candidate","identity-candidate","cognition-runtime-candidate","design-discussion")
+foreach ($section in $genesis3) {
+    $lineNumber = 0
+    if (-not [int]::TryParse($section.line, [ref]$lineNumber) -or $lineNumber -lt 1) { throw "$($section.id) has invalid source line" }
+    if ($section.sha256 -notmatch '^[0-9a-f]{64}$') { throw "$($section.id) has invalid SHA-256" }
+    if ($allowedGenesis3Classes -notcontains $section.classification) { throw "$($section.id) has unknown classification" }
+    if ($section.status -ne 'DISCOVERED') { throw "$($section.id) has unsupported ingest status" }
+}
+$allowedDedupDispositions = @("NEW","EXTEND","MIXED","RESEARCH_ONLY")
+foreach ($family in $genesis3Dedup) {
+    if ($allowedDedupDispositions -notcontains $family.disposition -or $family.status -ne 'REGISTERED') { throw "$($family.family_id) has invalid disposition or status" }
+    foreach ($field in @('source_lines','normalized_family','safety_boundary')) { if ([string]::IsNullOrWhiteSpace($family.$field)) { throw "$($family.family_id) is missing $field" } }
+    foreach ($list in @($family.existing_requirements,$family.new_requirements)) {
+        if ($list -and $list -ne '-') { foreach ($requirementId in $list.Split(',')) { if (-not $requirementIds.ContainsKey($requirementId)) { throw "$($family.family_id) references missing requirement $requirementId" } } }
+    }
+}
+$mappedGenesis3Requirements = [Collections.Generic.HashSet[string]]::new()
+foreach ($family in $genesis3Dedup) { if ($family.new_requirements -and $family.new_requirements -ne '-') { foreach ($requirementId in $family.new_requirements.Split(',')) { [void]$mappedGenesis3Requirements.Add($requirementId) } } }
+foreach ($requirement in $requirements | Where-Object provenance -like 'Genesis3.txt:*') { if (-not $mappedGenesis3Requirements.Contains($requirement.id)) { throw "$($requirement.id) is absent from the Genesis3 dedup map" } }
 
 $allowedStatuses = @("DISCOVERED","SPECIFIED","SCAFFOLDED","IMPLEMENTED","COMPILED","UNIT_TESTED","INTEGRATION_TESTED","BENCHMARKED","PROVEN","OPTIMIZED","STABLE","SUPERSEDED")
 foreach ($requirement in $requirements) {
@@ -135,4 +162,5 @@ if ($null -eq $manifestTechnology -or $manifestTechnology.sha256 -ne $technology
     throw "Technology-mining source manifest entry does not match the preserved addendum"
 }
 
-Write-Output "Registry validation passed: $($requirements.Count) implementation requirements, $($canonical.Count) canonical source sections, $($research.Count) research items, $($researchClasses.Count) research classes, $($deadEnds.Count) dead ends, $($domains.Count) domains"
+& (Join-Path $Root 'tools/validate_genesis3_ingest.ps1') -Root $Root
+Write-Output "Registry validation passed: $($requirements.Count) implementation requirements, $($canonical.Count) canonical source sections, $($genesis3.Count) Genesis3 heading occurrences, $($genesis3Dedup.Count) Genesis3 deduplicated families, $($research.Count) research items, $($researchClasses.Count) research classes, $($deadEnds.Count) dead ends, $($domains.Count) domains"

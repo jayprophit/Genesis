@@ -17,6 +17,7 @@ ctest --preset local-release
 ./build/genesis_memory_bench.exe
 ./build/genesis_learning_bench.exe
 pwsh -NoProfile -File tools/validate_registry.ps1
+pwsh -NoProfile -File tools/validate_genesis3_ingest.ps1
 pwsh -NoProfile -File tools/secret_scan.ps1
 pwsh -NoProfile -File tools/report_completion.ps1
 pwsh -NoProfile -File tools/report_program_completion.ps1
@@ -29,7 +30,7 @@ different compiler or platform may use a named subdirectory beneath `build/`
 when qualification requires simultaneous artifacts, but generated output never
 becomes project source or completion evidence by itself.
 
-Read `docs/BUILD_ORDER.md`, `docs/IMPLEMENTATION_STAGES.md`, `docs/STAGE_2_LIFE_INTEGRITY.md`, `docs/STAGE_3_4_ORGANISM_SUPPORT.md`, `docs/SPECIFICATION_COMPLETION_POLICY.md`, `docs/FOUNDATION_GAP_REPORT.md`, `docs/audit/SOURCE_AUDIT.md`, and `registry/requirements.tsv` before extending Genesis. The canonical source copy is `docs/specifications/source/genesis.txt`; the generated `registry/canonical_sections.tsv` preserves every numbered section and its exact source line. The technology-mining copy is `docs/specifications/source/technology_mining_addendum.txt`; its registry is research-only and does not trigger unrestricted crawling or experimental hardware implementation.
+Read `docs/BUILD_ORDER.md`, `docs/IMPLEMENTATION_STAGES.md`, `docs/STAGE_2_LIFE_INTEGRITY.md`, `docs/STAGE_3_4_ORGANISM_SUPPORT.md`, `docs/SPECIFICATION_COMPLETION_POLICY.md`, `docs/FOUNDATION_GAP_REPORT.md`, `docs/specifications/GENESIS3_INGEST.md`, `docs/audit/SOURCE_AUDIT.md`, and `registry/requirements.tsv` before extending Genesis. The canonical source copy is `docs/specifications/source/genesis.txt`; the generated `registry/canonical_sections.tsv` preserves every numbered section and its exact source line. The separate Genesis3 continuation is preserved at `docs/specifications/source/genesis3.txt`, with every Markdown heading occurrence in `registry/genesis3_sections.tsv` and its family-level semantic diff in `registry/genesis3_dedup_map.tsv`. The technology-mining copy is `docs/specifications/source/technology_mining_addendum.txt`; its registry is research-only and does not trigger unrestricted crawling or experimental hardware implementation.
 
 Program percentages are derived from leaf-level evidence gates in
 `registry/completion_components.tsv`; run the program-completion report rather
