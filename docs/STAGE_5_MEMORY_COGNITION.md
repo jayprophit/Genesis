@@ -62,8 +62,13 @@ over-capacity inputs are rejected.
 One-step counterfactual projection returns confidence-ranked consequences from
 matching hypotheses under a strict result limit. Every returned item is explicitly
 marked simulated so it cannot be mistaken for an observation, autobiographical
-memory or fact. Multi-step search, intervention semantics, confounder handling and
-crash-safe persistence remain open and are tracked separately. The local benchmark
+memory or fact. Multi-step intervention search now expands deterministic hypothesis
+paths under explicit depth, branch, path, expansion and minimum-confidence limits.
+It prevents path cycles, multiplies edge confidence without presenting it as proof,
+reports depth, branch, path and resource truncation separately, flags unresolved branching
+as a potential confounder, and can never authorize an action. Search results are
+derived and never persisted as observations or memories; recovery tests demonstrate
+that they can be regenerated from verified causal snapshots. The local benchmark
 built 10,000 observations, hypotheses and predictions in approximately 0.665
 seconds, resolved 10,000 outcomes in 0.047 seconds, and ran 1,000 bounded projections
 in 0.310 seconds. These are development-machine measurements only.
@@ -79,6 +84,11 @@ identity mismatch and unsupported schemas. The 30,000-record local benchmark
 produced a 7,783,499-byte snapshot and restored it in approximately 0.774 seconds.
 Bounded counterfactual projections are regenerated from restored hypotheses rather
 than serialized as facts.
+
+The dedicated branching benchmark performed 1,000 bounded multi-step searches and
+returned 15,944 simulated paths in approximately 1.133 seconds on the development
+machine. This is a workload measurement, not a production latency guarantee or a
+claim that the hypotheses establish causation.
 
 Learning interference is now an explicit evidence-linked graph over registered
 traces. The consolidation scheduler produces a deterministic, cost-bounded plan

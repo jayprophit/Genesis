@@ -13,6 +13,11 @@ struct WorldStateObservation { std::string id,entity_id,property,value_digest,ev
 struct CausalHypothesis { std::string id,cause_property,cause_value_digest,effect_property,effect_value_digest,evidence_digest;std::uint64_t created_at{},updated_at{},support_count{},counterevidence_count{};double prior_confidence{},calibrated_confidence{}; };
 struct WorldPrediction { std::string id,hypothesis_id,entity_id,expected_value_digest,outcome_evidence_digest;std::uint64_t issued_at{},due_at{},resolved_at{};double issued_confidence{};PredictionState state{PredictionState::pending}; };
 struct CounterfactualResult { std::string hypothesis_id,effect_property,effect_value_digest;double confidence{};bool simulated{true}; };
+struct Intervention { std::string property,value_digest; };
+struct SimulationLimits { std::size_t maximum_depth{3},maximum_branches_per_node{4},maximum_paths{16},maximum_expansions{64};double minimum_confidence{}; };
+struct CounterfactualStep { std::string hypothesis_id,cause_property,cause_value_digest,effect_property,effect_value_digest;double edge_confidence{}; };
+struct CounterfactualPath { std::vector<CounterfactualStep> steps;std::string final_property,final_value_digest;double accumulated_confidence{};bool simulated{true},action_authorized{false},unresolved_confounders{false}; };
+struct CounterfactualSearchResult { std::vector<CounterfactualPath> paths;std::size_t expanded_nodes{};bool budget_exhausted{false},depth_limited{false},branch_limited{false},path_limited{false}; };
 class WorldDynamics final {
 public:
  WorldDynamics(std::string organism_id,std::size_t state_capacity,std::size_t hypothesis_capacity,std::size_t prediction_capacity);
@@ -22,6 +27,7 @@ public:
  bool resolve_prediction(std::string_view prediction_id,std::string_view observed_value_digest,std::string_view evidence_digest,std::uint64_t observed_at,std::string* error=nullptr);
  std::size_t expire_predictions(std::uint64_t now);
  [[nodiscard]] std::vector<CounterfactualResult> simulate(std::string_view cause_property,std::string_view cause_value_digest,std::size_t maximum)const;
+ [[nodiscard]] CounterfactualSearchResult simulate_intervention(const Intervention& intervention,const SimulationLimits& limits)const;
  [[nodiscard]] const WorldPrediction* find_prediction(std::string_view id)const noexcept;
  [[nodiscard]] const CausalHypothesis* find_hypothesis(std::string_view id)const noexcept;
  [[nodiscard]] bool verify()const;
