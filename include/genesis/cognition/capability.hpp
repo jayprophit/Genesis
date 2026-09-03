@@ -5,6 +5,7 @@
 #include <string>
 #include <string_view>
 namespace genesis::cognition {
+class CapabilityStore;
 enum class CapabilityEvidenceLevel { unavailable, declared, observed, qualified };
 struct CompetencyPolicy { std::uint64_t minimum_trials{5};double minimum_success_rate{.8};std::uint64_t maximum_consecutive_failures{2}; };
 struct CapabilityRecord { std::string id,route,declaration_evidence_digest,latest_evidence_digest,qualification_evidence_digest;CapabilityEvidenceLevel level{CapabilityEvidenceLevel::unavailable};std::uint64_t trials{},successes{},consecutive_failures{},updated_at{};double calibrated_competence{};bool revoked{}; };
@@ -23,6 +24,6 @@ public:
  [[nodiscard]] std::size_t capacity()const noexcept{return capacity_;}
  [[nodiscard]] const CompetencyPolicy& policy()const noexcept{return policy_;}
  [[nodiscard]] const std::map<std::string,CapabilityRecord>& records()const noexcept{return records_;}
-private: std::string organism_id_;std::size_t capacity_{};CompetencyPolicy policy_;std::map<std::string,CapabilityRecord> records_;
+private: friend class CapabilityStore;std::string organism_id_;std::size_t capacity_{};CompetencyPolicy policy_;std::map<std::string,CapabilityRecord> records_;
 };
 }

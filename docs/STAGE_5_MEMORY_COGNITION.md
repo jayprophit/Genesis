@@ -48,8 +48,8 @@ evidence, not a production latency guarantee.
 Completion accounting now separates persistent belief state from the broader
 meaning of a world or self model. Evidence-qualified belief storage is complete
 against its registered gates. Causal/temporal dynamics, counterfactual simulation,
-capability calibration and autobiographical continuity remain separate incomplete
-leaves; persistence alone does not justify calling the whole model complete.
+capability calibration and autobiographical continuity remain separate leaves;
+completing one leaf does not justify calling the whole self model complete.
 
 The self model now includes an organism-bound capability and competency ledger.
 Routes progress only through unavailable, declared, observed and qualified evidence
@@ -60,8 +60,14 @@ failures automatically demote a route, while explicit revocation makes it
 unavailable. Qualification never authorizes execution: authenticated identity,
 policy approval, safety approval and decision evidence must all pass independently.
 The local benchmark declared and qualified 10,000 capabilities from 50,000 measured
-outcomes in approximately 0.210 seconds. Persistence and migration of this ledger
-remain open, so the capability-calibration leaf is intentionally not complete.
+outcomes in approximately 0.202 seconds. Its schema-1 snapshot was 3,117,927 bytes
+and serialized, checksummed, restored and fully revalidated in approximately 0.087
+seconds. Snapshots are organism-bound, size-bounded and committed as immutable
+versions through an atomic rename. Tests reject corruption, unsupported schemas,
+unsafe identifiers and conflicting versions. Authorization decisions are deliberately
+excluded from persistence, so recovery can never replay an old permission. Future
+cross-schema migration remains a separate platform-wide migration requirement; the
+current capability-calibration leaf is complete against its registered schema-1 gates.
 
 Causal world dynamics now separate immutable state observations, causal hypotheses,
 time-bounded predictions and observed outcomes. Hypotheses retain prior confidence,
