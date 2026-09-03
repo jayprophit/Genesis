@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 namespace genesis::cognition {
+class ContinuityStore;
 struct ContinuityAnchor { OriginKind origin{OriginKind::genesis};std::string source_organism_id,source_checkpoint_digest; };
 struct LifeEvent { std::string id,memory_id,content_digest,provenance_digest,previous_event_digest,event_digest;memory::Origin memory_origin{memory::Origin::observed};memory::IdentityScope scope{memory::IdentityScope::organism_private};std::uint64_t sequence{},logical_time{}; };
 struct ContinuityCheckpoint { std::string id,head_event_digest,checkpoint_digest;std::uint64_t sequence{},logical_time{}; };
@@ -21,6 +22,6 @@ public:
  [[nodiscard]] const ContinuityAnchor& anchor()const noexcept{return anchor_;}
  [[nodiscard]] const std::vector<LifeEvent>& events()const noexcept{return events_;}
  [[nodiscard]] const std::vector<ContinuityCheckpoint>& checkpoints()const noexcept{return checkpoints_;}
-private:LineageIdentity identity_;ContinuityAnchor anchor_;std::size_t event_capacity_{},checkpoint_capacity_{};std::vector<LifeEvent> events_;std::vector<ContinuityCheckpoint> checkpoints_;
+private:friend class ContinuityStore;LineageIdentity identity_;ContinuityAnchor anchor_;std::size_t event_capacity_{},checkpoint_capacity_{};std::vector<LifeEvent> events_;std::vector<ContinuityCheckpoint> checkpoints_;
 };
 }

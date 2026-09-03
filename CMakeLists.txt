@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Genesis VERSION 0.16.0 LANGUAGES CXX)
+project(Genesis VERSION 0.17.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -13,6 +13,7 @@ add_library(genesis_core STATIC
     src/cognition/capability.cpp
     src/cognition/capability_persistence.cpp
     src/cognition/continuity.cpp
+    src/cognition/continuity_persistence.cpp
     src/cognition/world_model.cpp
     src/cognition/world_persistence.cpp
     src/development/maturity.cpp

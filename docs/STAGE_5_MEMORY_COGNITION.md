@@ -83,8 +83,14 @@ distinct source organism and remain divergent identities rather than continuatio
 A foreign or shared record labelled as direct experience is rejected; it can enter
 the journal only with its external, inherited, taught, observed, inferred or
 simulated origin preserved. The local benchmark appended 10,000 events and 100
-checkpoints in approximately 0.775 seconds. Crash-safe journal persistence remains
-open, so this leaf is intentionally recorded at 95% rather than complete.
+checkpoints in approximately 0.633 seconds. Its schema-1 snapshot was 3,586,307
+bytes and completed serialization, checksum verification, exact reconstruction and
+full invariant validation in approximately 0.197 seconds. Snapshots preserve the
+complete lineage identity, continuity anchor, event chain and checkpoints under
+bounded sizes, immutable versions and atomic commit. Tests reject corruption,
+unsupported schemas, owner mismatch, unsafe paths and conflicting versions. Restore,
+clone, fork and child origins remain distinct after recovery. The autobiographical
+continuity leaf is complete against its registered schema-1 gates.
 
 Causal world dynamics now separate immutable state observations, causal hypotheses,
 time-bounded predictions and observed outcomes. Hypotheses retain prior confidence,
