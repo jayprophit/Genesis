@@ -62,13 +62,17 @@ private:
 };
 class RetentionEvaluator final {
 public:
- explicit RetentionEvaluator(std::size_t record_capacity,double stable_tolerance=.02);
+ RetentionEvaluator(std::string organism_id,std::size_t record_capacity,double stable_tolerance=.02);
  bool observe(RetentionObservation observation,std::string* error=nullptr);
  [[nodiscard]] std::optional<RetentionReport> report(std::string_view trace_id)const;
  [[nodiscard]] std::optional<RetentionFeedback> feedback(std::string_view trace_id)const;
  [[nodiscard]] bool verify()const;
  [[nodiscard]] const std::vector<RetentionRecord>& records()const noexcept;
+ [[nodiscard]] const std::string& organism_id()const noexcept;
+ [[nodiscard]] std::size_t record_capacity()const noexcept;
+ [[nodiscard]] double stable_tolerance()const noexcept;
 private:
+ std::string organism_id_;
  std::size_t record_capacity_{};
  double stable_tolerance_{};
  std::vector<RetentionRecord> records_;

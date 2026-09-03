@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Genesis VERSION 0.8.0 LANGUAGES CXX)
+project(Genesis VERSION 0.9.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -16,6 +16,7 @@ add_library(genesis_core STATIC
     src/genetics/reproduction.cpp
     src/identity/lineage.cpp
     src/learning/consolidation.cpp
+    src/learning/persistence.cpp
     src/memory/origin.cpp
     src/memory/graph.cpp
     src/memory/persistence.cpp

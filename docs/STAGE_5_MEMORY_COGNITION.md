@@ -53,9 +53,18 @@ be explicitly validated by the scheduler before they can change accessibility or
 uncertainty. Observation records are sequence-ordered and SHA-256 chained.
 
 The 10,000-trace local benchmark recorded 20,000 observations and generated
-10,000 reports in approximately 0.173 seconds. This is machine-local development
-evidence, not a production latency guarantee. Crash-safe persistence and migration
-of retention records remain open, so the retention leaf is not marked complete.
+10,000 reports in approximately 0.214 seconds. Its 3,557,919-byte snapshot was
+serialized, checksummed, restored, re-indexed and fully revalidated in approximately
+0.546 seconds. These are machine-local development measurements, not production
+latency guarantees.
+
+Retention snapshots are now organism-bound, schema-tagged, size-bounded and
+whole-record checksummed. Immutable versions commit through a temporary file and
+atomic rename. Restore rebuilds observations through the public validator rather
+than trusting serialized derived indexes or record-chain fields. Tests cover
+roundtrip recovery, idempotent writes, conflicting immutable versions, unsafe
+identifiers and corruption. Unsupported schemas fail explicitly; actual future
+cross-schema migrations must be registered and tested when a second schema exists.
 
 The prediction system retrieves multiple experiences and reports confidence; it
 does not create categorical identity rules such as “person like this is bad.”
@@ -63,9 +72,9 @@ The workspace name is architectural terminology and is not evidence of
 consciousness or subjective experience.
 
 Still open in Stage 5: persistent belief-model storage, evidence-source quality,
-real perception adapters, language representation, affect regulation, retention
-record persistence/migration, fuzzing, and broader integration across the organism
-event fabric.
+real perception adapters, language representation, affect regulation, future
+cross-schema migration implementations, fuzzing, and broader integration across
+the organism event fabric.
 
 `genesis2.txt` is preserved losslessly and indexed by all 88 Markdown heading
 occurrences. Repeated passages remain traceable; referenced tools and repositories
