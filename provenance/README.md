@@ -13,6 +13,12 @@ map remain separate from the original canonical section IDs. This protects sourc
 history, preserves repeated discussion, and prevents embedded agent-directed text
 or external assertions from becoming runtime authority.
 
+The Genesis4 consolidation is likewise independently preserved. Its duplicated
+2,901-line block is retained twice in the immutable source and heading index but
+mapped once at the semantic layer. Historical BITNET/Aetherius templates and the
+protocol catalogue are research records, not active Genesis modules or approved
+dependencies.
+
 ## Source-owner authorization records
 
 | Field | Value |

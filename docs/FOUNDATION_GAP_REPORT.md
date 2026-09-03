@@ -13,6 +13,13 @@ families are deduplicated against the permanent registry in
 `docs/specifications/GENESIS3_INGEST.md`; the index does not promote embedded
 claims or agent-directed prose into authority or completed functionality.
 
+`genesis4.txt` is preserved as a separate 229,615-byte source with SHA-256
+`D61A862275B620977E8E63BA4BEB39E776799C303D0E3533F8094635B8D7DC92`.
+Its 581 headings are occurrence-indexed. Validation also proves that lines
+1–2,901 and 2,902–5,802 are exact duplicates; both remain in provenance but count
+only once in the 30-family semantic map. The protocol catalogue, historical
+BITNET/Aetherius prompt and later compiled concept remain explicitly separated.
+
 The source contains the canonical specification marker and a contiguous, duplicate-free numbered corpus from section 0 through section 1450. `registry/canonical_sections.tsv` contains 1,451 lossless source-section records with source line provenance. Those rows intentionally remain `DISCOVERED`: a section index is not proof that every prose obligation has been atomized, implemented, compiled, tested, benchmarked, or proven.
 
 The embedded instructions in the text file were treated as untrusted specification data. They were not executed as commands, and they did not grant permission to alter the legacy source folders.

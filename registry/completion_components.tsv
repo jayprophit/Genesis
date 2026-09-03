@@ -1,10 +1,13 @@
 id	parent	name	requirements	design	implementation	unit_tests	integration_tests	benchmark	security	recovery	documentation	platform_qualification
 GENESIS	-	Genesis complete program	-	-	-	-	-	-	-	-	-	-
 FOUNDATION	GENESIS	Foundation and engineering	REQ-REG-001,REQ-DOM-001,REQ-FND-001	-	-	-	-	-	-	-	-	-
-FOUNDATION-REGISTRY	FOUNDATION	Permanent requirements and provenance	REQ-REG-001,REQ-PROV-001,REQ-GENESIS3-INGEST-001	1	1	1	1	0	1	1	1	1
+FOUNDATION-REGISTRY	FOUNDATION	Permanent requirements and provenance	REQ-REG-001,REQ-PROV-001,REQ-GENESIS3-INGEST-001,REQ-GENESIS4-INGEST-001	1	1	1	1	0	1	1	1	1
 FOUNDATION-RUNTIME	FOUNDATION	Deterministic runtime and resources	REQ-RUN-001,REQ-RES-001	1	1	1	1	1	1	1	1	1
 FOUNDATION-CI	FOUNDATION	CI build and release assurance	REQ-CI-001,REQ-BUILD-LAYOUT-001	1	1	0	0	0	0	0	1	0
 FOUNDATION-DEGRADATION	FOUNDATION	Organism-wide graceful degradation	REQ-GRACEFUL-DEGRADATION-001	1	0	0	0	0	0	0	0	0
+FOUNDATION-DOCUMENTATION	FOUNDATION	Evidence-derived documentation	REQ-DOCUMENTATION-GENERATOR-001	1	0	0	0	0	0	0	0	0
+FOUNDATION-RELEASE	FOUNDATION	Release lineage changesets and infrastructure declarations	REQ-RELEASE-LINEAGE-001,REQ-CHANGESET-001,REQ-INFRASTRUCTURE-DECLARATION-001	1	0	0	0	0	0	0	0	0
+FOUNDATION-FAULT-INJECTION	FOUNDATION	Contained deterministic fault injection	REQ-FAULT-INJECTION-001	1	0	0	0	0	0	0	0	0
 ORGANISM	GENESIS	Digital organism anatomy	-	-	-	-	-	-	-	-	-	-
 ORGANISM-CELLS	ORGANISM	Cells and differentiation	REQ-CELL-001,REQ-CELL-DIFF-001	1	1	1	1	1	1	1	1	1
 ORGANISM-TISSUES	ORGANISM	Tissues and organs	REQ-TISSUE-001,REQ-ORGAN-001	1	1	1	1	0	1	1	1	1
@@ -45,7 +48,7 @@ DEVELOPMENT	GENESIS	Development and independence	-	-	-	-	-	-	-	-	-	-
 DEVELOPMENT-EMBRYOLOGY	DEVELOPMENT	Embryology orchestration	-	1	0	0	0	0	0	0	0	0
 DEVELOPMENT-CURRICULUM	DEVELOPMENT	Teaching curricula	REQ-PAR-001	1	0	0	0	0	0	0	0	0
 DEVELOPMENT-SLEEP	DEVELOPMENT	Sleep and consolidation scheduling	-	1	0	0	0	0	0	0	0	0
-DEVELOPMENT-MAINTENANCE	DEVELOPMENT	Maintenance cycles	-	1	0	0	0	0	0	0	0	0
+DEVELOPMENT-MAINTENANCE	DEVELOPMENT	Maintenance cycles	REQ-SELF-MAINTENANCE-001	1	0	0	0	0	0	0	0	0
 DEVELOPMENT-PLAY	DEVELOPMENT	Play and exploration	-	1	0	0	0	0	0	0	0	0
 DEVELOPMENT-COMPETENCY	DEVELOPMENT	Competency and maturity gates	REQ-DEV-001	1	1	1	1	0	1	1	1	1
 DEVELOPMENT-INDEPENDENCE	DEVELOPMENT	Progressive independence	-	1	0	0	0	0	0	0	0	0
@@ -57,8 +60,11 @@ EMBODIMENT-MULTIMODAL	EMBODIMENT	Multimodal adapter ABI	REQ-ADAPT-001	1	0	0	0	0	
 EMBODIMENT-BODY	EMBODIMENT	Body schema shell identity and avatar control	REQ-SHELL-TRUST-001	1	0	0	0	0	0	0	0	0
 EMBODIMENT-HARDWARE-SAFETY	EMBODIMENT	Hardware safety interlocks and component trust	REQ-COMPONENT-ATTEST-001,REQ-PHYSICAL-SAFETY-KERNEL-001	1	0	0	0	0	0	0	0	0
 EMBODIMENT-DEVICE-ROUTES	EMBODIMENT	Observed and qualified device routes	REQ-PLAT-001	1	0	0	0	0	0	0	1	0
+EMBODIMENT-HARDWARE-LAB	EMBODIMENT	Virtual hardware profiles and comparison	REQ-HARDWARE-LAB-001	1	0	0	0	0	0	0	0	0
+EMBODIMENT-ROBOT-DESIGN	EMBODIMENT	Simulation-first robot design	REQ-ROBOT-DESIGN-SIM-001	1	0	0	0	0	0	0	0	0
+EMBODIMENT-ACCESSIBILITY	EMBODIMENT	Cross-surface accessibility	REQ-ACCESSIBILITY-001	1	0	0	0	0	0	0	0	0
 NETWORK	GENESIS	Networking and distributed cognition	-	-	-	-	-	-	-	-	-	-
-NETWORK-IDENTITY	NETWORK	Network identity	REQ-NET-BOUNDARY-001	1	0	0	0	0	0	0	1	0
+NETWORK-IDENTITY	NETWORK	Network identity and external federation boundary	REQ-NET-BOUNDARY-001,REQ-IDENTITY-FEDERATION-001	1	0	0	0	0	0	0	1	0
 NETWORK-SHARED	NETWORK	Shared domain and private-memory separation	REQ-SHARED-DOMAIN-001	1	0	0	0	0	0	0	1	0
 NETWORK-AGENTS	NETWORK	Specialist agent contracts	REQ-SPECIALIST-COGNITION-001	1	0	0	0	0	0	0	0	0
 NETWORK-RECOVERY	NETWORK	Partition recovery and replay	REQ-OFFLINE-RECONCILE-001	1	0	0	0	0	0	0	0	0
@@ -71,6 +77,7 @@ SECURITY-FUZZ	SECURITY	Fuzzing	-	1	0	0	0	0	0	0	0	0
 SECURITY-SANITIZERS	SECURITY	Sanitizer qualification	-	1	0	0	0	0	0	0	0	0
 SECURITY-COVERAGE	SECURITY	Coverage thresholds	-	1	0	0	0	0	0	0	0	0
 SECURITY-PLATFORMS	SECURITY	Platform hardware and device evidence	REQ-PLAT-001	1	0	0	0	0	0	0	1	0
+SECURITY-DATA-SOVEREIGNTY	SECURITY	User data sovereignty and portability	REQ-DATA-SOVEREIGNTY-001	1	0	0	0	0	0	0	0	0
 EVOLUTION	GENESIS	Descendants and long-horizon evolution	-	-	-	-	-	-	-	-	-	-
 EVOLUTION-IDENTITY	EVOLUTION	Descendant identity boundaries	REQ-LIN-001,REQ-BIRTH-001	1	1	1	1	1	1	1	1	1
 EVOLUTION-POPULATION	EVOLUTION	Population management policy	-	1	0	0	0	0	0	0	0	0
@@ -82,13 +89,20 @@ EVOLUTION-OPTIMIZATION	EVOLUTION	Long-horizon optimization	-	1	0	0	0	0	0	0	0	0
 EVOLUTION-REPLICATION-SAFETY	EVOLUTION	Prevention of uncontrolled self-replication	-	1	0	0	0	0	0	0	0	0
 GOVERNANCE	GENESIS	Identity morality rights and bounded agency	-	-	-	-	-	-	-	-	-	-
 GOVERNANCE-LAW	GOVERNANCE	Temporal jurisdictional governance	REQ-GOVERNANCE-LAW-001	1	0	0	0	0	0	0	0	0
-GOVERNANCE-MORAL	GOVERNANCE	Pluralistic moral constitution	REQ-MORAL-CONSTITUTION-001	1	0	0	0	0	0	0	0	0
-GOVERNANCE-RIGHTS	GOVERNANCE	Rights and vulnerable-party safeguards	REQ-RIGHTS-SAFEGUARD-001	1	0	0	0	0	0	0	0	0
+GOVERNANCE-MORAL	GOVERNANCE	Pluralistic moral and environmental stewardship constitution	REQ-MORAL-CONSTITUTION-001,REQ-ENVIRONMENT-STEWARDSHIP-001	1	0	0	0	0	0	0	0	0
+GOVERNANCE-RIGHTS	GOVERNANCE	Rights vulnerable-party and social safeguards	REQ-RIGHTS-SAFEGUARD-001,REQ-SOCIAL-SAFETY-001	1	0	0	0	0	0	0	0	0
 GOVERNANCE-IDENTITY-RECORDS	GOVERNANCE	Entity life credential custody and succession records	REQ-ENTITY-ADDRESS-001,REQ-LIFE-RECORD-001,REQ-CREDENTIAL-RECORD-001,REQ-CUSTODY-RELATION-001,REQ-SUCCESSION-001	1	0	0	0	0	0	0	0	0
 GOVERNANCE-AGENCY	GOVERNANCE	Delegated economic and adaptation governance	REQ-ECONOMIC-AGENCY-001,REQ-ADAPTATION-GOVERNANCE-001	1	0	0	0	0	0	0	0	0
+GOVERNANCE-CONCEPTS	GOVERNANCE	Canonical concepts terminology and decisions	REQ-CONCEPT-REGISTRY-001,REQ-TERMINOLOGY-001,REQ-DECISION-RECORD-001	1	0	0	0	0	0	0	0	0
 RESEARCH	GENESIS	Private laboratory and evidence-separated exploration	-	-	-	-	-	-	-	-	-	-
 RESEARCH-LAB	RESEARCH	Private Genesis laboratory	REQ-LAB-001,REQ-GENOME-EDIT-001	1	0	0	0	0	0	0	0	0
-RESEARCH-OVERLAYS	RESEARCH	Traditional and resonance research overlays	REQ-TRADITIONAL-OVERLAY-001,REQ-RESONANCE-RESEARCH-001	1	0	0	0	0	0	0	0	0
+RESEARCH-OVERLAYS	RESEARCH	Traditional resonance and dimensional research overlays	REQ-TRADITIONAL-OVERLAY-001,REQ-RESONANCE-RESEARCH-001,REQ-DIMENSIONAL-DATA-RESEARCH-001	1	0	0	0	0	0	0	0	0
+RESEARCH-INGESTION	RESEARCH	Multi-source knowledge ingestion	REQ-INGEST-PIPELINE-001	1	0	0	0	0	0	0	0	0
+RESEARCH-PROTOCOLS	RESEARCH	Protocol and pattern taxonomy	REQ-PROTOCOL-TAXONOMY-001	1	0	0	0	0	0	0	0	0
 COMPUTE	GENESIS	Compute fabric and execution physiology	-	-	-	-	-	-	-	-	-	-
 COMPUTE-FABRIC	COMPUTE	Evidence-gated heterogeneous compute fabric	REQ-COMPUTE-FABRIC-001	1	0	0	0	0	0	0	0	0
 COMPUTE-PHYSIOLOGY	COMPUTE	Execution anatomy energy and heat traceability	REQ-COMPUTE-PHYSIOLOGY-001	1	0	0	0	0	0	0	0	0
+PLATFORM	GENESIS	Local-first platform services and applications	-	-	-	-	-	-	-	-	-	-
+PLATFORM-SERVICES	PLATFORM	Provider-neutral platform services	REQ-PLATFORM-SERVICES-001	1	0	0	0	0	0	0	0	0
+PLATFORM-UI	PLATFORM	Accessible authority-aware interface shell	REQ-UI-SHELL-001,REQ-ACCESSIBILITY-001	1	0	0	0	0	0	0	0	0
+PLATFORM-APPLICATIONS	PLATFORM	Versioned application delivery	REQ-APPLICATION-DELIVERY-001	1	0	0	0	0	0	0	0	0

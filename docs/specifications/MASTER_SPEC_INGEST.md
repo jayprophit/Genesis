@@ -14,3 +14,10 @@ occurrence index. `genesis3.txt` has a 537-heading occurrence index plus a
 family-level semantic deduplication map in `GENESIS3_INGEST.md`. Continuation
 headings begin at `DISCOVERED`; source preservation and indexing do not imply
 scientific validation, acceptance, implementation or completion.
+
+`genesis4.txt` adds 581 heading occurrences. Its first 2,901 lines are repeated
+exactly as lines 2,902–5,802; both source occurrences are preserved while mapping
+to one semantic family set. The remainder contains a protocol catalogue,
+historical BITNET/Aetherius planning and a later compiled concept. The boundaries,
+deduplication decisions and safety dispositions are recorded in
+`GENESIS4_INGEST.md` and `registry/genesis4_dedup_map.tsv`.

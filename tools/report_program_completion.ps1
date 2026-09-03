@@ -8,7 +8,7 @@ $weights=[ordered]@{design=10;implementation=25;unit_tests=15;integration_tests=
 $byId=@{};foreach($r in $rows){if($byId.ContainsKey($r.id)){throw "Duplicate component $($r.id)"};$byId[$r.id]=$r}
 foreach($r in $rows){if($r.parent -ne '-' -and !$byId.ContainsKey($r.parent)){throw "Unknown parent $($r.parent)"};if($r.requirements -and $r.requirements -ne '-'){foreach($requirementId in $r.requirements.Split(',')){if(!$requirementIds.ContainsKey($requirementId)){throw "Unknown requirement $requirementId in component $($r.id)"}}}}
 $mapped=@{};foreach($r in $rows){if($r.requirements -and $r.requirements -ne '-'){foreach($requirementId in $r.requirements.Split(',')){$mapped[$requirementId]=$true}}}
-foreach($requirement in $requirements|Where-Object provenance -like 'Genesis3.txt:*'){if(!$mapped.ContainsKey($requirement.id)){throw "Genesis3 requirement $($requirement.id) is missing from completion accounting"}}
+foreach($requirement in $requirements|Where-Object provenance -match '^Genesis[34]\.txt:'){if(!$mapped.ContainsKey($requirement.id)){throw "Continuation requirement $($requirement.id) is missing from completion accounting"}}
 $scores=@{}
 function Score([string]$id){if($scores.ContainsKey($id)){return $scores[$id]};$children=@($rows|Where-Object parent -eq $id);if($children.Count){$value=($children|ForEach-Object {Score $_.id}|Measure-Object -Average).Average}else{$r=$byId[$id];$value=0;foreach($g in $weights.Keys){if($r.$g -notin @('0','1')){throw "Invalid gate $g for $id"};$value+=[int]$r.$g*$weights[$g]}};$scores[$id]=[math]::Round($value,2);return $scores[$id]}
 $out=[Collections.Generic.List[string]]::new();$out.Add("id`tparent`tname`tpercentage`tstatus`trequirements")
