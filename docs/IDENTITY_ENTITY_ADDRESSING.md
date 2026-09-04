@@ -1,6 +1,6 @@
 # Typed entity addressing and registry recovery
 
-Genesis 0.24 implements the bounded foundation for `REQ-ENTITY-ADDRESS-001`
+Genesis 0.25 implements the bounded foundation for `REQ-ENTITY-ADDRESS-001`
 and `REQ-ENTITY-PERSIST-001`. It gives governed things stable typed addresses
 and preserves versioned relationship facts without confusing those facts with
 organism identity, authentication, ownership authority or action permission.
@@ -20,9 +20,11 @@ organism identity, authentication, ownership authority or action permission.
   contiguous, immutable identity fields cannot change, record time cannot move
   backward, and an ended, revoked or superseded history cannot be reopened.
 - `EntityRegistryStore` writes a schema-tagged, whole-record checksummed binary
-  snapshot, flushes the temporary file, and publishes without replacing an
-  existing version. An identical retry is idempotent; different bytes under the
-  same namespace/version are a conflict.
+  snapshot through the shared `ImmutableSnapshotFiles` primitive. It bounds and
+  flushes the temporary file, then publishes without replacing an existing
+  version. An identical retry is idempotent; different bytes under the same
+  namespace/version are a conflict. The same reviewed file primitive now backs
+  the digital life-record store rather than duplicating durability code.
 
 ## Identity and authority boundaries
 
@@ -76,10 +78,15 @@ authorization separation, deterministic serialization, corruption, future
 schemas, path safety, immutable conflicts, idempotence, and namespace/registrar
 binding.
 
+Shared-boundary coverage in `genesis_life_record_tests` additionally races two
+different writers against one immutable version and verifies exactly one
+winner, a classified conflict for the loser, exact winner recovery and
+rejection of non-regular targets.
+
 The local Windows benchmark registers 10,000 entities and 20,000 relationship
 versions, then persists and exactly reconstructs an 11,079,071-byte snapshot.
-The recorded run built the registry in 522 ms and completed the durable write,
-read and verification round trip in 938 ms. The deterministic snapshot digest
+The recorded run built the registry in 438 ms and completed the durable write,
+read and verification round trip in 1,111 ms. The deterministic snapshot digest
 was `4d473e497350ae668107277f568d6b5e59a8e1f4cc2e49c13ae93ff284d408a1`.
 These are local reference results,
 not portable latency guarantees.

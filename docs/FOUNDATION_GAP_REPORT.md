@@ -1,6 +1,6 @@
 # Genesis foundation gap report
 
-Verified 2026-09-02 against the local checkout at `C:\Users\jpowe\Desktop\Genesis`.
+Verified 2026-09-04 against the local checkout at `C:\Users\jpowe\Desktop\Genesis`.
 
 ## Source ingest
 
@@ -36,23 +36,28 @@ engineering facts or automatic implementation instructions.
 ## Completed foundation slice
 
 - `genesis_core` is a normal compiled static C++20 library rather than an interface-only target.
-- The monolithic header is split into common text, requirements/domains, provenance, identity/lineage, genome, RNA expression, and development modules, with the original umbrella include retained for compatibility.
+- The monolithic header is split into common text/storage, requirements/domains, provenance, identity/lineage/entity/life-record, genome, RNA expression, development, organism and cognition modules, with the original umbrella include retained for compatibility.
 - The requirement schema now contains `id`, `name`, `purpose`, `parent`, `dependencies`, `interfaces`, `implementation_files`, `tests`, `benchmarks`, `score_0_100`, `status`, `version`, `evidence`, `provenance`, `last_verified`, and `aliases`.
 - The lifecycle is `DISCOVERED → SPECIFIED → SCAFFOLDED → IMPLEMENTED → COMPILED → UNIT_TESTED → INTEGRATION_TESTED → BENCHMARKED → PROVEN → OPTIMIZED → STABLE → SUPERSEDED`. The validator enforces mappings for compiled, tested, benchmarked, and proven claims.
 - Domain and requirement validation detects duplicate IDs, repeated aliases, missing dependencies, unknown domains, invalid scores, and dependency cycles.
 - The runtime slice provides deterministic logical time, immutable SHA-256 event envelopes, ordered dispatch, causal-parent checks, replay pre-validation, bounded history, atomic resource reservations, and a causal state machine with replay-chain verification.
-- Stage 2 life-integrity contracts are implemented: immutable versioned genome serialization and storage, content-vs-record digests, atomic immutable version commits, deterministic two-parent recombination, mutation audit records, birth cutoff enforcement, origin-labelled inherited memory, and birth snapshot hashes. See `docs/STAGE_2_LIFE_INTEGRITY.md`.
+- Stage 2 life-integrity contracts are implemented: immutable typed-entity and life-record recovery, immutable versioned genome serialization and storage, content-vs-record digests, deterministic two-parent recombination, mutation audit records, birth cutoff enforcement, origin-labelled inherited memory, and birth snapshot hashes. See `docs/STAGE_2_LIFE_INTEGRITY.md`.
 - Typed entity addressability is implemented with deterministic type-prefixed
   IDs, evidence-bearing append-only relationship revisions, typed endpoint
   checks, explicit identity/authorization separation and immutable recovery.
   See `docs/IDENTITY_ENTITY_ADDRESSING.md`.
-- Tests cover SHA-256 vectors, monotonic clocks, deterministic subscription order, one-shot handlers, duplicate and invalid replay rejection, resource over-allocation and rollback, state transition causality, registry/schema checks, provenance chaining, identity, genome, RNA, maturity, genome-store round trips/conflicts, malformed records, lineage adversaries, deterministic births, mutation records, and inheritance cutoff boundaries.
-- Benchmarks cover the diagnostic provenance chain, runtime dispatcher, and 10,000 deterministic birth transactions. Benchmark output is measurement evidence, not a claim of production capacity.
+- Identity-bound digital life records are implemented with an exact birth anchor,
+  append-only hash-chained facts, temporal names, supersession/retraction,
+  typed entity references, continuity audits, immutable recovery and explicit
+  no-authority/no-credential-verification views. See
+  `docs/IDENTITY_LIFE_RECORD.md`.
+- Tests cover SHA-256 vectors, deterministic runtime and replay boundaries, registry/schema checks, provenance chaining, identity, typed entities and relations, life-record birth/name/reference/continuity invariants, immutable recovery, genome, RNA, maturity, lineage adversaries, deterministic births, mutation records, inheritance cutoff boundaries, organism composition, signalling, metabolism, homeostasis, immunity, memory, learning, affect and perception.
+- Benchmarks cover the diagnostic provenance chain, runtime dispatcher, deterministic birth transactions, typed entity registries, life records, organism support, memory, learning, affect and perception. Benchmark output is measurement evidence, not a claim of production capacity.
 - Registry schemas are seeded for biological analogies, capabilities, platform requirements, dependencies, drivers, firmware, deployment profiles, protocols, models, datasets, universal research items, evidence/utility class definitions, and rejected/dead-end research. The technology-mining registry has 43 items and the dead-end cache has 10 linked records with independent E/U classifications.
 - CI and secret-scan safeguards are present under `.github/workflows/ci.yml` and `tools/`.
 - A project-level proprietary `LICENSE` is present. Third-party material remains subject to its own terms.
 
-Latest clean-build smoke measurements on this desktop (Debug, MinGW): the diagnostic chain processed approximately 133,110 events/second and the runtime dispatcher approximately 15,303 events/second with a 1,024-entry history. The genetics benchmark completed 10,000 births in 5,688 ms (about 1,758 births/second). These figures are environment-sensitive and are retained as sanity checks, not performance guarantees.
+Recorded smoke measurements on this desktop include approximately 133,110 diagnostic-chain events/second, approximately 15,303 runtime-dispatch events/second with a 1,024-entry history, and 10,000 births in 5,688 ms. The current typed-entity benchmark built 10,000 entities plus 20,000 relation versions in 438 ms and durably round-tripped 11,079,071 bytes in 1,111 ms. The current life-record benchmark built 10,000 entries in 359 ms and durably round-tripped 7,108,659 bytes in 586 ms. These environment-sensitive measurements are retained as sanity checks, not performance guarantees.
 
 ## Current truthful status
 
@@ -64,14 +69,14 @@ implementations. In particular, no status in the current registry claims
 
 ## Remaining implementation gaps
 
-1. Computational cells, tissues, organs, signalling, metabolism, homeostasis, repair, immune boundaries, and sleep/maintenance (Stage 3–4).
-2. Memory graph, learning, perception, language, world/self models, affect, social cognition, and a bounded cognitive workspace (Stage 5).
-3. Capability adapters, local model routing, multimodality, body/avatar, hardware safety contracts, and qualified device routes (Stage 7).
-4. Approved cryptographic provider integration and key custody; the runtime hash and pending lineage marker are not identity authentication.
-5. Persistence/recovery integration beyond the genome record, sanitizer/coverage runs, fuzzing, performance budgets, and platform-specific qualification.
-6. Atomic requirement derivation and deduplication across all legacy documents; the 1,451-row source index must not be mistaken for that normalized graph.
-7. Component-level provenance, license, malware, compatibility, tests, and benchmarks for any future candidate from `F:\Aetherius OS`, `F:\ai chat conversations`, `F:\AI Digital Twin`, or `F:\Downloads`.
-8. Descendants, population evolution, unrestricted research crawling, and experimental quantum/photonic/BCI/swarm/UAP branches remain deferred by design.
+1. Finish the Stage 5 cognition family, including language structures, fuller world/self-model integration, bounded conscious-workspace orchestration, metacognition and introspection. Existing memory, learning, affect and perception slices do not close the entire family.
+2. Implement full embryology orchestration, curricula, teaching, sleep/consolidation, maintenance, play/exploration, competency gates, progressive independence and guardian/operator boundaries (Stage 6).
+3. Implement multimodal adapters, local-model discovery/routing, capability and provenance gates, body/avatar control, hardware interlocks, and observed then qualified device routes with measured latency and failure behavior (Stage 7).
+4. Implement network identity, private/shared-domain separation, specialist-agent contracts, recovery coordination, partition behavior and reconciliation without autobiographical corruption (Stage 8).
+5. Integrate an approved cryptographic provider and key custody/rotation, then add migrations, recovery records, fuzzing, sanitizer qualification, coverage thresholds and platform/device/model qualification matrices. Current hashes are deterministic integrity evidence, not authentication.
+6. Implement credential validation/disclosure, temporal custody and human associations, succession, retirement and decommissioning policy without letting those records rewrite birth identity, lineage or private autobiography.
+7. Complete atomic requirement derivation and deduplication across all legacy documents, plus component-level provenance, licensing, malware, compatibility, tests and benchmarks for any future candidate from `F:\Aetherius OS`, `F:\ai chat conversations`, `F:\AI Digital Twin`, or `F:\Downloads`.
+8. Descendant boundaries, population management, reproduction policy, mutation-effect evidence, diversity preservation, containment and long-horizon optimization remain gated. Uncontrolled self-replication and unsupported quantum/photonic/BCI/swarm/UAP hardware are not enabled.
 
 ## Acceptance gate for the next phase
 

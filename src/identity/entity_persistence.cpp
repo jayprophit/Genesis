@@ -1,31 +1,17 @@
 #include "genesis/identity/entity_persistence.hpp"
 
+#include "genesis/common/immutable_snapshot.hpp"
 #include "genesis/runtime/runtime.hpp"
 
 #include <algorithm>
-#include <atomic>
-#include <chrono>
-#include <cctype>
-#include <fstream>
 #include <limits>
 #include <stdexcept>
-#include <system_error>
-
-#ifdef _WIN32
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <windows.h>
-#else
-#include <cerrno>
-#include <fcntl.h>
-#include <unistd.h>
-#endif
 
 namespace genesis::identity {
 namespace {
 
 constexpr std::string_view kMagic = "GENESIS-ENTITY-REGISTRY";
+constexpr std::string_view kFileSuffix = "entities";
 constexpr std::uint64_t kSchemaVersion = 1U;
 constexpr std::uint64_t kMaximumItems = 1'000'000U;
 constexpr std::uint64_t kMaximumFieldBytes = 16U * 1024U * 1024U;
@@ -39,24 +25,45 @@ void set_error(EntityStoreError* error, EntityStoreErrorCode code, std::string m
 }
 
 bool bounded_text(std::string_view value, std::size_t maximum) {
-    if (value.empty() || value.size() > maximum) {
-        return false;
-    }
-    return std::all_of(value.begin(), value.end(), [](unsigned char character) {
-        return character >= 0x20U && character != 0x7fU;
-    });
+    return !value.empty() && value.size() <= maximum
+           && std::all_of(value.begin(), value.end(), [](unsigned char character) {
+                  return character >= 0x20U && character != 0x7fU;
+              });
 }
 
-void validate_identifier(std::string_view value) {
-    if (!bounded_text(value, 128U) || value == "." || value == "..") {
-        throw std::invalid_argument("unsafe or empty storage identifier");
+void map_file_error(const storage::ImmutableFileError& source,
+                    bool writing,
+                    EntityStoreError* target) {
+    switch (source.code) {
+    case storage::ImmutableFileErrorCode::none:
+        set_error(target, EntityStoreErrorCode::none, {});
+        return;
+    case storage::ImmutableFileErrorCode::invalid_identifier:
+        set_error(target, EntityStoreErrorCode::invalid_identifier, source.message);
+        return;
+    case storage::ImmutableFileErrorCode::not_found:
+        set_error(target, EntityStoreErrorCode::not_found, source.message);
+        return;
+    case storage::ImmutableFileErrorCode::conflicting_version:
+        set_error(target, EntityStoreErrorCode::conflicting_version, source.message);
+        return;
+    case storage::ImmutableFileErrorCode::record_too_large:
+        set_error(target,
+                  writing ? EntityStoreErrorCode::invalid_registry
+                          : EntityStoreErrorCode::corrupt_record,
+                  source.message);
+        return;
+    case storage::ImmutableFileErrorCode::unsafe_file_type:
+        set_error(target,
+                  writing ? EntityStoreErrorCode::io_error
+                          : EntityStoreErrorCode::corrupt_record,
+                  source.message);
+        return;
+    case storage::ImmutableFileErrorCode::io_error:
+        set_error(target, EntityStoreErrorCode::io_error, source.message);
+        return;
     }
-    for (const auto character : value) {
-        const auto byte = static_cast<unsigned char>(character);
-        if (std::isalnum(byte) == 0 && byte != '_' && byte != '-' && byte != '.') {
-            throw std::invalid_argument("unsafe storage identifier character");
-        }
-    }
+    set_error(target, EntityStoreErrorCode::io_error, "unknown immutable-file error");
 }
 
 void append_u64(std::string& output, std::uint64_t value) {
@@ -94,117 +101,6 @@ std::string read_string(std::string_view bytes, std::size_t& offset) {
     std::string value(bytes.substr(offset, size));
     offset += size;
     return value;
-}
-
-std::filesystem::path record_path(const std::filesystem::path& root,
-                                  std::string_view namespace_id,
-                                  std::string_view version) {
-    validate_identifier(namespace_id);
-    validate_identifier(version);
-    return root / (std::string(namespace_id) + "." + std::string(version)
-                   + ".entities");
-}
-
-void validate_regular_non_link(const std::filesystem::path& path) {
-    std::error_code error;
-    const auto status = std::filesystem::symlink_status(path, error);
-    if (error) {
-        throw std::runtime_error("cannot inspect entity registry record");
-    }
-    if (std::filesystem::is_symlink(status) || !std::filesystem::is_regular_file(status)) {
-        throw std::runtime_error("entity registry record is not a regular non-link file");
-    }
-}
-
-std::string read_all_bounded(const std::filesystem::path& path, std::size_t maximum) {
-    validate_regular_non_link(path);
-    std::error_code error;
-    const auto file_size = std::filesystem::file_size(path, error);
-    if (error || file_size > maximum) {
-        throw std::runtime_error("entity registry record exceeds the configured limit");
-    }
-    if (file_size > static_cast<std::uintmax_t>(
-                        std::numeric_limits<std::streamsize>::max())) {
-        throw std::runtime_error("entity registry record cannot be read safely");
-    }
-    std::ifstream input(path, std::ios::binary);
-    if (!input) {
-        throw std::runtime_error("cannot open entity registry record");
-    }
-    std::string bytes(static_cast<std::size_t>(file_size), '\0');
-    input.read(bytes.data(), static_cast<std::streamsize>(bytes.size()));
-    if (input.bad()
-        || input.gcount() != static_cast<std::streamsize>(bytes.size())) {
-        throw std::runtime_error("cannot read complete entity registry record");
-    }
-    char unexpected{};
-    if (input.get(unexpected)) {
-        throw std::runtime_error("entity registry record grew during bounded read");
-    }
-    return bytes;
-}
-
-void durable_flush_file(const std::filesystem::path& path) {
-#ifdef _WIN32
-    const auto handle = CreateFileW(path.c_str(),
-                                    GENERIC_WRITE,
-                                    FILE_SHARE_READ,
-                                    nullptr,
-                                    OPEN_EXISTING,
-                                    FILE_ATTRIBUTE_NORMAL,
-                                    nullptr);
-    if (handle == INVALID_HANDLE_VALUE) {
-        throw std::runtime_error("cannot open entity registry record for durable flush");
-    }
-    const auto flushed = FlushFileBuffers(handle) != 0;
-    CloseHandle(handle);
-    if (!flushed) {
-        throw std::runtime_error("cannot durably flush entity registry record");
-    }
-#else
-    const auto descriptor = ::open(path.c_str(), O_RDONLY);
-    if (descriptor < 0) {
-        throw std::runtime_error("cannot open entity registry record for durable flush");
-    }
-    const auto result = ::fsync(descriptor);
-    const auto close_result = ::close(descriptor);
-    if (result != 0 || close_result != 0) {
-        throw std::runtime_error("cannot durably flush entity registry record");
-    }
-#endif
-}
-
-bool publish_without_replacement(const std::filesystem::path& temporary,
-                                 const std::filesystem::path& target) {
-#ifdef _WIN32
-    return MoveFileExW(temporary.c_str(), target.c_str(), MOVEFILE_WRITE_THROUGH) != 0;
-#else
-    if (::link(temporary.c_str(), target.c_str()) != 0) {
-        return false;
-    }
-    if (::unlink(temporary.c_str()) != 0) {
-        std::error_code ignored;
-        std::filesystem::remove(temporary, ignored);
-    }
-    auto directory_flags = O_RDONLY;
-#ifdef O_DIRECTORY
-    directory_flags |= O_DIRECTORY;
-#endif
-    const auto directory = ::open(target.parent_path().c_str(), directory_flags);
-    if (directory >= 0) {
-        static_cast<void>(::fsync(directory));
-        static_cast<void>(::close(directory));
-    }
-    return true;
-#endif
-}
-
-std::filesystem::path temporary_path_for(const std::filesystem::path& target) {
-    static std::atomic<std::uint64_t> counter{0U};
-    const auto tick = std::chrono::steady_clock::now().time_since_epoch().count();
-    const auto sequence = counter.fetch_add(1U, std::memory_order_relaxed);
-    const auto token = runtime::sha256(std::to_string(tick) + ":" + std::to_string(sequence));
-    return std::filesystem::path(target.string() + ".tmp-" + token.substr(0U, 20U));
 }
 
 void append_entity(std::string& output, const EntityAddress& entity) {
@@ -280,9 +176,7 @@ EntityRelation read_relation(std::string_view bytes, std::size_t& offset) {
 EntityRegistryStore::EntityRegistryStore(std::filesystem::path root,
                                          std::size_t maximum_record_bytes)
     : root_(std::move(root)), maximum_record_bytes_(maximum_record_bytes) {
-    if (root_.empty() || maximum_record_bytes_ < 1024U) {
-        throw std::invalid_argument("invalid entity registry store configuration");
-    }
+    static_cast<void>(storage::ImmutableSnapshotFiles(root_, maximum_record_bytes_));
 }
 
 std::string EntityRegistryStore::serialize(const EntityRegistry& registry) {
@@ -386,81 +280,20 @@ std::optional<EntityRegistry> EntityRegistryStore::deserialize(std::string_view 
 bool EntityRegistryStore::write(const EntityRegistry& registry,
                                 std::string_view version,
                                 EntityStoreError* error) const {
-    std::filesystem::path temporary;
     try {
-        validate_identifier(registry.namespace_id());
-        validate_identifier(version);
         const auto bytes = serialize(registry);
-        if (bytes.size() > maximum_record_bytes_) {
-            throw std::invalid_argument("entity registry record exceeds configured limit");
-        }
-        if (bytes.size()
-            > static_cast<std::size_t>(std::numeric_limits<std::streamsize>::max())) {
-            throw std::invalid_argument("entity registry record exceeds stream limits");
-        }
-
-        std::error_code filesystem_error;
-        std::filesystem::create_directories(root_, filesystem_error);
-        if (filesystem_error || !std::filesystem::is_directory(root_)) {
-            throw std::runtime_error("cannot create entity registry store");
-        }
-        const auto target = record_path(root_, registry.namespace_id(), version);
-        if (std::filesystem::exists(target)) {
-            if (read_all_bounded(target, maximum_record_bytes_) == bytes) {
-                set_error(error, EntityStoreErrorCode::none, {});
-                return true;
-            }
-            set_error(error,
-                      EntityStoreErrorCode::conflicting_version,
-                      "immutable entity registry version conflict");
+        storage::ImmutableSnapshotFiles files(root_, maximum_record_bytes_);
+        storage::ImmutableFileError file_error;
+        if (!files.write(registry.namespace_id(), version, kFileSuffix, bytes, &file_error)) {
+            map_file_error(file_error, true, error);
             return false;
         }
-
-        temporary = temporary_path_for(target);
-        {
-            std::ofstream output(temporary, std::ios::binary | std::ios::trunc);
-            if (!output) {
-                throw std::runtime_error("cannot create temporary entity registry record");
-            }
-            output.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
-            output.flush();
-            if (!output) {
-                throw std::runtime_error("cannot flush temporary entity registry record");
-            }
-        }
-        durable_flush_file(temporary);
-
-        if (!publish_without_replacement(temporary, target)) {
-            std::error_code ignored;
-            std::filesystem::remove(temporary, ignored);
-            temporary.clear();
-            if (std::filesystem::exists(target)) {
-                if (read_all_bounded(target, maximum_record_bytes_) == bytes) {
-                    set_error(error, EntityStoreErrorCode::none, {});
-                    return true;
-                }
-                set_error(error,
-                          EntityStoreErrorCode::conflicting_version,
-                          "entity registry version was created concurrently with different data");
-                return false;
-            }
-            throw std::runtime_error("cannot atomically publish entity registry record");
-        }
-        temporary.clear();
         set_error(error, EntityStoreErrorCode::none, {});
         return true;
     } catch (const std::invalid_argument& exception) {
-        if (!temporary.empty()) {
-            std::error_code ignored;
-            std::filesystem::remove(temporary, ignored);
-        }
         set_error(error, EntityStoreErrorCode::invalid_registry, exception.what());
         return false;
     } catch (const std::exception& exception) {
-        if (!temporary.empty()) {
-            std::error_code ignored;
-            std::filesystem::remove(temporary, ignored);
-        }
         set_error(error, EntityStoreErrorCode::io_error, exception.what());
         return false;
     }
@@ -472,18 +305,17 @@ std::optional<EntityRegistry> EntityRegistryStore::read(
     std::string_view version,
     EntityStoreError* error) const {
     try {
-        validate_identifier(namespace_id);
-        validate_identifier(version);
         if (!bounded_text(registrar_organism_id, 256U)) {
             throw std::invalid_argument("invalid registrar identity");
         }
-        const auto target = record_path(root_, namespace_id, version);
-        if (!std::filesystem::exists(target)) {
-            set_error(error, EntityStoreErrorCode::not_found, "entity registry version not found");
+        storage::ImmutableSnapshotFiles files(root_, maximum_record_bytes_);
+        storage::ImmutableFileError file_error;
+        const auto bytes = files.read(namespace_id, version, kFileSuffix, &file_error);
+        if (!bytes.has_value()) {
+            map_file_error(file_error, false, error);
             return std::nullopt;
         }
-        const auto bytes = read_all_bounded(target, maximum_record_bytes_);
-        auto registry = deserialize(bytes, error);
+        auto registry = deserialize(*bytes, error);
         if (registry.has_value()
             && (registry->namespace_id() != namespace_id
                 || registry->registrar_organism_id() != registrar_organism_id)) {

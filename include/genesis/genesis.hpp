@@ -2,6 +2,7 @@
 
 // Stable public umbrella header. Implementations live in the compiled
 // genesis_core library; clients can include narrower module headers instead.
+#include "genesis/common/immutable_snapshot.hpp"
 #include "genesis/common/text.hpp"
 #include "genesis/cognition/workspace.hpp"
 #include "genesis/cognition/persistence.hpp"
@@ -14,6 +15,8 @@
 #include "genesis/genetics/reproduction.hpp"
 #include "genesis/identity/entity_persistence.hpp"
 #include "genesis/identity/entity_registry.hpp"
+#include "genesis/identity/life_persistence.hpp"
+#include "genesis/identity/life_record.hpp"
 #include "genesis/identity/lineage.hpp"
 #include "genesis/learning/consolidation.hpp"
 #include "genesis/learning/persistence.hpp"

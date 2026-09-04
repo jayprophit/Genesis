@@ -390,6 +390,9 @@ void test_persistence_and_recovery() {
     require(!store.read("../escape", "organism-main", "1.0.0", &error).has_value()
                 && error.code == EntityStoreErrorCode::invalid_identifier,
             "unsafe entity registry path identifier was accepted");
+    require(!store.read("local.genesis", "organism\nmain", "1.0.0", &error).has_value()
+                && error.code == EntityStoreErrorCode::invalid_identifier,
+            "unsafe entity registry registrar identifier was accepted");
     require(!store.read("missing", "organism-main", "1.0.0", &error).has_value()
                 && error.code == EntityStoreErrorCode::not_found,
             "missing entity registry version did not report not-found");

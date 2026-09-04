@@ -5,7 +5,7 @@ G3F-003	74-261;9507-9532;17402-17525	Digital genome edit and impact simulation	R
 G3F-004	262-298;1891-1996	Creator fallibility and evidence truth separation	REQ-PROV-001,REQ-EVAL-001,REQ-BELIEF-SOURCE-001	-	EXTEND	Creator statement does not become unquestionable truth	REGISTERED
 G3F-005	299-359;592-722	Reproductive phenotype descendants and population	REQ-REPRO-001,REQ-BIRTH-001,REQ-LIN-001	-	EXTEND	Phenotype identity maturity and reproductive authority remain distinct	REGISTERED
 G3F-006	360-504;8832-8890;10735-10957	Shell identity temporary embodiment and external robotics	REQ-PLAT-001,REQ-ADAPT-001	REQ-SHELL-TRUST-001	MIXED	No concrete physical route is claimed or authorized	REGISTERED
-G3F-007	505-591;778-849;2477-2561	Names lifecycle identity and life record	REQ-ID-001,REQ-BIRTH-001,REQ-SELF-CONTINUITY-001	REQ-LIFE-RECORD-001	MIXED	Name shell account and record never replace organism identity	REGISTERED
+G3F-007	505-591;778-849;2477-2561	Names lifecycle identity and life record	REQ-ID-001,REQ-BIRTH-001,REQ-SELF-CONTINUITY-001	REQ-LIFE-RECORD-001,REQ-LIFE-RECORD-PERSIST-001	MIXED	Name shell account and record never replace organism identity	REGISTERED
 G3F-008	663-777	Inheritance channels and ancestral archive	REQ-INH-001,REQ-LIN-001,REQ-MEM-001,REQ-PROV-001	-	EXTEND	Post-birth teaching cannot be relabelled genetic inheritance	REGISTERED
 G3F-009	850-959	Resource economy opportunity cost and reciprocity	REQ-RES-001,REQ-METABOLISM-001,REQ-HOME-001	-	EXTEND	No coercive deprivation or artificial suffering mechanism	REGISTERED
 G3F-010	960-1391;3844-3900	Temporal law policy disclosure trust and appeals	REQ-POL-001,REQ-PROV-001,REQ-BELIEF-SOURCE-001	REQ-GOVERNANCE-LAW-001	MIXED	Knowledge disclosure recommendation and action remain distinct	REGISTERED

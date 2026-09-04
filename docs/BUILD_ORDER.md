@@ -6,8 +6,9 @@ Authorized legacy information enters through `docs/research/SOURCE_ABSTRACTIONS.
 
 1. Requirements, dependency graph, provenance, replay, and evidence gates.
 2. Runtime: time, events, resources, causality, state transition, accounting, recovery.
-3. Identity, typed entity addressability and lineage; distinguish entity facts,
-   authority, restore, clone, fork, and child.
+3. Identity, typed entity addressability, lineage and append-only life records;
+   distinguish entity facts, record history, authority, restore, clone, fork,
+   and child.
 4. Genome, three-strand inheritance, RNA expression, birth boundary, reproduction and mutation audit.
 5. Computational cells, differentiation, tissues, repair and controlled recycling.
 6. Signalling, homeostasis, metabolism, immune boundaries and global modulation.

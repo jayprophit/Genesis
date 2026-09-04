@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Genesis VERSION 0.24.0 LANGUAGES CXX)
+project(Genesis VERSION 0.25.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -7,6 +7,7 @@ option(GENESIS_ENABLE_SANITIZERS "Enable address and undefined-behaviour sanitiz
 include(GNUInstallDirs)
 
 add_library(genesis_core STATIC
+    src/common/immutable_snapshot.cpp
     src/common/text.cpp
     src/cognition/workspace.cpp
     src/cognition/persistence.cpp
@@ -27,6 +28,8 @@ add_library(genesis_core STATIC
     src/genetics/reproduction.cpp
     src/identity/entity_persistence.cpp
     src/identity/entity_registry.cpp
+    src/identity/life_persistence.cpp
+    src/identity/life_record.cpp
     src/identity/lineage.cpp
     src/learning/consolidation.cpp
     src/learning/persistence.cpp
@@ -115,6 +118,12 @@ target_compile_options(genesis_identity_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Cl
 add_test(NAME genesis_identity_tests COMMAND genesis_identity_tests)
 add_executable(genesis_identity_bench benchmarks/identity_benchmark.cpp)
 target_link_libraries(genesis_identity_bench PRIVATE genesis_core)
+add_executable(genesis_life_record_tests tests/life_record_tests.cpp)
+target_link_libraries(genesis_life_record_tests PRIVATE genesis_core)
+target_compile_options(genesis_life_record_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_life_record_tests COMMAND genesis_life_record_tests)
+add_executable(genesis_life_record_bench benchmarks/life_record_benchmark.cpp)
+target_link_libraries(genesis_life_record_bench PRIVATE genesis_core)
 
 install(TARGETS genesis_core EXPORT GenesisTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
