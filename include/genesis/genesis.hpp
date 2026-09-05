@@ -28,3 +28,5 @@
 #include "genesis/provenance/ledger.hpp"
 #include "genesis/requirements/registry.hpp"
 #include "genesis/runtime/runtime.hpp"
+#include "genesis/security/crypto_provider.hpp"
+#include "genesis/security/crypto_persistence.hpp"

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Genesis VERSION 0.25.0 LANGUAGES CXX)
+project(Genesis VERSION 0.26.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -41,6 +41,8 @@ add_library(genesis_core STATIC
     src/provenance/ledger.cpp
     src/requirements/registry.cpp
     src/runtime/runtime.cpp
+    src/security/crypto_provider.cpp
+    src/security/crypto_persistence.cpp
 )
 target_include_directories(genesis_core PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -124,6 +126,13 @@ target_compile_options(genesis_life_record_tests PRIVATE $<$<CXX_COMPILER_ID:GNU
 add_test(NAME genesis_life_record_tests COMMAND genesis_life_record_tests)
 add_executable(genesis_life_record_bench benchmarks/life_record_benchmark.cpp)
 target_link_libraries(genesis_life_record_bench PRIVATE genesis_core)
+add_executable(genesis_security_tests tests/security_tests.cpp)
+target_link_libraries(genesis_security_tests PRIVATE genesis_core)
+target_compile_options(genesis_security_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_security_tests COMMAND genesis_security_tests
+    ${CMAKE_CURRENT_SOURCE_DIR}/registry/crypto_reference_baseline.tsv)
+add_executable(genesis_crypto_provider_bench benchmarks/crypto_provider_benchmark.cpp)
+target_link_libraries(genesis_crypto_provider_bench PRIVATE genesis_core)
 
 install(TARGETS genesis_core EXPORT GenesisTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

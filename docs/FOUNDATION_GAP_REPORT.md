@@ -1,6 +1,6 @@
 # Genesis foundation gap report
 
-Verified 2026-09-04 against the local checkout at `C:\Users\jpowe\Desktop\Genesis`.
+Verified 2026-09-05 against the local checkout at `C:\Users\jpowe\Desktop\Genesis`.
 
 ## Source ingest
 
@@ -51,13 +51,20 @@ engineering facts or automatic implementation instructions.
   typed entity references, continuity audits, immutable recovery and explicit
   no-authority/no-credential-verification views. See
   `docs/IDENTITY_LIFE_RECORD.md`.
+- The 0.26 cryptographic qualification foundation implements owner-bound threat
+  and policy revisions, derived provider identities, declared/observed/qualified/
+  suspended/revoked evidence states, independent-organization qualification,
+  time-bounded policy evaluation and immutable recovery. It records candidates
+  only and cannot execute cryptography or authenticate/authorize anything. See
+  `docs/security/CRYPTOGRAPHIC_THREAT_MODEL.md` and
+  `docs/security/CRYPTOGRAPHIC_PROVIDER_BOUNDARY.md`.
 - Tests cover SHA-256 vectors, deterministic runtime and replay boundaries, registry/schema checks, provenance chaining, identity, typed entities and relations, life-record birth/name/reference/continuity invariants, immutable recovery, genome, RNA, maturity, lineage adversaries, deterministic births, mutation records, inheritance cutoff boundaries, organism composition, signalling, metabolism, homeostasis, immunity, memory, learning, affect and perception.
-- Benchmarks cover the diagnostic provenance chain, runtime dispatcher, deterministic birth transactions, typed entity registries, life records, organism support, memory, learning, affect and perception. Benchmark output is measurement evidence, not a claim of production capacity.
+- Benchmarks cover the diagnostic provenance chain, runtime dispatcher, deterministic birth transactions, typed entity registries, life records, cryptographic provider evidence, organism support, memory, learning, affect and perception. Benchmark output is measurement evidence, not a claim of production capacity or security qualification.
 - Registry schemas are seeded for biological analogies, capabilities, platform requirements, dependencies, drivers, firmware, deployment profiles, protocols, models, datasets, universal research items, evidence/utility class definitions, and rejected/dead-end research. The technology-mining registry has 43 items and the dead-end cache has 10 linked records with independent E/U classifications.
 - CI and secret-scan safeguards are present under `.github/workflows/ci.yml` and `tools/`.
 - A project-level proprietary `LICENSE` is present. Third-party material remains subject to its own terms.
 
-Recorded smoke measurements on this desktop include approximately 133,110 diagnostic-chain events/second, approximately 15,303 runtime-dispatch events/second with a 1,024-entry history, and 10,000 births in 5,688 ms. The current typed-entity benchmark built 10,000 entities plus 20,000 relation versions in 438 ms and durably round-tripped 11,079,071 bytes in 1,111 ms. The current life-record benchmark built 10,000 entries in 359 ms and durably round-tripped 7,108,659 bytes in 586 ms. These environment-sensitive measurements are retained as sanity checks, not performance guarantees.
+Recorded smoke measurements on this desktop include approximately 133,110 diagnostic-chain events/second, approximately 15,303 runtime-dispatch events/second with a 1,024-entry history, and 10,000 births in 5,688 ms. The current typed-entity benchmark built 10,000 entities plus 20,000 relation versions in 438 ms and durably round-tripped 11,079,071 bytes in 1,111 ms. The current life-record benchmark built 10,000 entries in 359 ms and durably round-tripped 7,108,659 bytes in 586 ms. The synthetic cryptographic-registry benchmark built 10,000 provider manifests plus 20,000 assessment versions in 2,235 ms and immutably round-tripped and revalidated 25,627,296 bytes in 5,218 ms. These environment-sensitive measurements are retained as sanity checks, not performance guarantees, provider approval or security validation.
 
 ## Current truthful status
 
@@ -73,7 +80,7 @@ implementations. In particular, no status in the current registry claims
 2. Implement full embryology orchestration, curricula, teaching, sleep/consolidation, maintenance, play/exploration, competency gates, progressive independence and guardian/operator boundaries (Stage 6).
 3. Implement multimodal adapters, local-model discovery/routing, capability and provenance gates, body/avatar control, hardware interlocks, and observed then qualified device routes with measured latency and failure behavior (Stage 7).
 4. Implement network identity, private/shared-domain separation, specialist-agent contracts, recovery coordination, partition behavior and reconciliation without autobiographical corruption (Stage 8).
-5. Integrate an approved cryptographic provider and key custody/rotation, then add migrations, recovery records, fuzzing, sanitizer qualification, coverage thresholds and platform/device/model qualification matrices. Current hashes are deterministic integrity evidence, not authentication.
+5. The 0.26 qualification registry now records threat models, temporal algorithm policy, provider identities, observations, independent qualifications, suspension/revocation and immutable evidence recovery. It deliberately performs no cryptography. Next select and verify an actual module/provider/operational environment, implement key custody/rotation and authenticated migration/recovery records, then add fuzzing, sanitizer qualification, coverage thresholds, external security review and platform/device/model qualification matrices. Current hashes are deterministic integrity evidence, not authentication.
 6. Implement credential validation/disclosure, temporal custody and human associations, succession, retirement and decommissioning policy without letting those records rewrite birth identity, lineage or private autobiography.
 7. Complete atomic requirement derivation and deduplication across all legacy documents, plus component-level provenance, licensing, malware, compatibility, tests and benchmarks for any future candidate from `F:\Aetherius OS`, `F:\ai chat conversations`, `F:\AI Digital Twin`, or `F:\Downloads`.
 8. Descendant boundaries, population management, reproduction policy, mutation-effect evidence, diversity preservation, containment and long-horizon optimization remain gated. Uncontrolled self-replication and unsupported quantum/photonic/BCI/swarm/UAP hardware are not enabled.

@@ -1,0 +1,14 @@
+reference_id	title	publisher	status	retrieved_at	url	usage_boundary
+CRYPTO-REF-001	Security Requirements for Cryptographic Modules FIPS 140-3	NIST	FINAL	2026-09-04	https://csrc.nist.gov/pubs/fips/140-3/final	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-002	Cryptographic Module Validation Program FIPS 140-3 Standards	NIST	LIVE_PROGRAM	2026-09-04	https://csrc.nist.gov/projects/cryptographic-module-validation-program/fips-140-3-standards	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-003	Cryptographic Algorithm Validation Program	NIST	LIVE_PROGRAM	2026-09-04	https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-004	Recommendation for Key Management Part 1 General SP 800-57 Part 1 Rev 5	NIST	FINAL	2026-09-04	https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-005	Transitioning the Use of Cryptographic Algorithms and Key Lengths SP 800-131A Rev 2	NIST	FINAL	2026-09-04	https://csrc.nist.gov/pubs/sp/800/131/a/r2/final	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-006	Transitioning the Use of Cryptographic Algorithms and Key Lengths SP 800-131A Rev 3	NIST	DRAFT_MONITOR_ONLY	2026-09-04	https://csrc.nist.gov/pubs/sp/800/131/a/r3/ipd	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-007	Considerations for Achieving Cryptographic Agility CSWP 39 Update 1	NIST	FINAL	2026-09-04	https://csrc.nist.gov/pubs/cswp/39/upd1/final	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-008	Module-Lattice-Based Key-Encapsulation Mechanism Standard FIPS 203	NIST	FINAL	2026-09-04	https://csrc.nist.gov/pubs/fips/203/final	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-009	Module-Lattice-Based Digital Signature Standard FIPS 204	NIST	FINAL	2026-09-04	https://csrc.nist.gov/pubs/fips/204/final	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-010	Stateless Hash-Based Digital Signature Standard FIPS 205	NIST	FINAL	2026-09-04	https://csrc.nist.gov/pubs/fips/205/final	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-011	Transition to Post-Quantum Cryptography Standards IR 8547	NIST	DRAFT_MONITOR_ONLY	2026-09-04	https://csrc.nist.gov/pubs/ir/8547/ipd	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-012	Post-Quantum Cryptography Migration Timelines	UK NCSC	CURRENT_GUIDANCE	2026-09-04	https://www.ncsc.gov.uk/guidance/pqc-migration-timelines	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-013	Protocol Design Principles Cryptographic Agility	UK NCSC	CURRENT_GUIDANCE	2026-09-04	https://www.ncsc.gov.uk/whitepaper/protocol-design-principles	REFERENCE_ONLY_NO_AUTO_APPROVAL
