@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Configure
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
       - name: Build
@@ -29,4 +29,3 @@ jobs:
       - name: Secret scan
         shell: pwsh
         run: ./tools/secret_scan.ps1
-

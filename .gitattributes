@@ -1,3 +1,6 @@
-# Preserve the user-supplied Genesis3 source as exact evidence bytes.
+# Preserve user-supplied specification evidence as exact bytes on every OS.
+docs/specifications/source/genesis.txt binary
+docs/specifications/source/genesis2.txt binary
 docs/specifications/source/genesis3.txt binary
 docs/specifications/source/genesis4.txt binary
+docs/specifications/source/technology_mining_addendum.txt binary
