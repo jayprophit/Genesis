@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Genesis VERSION 0.28.0 LANGUAGES CXX)
+project(Genesis VERSION 0.29.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -47,6 +47,8 @@ add_library(genesis_core STATIC
     src/security/key_custody_persistence.cpp
     src/security/platform_crypto_inventory.cpp
     src/security/platform_crypto_inventory_native.cpp
+    src/security/provider_open_observation.cpp
+    src/security/provider_open_observation_native.cpp
 )
 target_include_directories(genesis_core PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -156,6 +158,17 @@ add_test(NAME genesis_platform_crypto_inventory_tests
     COMMAND genesis_platform_crypto_inventory_tests)
 add_executable(genesis_crypto_platform_probe tools/crypto_platform_probe.cpp)
 target_link_libraries(genesis_crypto_platform_probe PRIVATE genesis_core)
+add_executable(genesis_provider_open_observation_tests
+    tests/provider_open_observation_tests.cpp)
+target_link_libraries(genesis_provider_open_observation_tests PRIVATE genesis_core)
+target_compile_options(genesis_provider_open_observation_tests PRIVATE
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic>
+    $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_provider_open_observation_tests
+    COMMAND genesis_provider_open_observation_tests)
+add_executable(genesis_crypto_provider_open_probe
+    tools/crypto_provider_open_probe.cpp)
+target_link_libraries(genesis_crypto_provider_open_probe PRIVATE genesis_core)
 
 install(TARGETS genesis_core EXPORT GenesisTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

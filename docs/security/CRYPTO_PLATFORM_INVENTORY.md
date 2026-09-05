@@ -65,6 +65,13 @@ nor local registration proves that a provider opens successfully, that a TPM is
 present or healthy, that an exact module or operational environment has a valid
 certificate, or that Genesis can safely perform an operation.
 
+Genesis 0.29 adds the separate bounded route in
+`CRYPTO_PROVIDER_OPEN_OBSERVATION.md`. It proved the distinction directly on
+this host: the Software KSP opened for one provider-level property query, while
+the registered Platform/TPM KSP returned `NTE_DEVICE_NOT_READY`. Neither result
+changes this inventory record's permanent `provider_opened=false` boundary or
+qualifies either provider.
+
 Run the read-only probe with:
 
 ```powershell
@@ -97,8 +104,9 @@ enabled, Genesis still requires at least:
    environment;
 2. license, provenance, supply-chain, certificate, algorithm and threat-policy
    review;
-3. a bounded provider-open observation that remains separate from key access;
-4. misuse-resistant, non-exportable native-handle adapters with authenticated
+3. independent qualification of the exact registered and observed provider,
+   module artifact, policy revision and operational environment;
+4. misuse-resistant, non-exportable native-key-handle adapters with authenticated
    actors and deny-by-default authorization;
 5. failure, zeroization, rotation, recovery and deletion evidence;
 6. fuzzing, sanitizer, coverage, external security and named-platform evidence;

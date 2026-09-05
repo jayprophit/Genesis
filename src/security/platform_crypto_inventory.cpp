@@ -113,12 +113,6 @@ bool digest(std::string_view value) {
               });
 }
 
-std::string provider_name_digest(std::string_view provider_name) {
-    std::string material{"genesis.security.registered_provider_name.v1"};
-    append_material(material, provider_name);
-    return runtime::sha256(material);
-}
-
 std::string inventory_digest(const CryptoPlatformInventory& inventory) {
     std::string material{"genesis.security.crypto_platform_inventory.v1"};
     append_material(material, inventory.platform_id);
@@ -209,6 +203,24 @@ bool crypto_platform_inventory_status_from_string(
     return true;
 }
 
+bool valid_registered_crypto_provider_name(std::string_view value) noexcept {
+    try {
+        return bounded_text(value, kMaximumProviderNameLength);
+    } catch (...) {
+        return false;
+    }
+}
+
+std::string derive_registered_crypto_provider_name_digest(
+    std::string_view provider_name) {
+    if (!valid_registered_crypto_provider_name(provider_name)) {
+        throw std::invalid_argument("provider name is not valid bounded UTF-8 evidence text");
+    }
+    std::string material{"genesis.security.registered_provider_name.v1"};
+    append_material(material, provider_name);
+    return runtime::sha256(material);
+}
+
 CryptoPlatformInventory make_crypto_platform_inventory(
     CryptoPlatformInventoryDraft draft) {
     if (!portable_identifier(draft.platform_id, kMaximumPlatformIdLength)) {
@@ -224,7 +236,7 @@ CryptoPlatformInventory make_crypto_platform_inventory(
         throw std::invalid_argument("registered provider count exceeds the evidence limit");
     }
     for (const auto& name : draft.registered_provider_names) {
-        if (!bounded_text(name, kMaximumProviderNameLength)) {
+        if (!valid_registered_crypto_provider_name(name)) {
             throw std::invalid_argument("provider name is empty, unbounded, or contains control text");
         }
     }
@@ -263,7 +275,7 @@ CryptoPlatformInventory make_crypto_platform_inventory(
     inventory.provider_registry_enumeration_succeeded = observed;
     inventory.registered_providers.reserve(draft.registered_provider_names.size());
     for (auto& name : draft.registered_provider_names) {
-        const auto name_digest = provider_name_digest(name);
+        const auto name_digest = derive_registered_crypto_provider_name_digest(name);
         inventory.registered_providers.push_back(
             {std::move(name), std::move(name_digest)});
     }
@@ -299,10 +311,11 @@ bool CryptoPlatformInventory::verify() const {
         }
         for (std::size_t index = 0U; index < registered_providers.size(); ++index) {
             const auto& provider = registered_providers[index];
-            if (!bounded_text(provider.provider_name, kMaximumProviderNameLength)
+            if (!valid_registered_crypto_provider_name(provider.provider_name)
                 || !digest(provider.provider_name_digest)
                 || provider.provider_name_digest
-                       != provider_name_digest(provider.provider_name)
+                       != derive_registered_crypto_provider_name_digest(
+                           provider.provider_name)
                 || (index > 0U
                     && registered_providers[index - 1U].provider_name
                            >= provider.provider_name)) {

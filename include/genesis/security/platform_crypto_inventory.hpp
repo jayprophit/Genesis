@@ -19,6 +19,10 @@ enum class CryptoPlatformInventoryStatus : std::uint8_t {
 [[nodiscard]] bool crypto_platform_inventory_status_from_string(
     std::string_view text,
     CryptoPlatformInventoryStatus& value) noexcept;
+[[nodiscard]] bool valid_registered_crypto_provider_name(
+    std::string_view value) noexcept;
+[[nodiscard]] std::string derive_registered_crypto_provider_name_digest(
+    std::string_view provider_name);
 
 struct RegisteredCryptoProviderObservation final {
     std::string provider_name;

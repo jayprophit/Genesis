@@ -2,7 +2,7 @@
 
 Status: implemented foundation, security review still open
 
-Architecture version: 0.28.0
+Architecture version: 0.29.0
 
 Last reviewed: 2026-09-05
 
@@ -10,8 +10,10 @@ Last reviewed: 2026-09-05
 
 This threat model covers the Genesis registry that records cryptographic policy,
 provider declarations, observations, qualifications, suspensions and
-revocations. It covers integrity and recovery of those evidence records. It does
-not cover secret-key generation or storage, cryptographic operations, identity
+revocations, plus bounded native provider-registration and provider-open
+observations. It covers integrity and recovery of registry evidence and the
+in-memory validation boundary of the platform observations. It does not cover
+secret-key generation or storage, cryptographic operations, identity
 authentication, signature verification, remote protocols, secure boot, device
 attestation or authorization. Those remain separate fail-closed requirements.
 
@@ -38,6 +40,8 @@ The protected assets are:
 7. immutable recovery bytes and their schema, checksum and owner binding;
 8. truthful capability boundaries that prevent evidence records from becoming
    operational authority.
+9. exact registration-bound provider-open status, provider-reported
+   implementation flags, native failure status and handle-release evidence.
 
 Keys, passwords, tokens, seeds, private key material and recovery secrets are not
 registry assets because the registry must never receive or serialize them.
@@ -68,7 +72,7 @@ outside this module, so `audit_entities` rechecks owner and evaluator references
 
 ## Threats and controls
 
-| Threat | Required control in 0.27 |
+| Threat | Required control in 0.29 |
 |---|---|
 | Supply-chain substitution | Provider ID binds implementation name, version, platform and module-binary digest; manifests also record source, license and build evidence digests. |
 | Binary or module-boundary tampering | Manifest identity and chained assessment digests bind module and implementation evidence; changed bytes require a new provider identity. |
@@ -83,6 +87,7 @@ outside this module, so `audit_entities` rechecks owner and evaluator references
 | Unauthorized lifecycle assertion | Transition and succession actors must be registered and hold the recorded custodian or separate recovery-authority role. These are structural facts only; actor authentication and authorization remain mandatory operational gates. |
 | Key reuse or lineage ambiguity | Successors bind an existing predecessor, exact next generation and a different locator digest; predecessor and successor participation is unique and recovery requires a recorded compromise. Actual provider-side non-reuse must still be tested. |
 | Misconfiguration or route substitution | Provider, function, algorithm, implementation-route identifier and implementation digest must agree across the manifest, observation and qualification; policy must independently allow the algorithm/function pair. |
+| Registration mistaken for availability | The provider-open probe requires a verified inventory and exact name match, records native open/property/release status, and cannot qualify the route. A registered local Platform KSP was retained as unavailable when open returned `NTE_DEVICE_NOT_READY`. |
 | Compromised device or platform | Platform evidence is recorded per route, but no platform is qualified by this repository yet. |
 | Malicious dependency | Source/build/license evidence digests are required; software-composition analysis and external review remain open. |
 | Side channel or implementation flaw | The model can record the threat and evidence, but measurement, fuzzing, constant-time review and sanitizer/platform qualification remain open. |
@@ -152,7 +157,8 @@ artifacts and operational key custody remain open.
 
 ## Residual risk and open gates
 
-- No real cryptographic library is linked, selected or approved.
+- Windows Ncrypt is linked only for bounded registration and provider-open
+  observation. No provider is selected or approved for key operations.
 - No real validation certificate has been verified against a module binary and
   operational environment.
 - Secret-free lifecycle, rotation and recovery evidence records now exist, but

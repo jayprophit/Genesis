@@ -38,6 +38,10 @@ before any real qualification.
   observations and their immutable negative capability claims;
   `platform_crypto_inventory_native.cpp` owns the single Windows CNG
   enumeration call and explicit non-Windows fallback.
+- `provider_open_observation.hpp/.cpp` owns the registration-bound
+  open/property/release evidence state machine and its permanent no-key
+  capability claims; `provider_open_observation_native.cpp` owns the bounded
+  Windows CNG route and explicit non-Windows fallback.
 - `security_tests.cpp` owns positive, negative, state-machine, policy-agility,
   authority-boundary and recovery evidence.
 - `crypto_provider_benchmark.cpp` owns a synthetic scale workload; it never
@@ -109,11 +113,22 @@ names on the local Windows x86-64 host in 428 microseconds, with evidence digest
 It opened no provider, enumerated no keys, executed no cryptographic operation
 and qualified nothing. See `CRYPTO_PLATFORM_INVENTORY.md`.
 
+The 0.29 bounded provider-open probe then tested two exact registered names. The
+Microsoft Software Key Storage Provider opened, reported the software
+implementation flag, and released in 7,896 microseconds; evidence digest
+`8942db4acf2490e18e0aee6737a30cb3e4dada6f7519240cdb298756dffe7e2b`.
+The registered Microsoft Platform Crypto Provider returned
+`NTE_DEVICE_NOT_READY` (`0x80090030`) after 13,239 microseconds; evidence digest
+`dba496f5e96b9573fe7dd0bcf2ade26c7aa331fef1916d863de2f37da07af078`.
+Neither route enumerated or accessed a key, performed cryptography, or qualified
+a provider. See `CRYPTO_PROVIDER_OPEN_OBSERVATION.md`.
+
 ## Next dependency gates
 
-1. Observe a bounded provider-open route, then integrate provider-owned
-   non-exportable key operations without placing secrets, native handles or
-   plaintext locators in the registry or Git.
+1. Independently qualify an exact observed provider/module/operational
+   environment, then integrate provider-owned non-exportable key operations
+   without placing secrets, native handles or plaintext locators in the
+   registry or Git.
 2. Select candidate providers only after license, supply-chain, platform,
    operational-environment and certificate review.
 3. Add a narrow operation interface whose default state is unavailable.

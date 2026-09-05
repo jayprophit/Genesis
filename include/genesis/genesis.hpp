@@ -33,3 +33,4 @@
 #include "genesis/security/key_custody.hpp"
 #include "genesis/security/key_custody_persistence.hpp"
 #include "genesis/security/platform_crypto_inventory.hpp"
+#include "genesis/security/provider_open_observation.hpp"

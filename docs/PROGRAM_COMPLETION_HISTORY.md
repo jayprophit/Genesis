@@ -105,11 +105,39 @@ qualification remain open. Security is one of 12 equal top-level families, so
 its 3.05-point change contributes approximately `3.05 / 12 = 0.2542` points;
 full-tree rounding produces the 27.48% Genesis result.
 
+## 27.48% provider-open observation increment
+
+The exact 0.29.0 security snapshot (the commit containing this section) is
+compared with its 0.28.0 parent below. It excludes the independent, uncommitted
+agent-platform increment.
+
+| Measure | 0.28.0 security snapshot | 0.29.0 security snapshot | Change |
+|---|---:|---:|---:|
+| Requirements | 164 | 165 | +1 |
+| Completion components | 117 | 119 | +2 |
+| Networking family | 12.00% | 12.00% | unchanged |
+| Security family | 26.94% | 26.94% | unchanged |
+| Genesis total | 27.48% | 27.48% | unchanged |
+
+No requirement or completion component was removed. The added requirement is
+`REQ-CRYPTO-PROVIDER-OPEN-001`. The two added components are the
+`SECURITY-PLATFORM-OBSERVATION` grouping node and the separately gated
+`SECURITY-PLATFORM-PROVIDER-OPEN` leaf; the existing inventory leaf was moved
+under that grouping without losing evidence.
+
+Both observation leaves score 70%: design, implementation, unit, integration
+and documentation gates are closed, while benchmark, security review, recovery
+and platform qualification remain open. Their parent therefore remains 70%,
+and `SECURITY-PLATFORMS` remains the average of 70% observation and 15% named
+qualification: 42.5%. The denominator expansion prevents a safe observation
+slice from inflating platform or whole-program completion. A successful KSP
+open and a truthful native failure are evidence, not provider qualification.
+
 ## Combined local working-tree view
 
 The concurrent local agent-platform increment adds two requirements and two
-network components. When that scope and the 0.28 inventory scope are generated
-together, the working tree contains 166 requirements and 119 components,
+network components. When that scope and the 0.29 provider-open scope are generated
+together, the working tree contains 167 requirements and 121 components,
 networking is 21.43%, security is 26.94%, and Genesis is 28.27%. That combined
 figure is not the published security baseline until the agent-platform scope
 receives its own review and commit.
