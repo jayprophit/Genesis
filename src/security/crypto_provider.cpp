@@ -1260,19 +1260,24 @@ CryptoProviderDecision CryptoProviderRegistry::evaluate(
     CryptoFunction function,
     std::uint64_t at) const {
     CryptoProviderDecision decision;
+    decision.provider_id = std::string(provider_id);
+    decision.algorithm_id = std::string(algorithm_id);
+    decision.function = function;
     const auto* manifest = provider(provider_id);
     if (manifest == nullptr) {
         decision.reason = "provider_not_registered";
         return decision;
     }
     decision.provider_found = true;
-    decision.capability_declared =
-        find_capability(*manifest, algorithm_id, function) != nullptr;
+    const auto* capability = find_capability(*manifest, algorithm_id, function);
+    decision.capability_declared = capability != nullptr;
     decision.key_custody_required = crypto_function_requires_key_material(function);
     if (!decision.capability_declared) {
         decision.reason = "capability_not_declared";
         return decision;
     }
+    decision.implementation_route = capability->implementation_route;
+    decision.implementation_digest = capability->implementation_digest;
 
     auto state = ProviderState::declared;
     const CryptoProviderAssessment* qualification = nullptr;
@@ -1339,6 +1344,9 @@ CryptoProviderDecision CryptoProviderRegistry::evaluate(
         && digest(qualification->module_validation_evidence_digest);
     decision.key_custody_evidence_recorded =
         route != nullptr && digest(route->key_custody_evidence_digest);
+    if (decision.key_custody_evidence_recorded) {
+        decision.key_custody_evidence_digest = route->key_custody_evidence_digest;
+    }
     decision.integration_candidate =
         decision.validation_evidence_recorded
         && (!decision.key_custody_required

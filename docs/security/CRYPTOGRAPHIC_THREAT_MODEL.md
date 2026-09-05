@@ -2,7 +2,7 @@
 
 Status: implemented foundation, security review still open
 
-Architecture version: 0.26.0
+Architecture version: 0.27.0
 
 Last reviewed: 2026-09-05
 
@@ -68,7 +68,7 @@ outside this module, so `audit_entities` rechecks owner and evaluator references
 
 ## Threats and controls
 
-| Threat | Required control in 0.26 |
+| Threat | Required control in 0.27 |
 |---|---|
 | Supply-chain substitution | Provider ID binds implementation name, version, platform and module-binary digest; manifests also record source, license and build evidence digests. |
 | Binary or module-boundary tampering | Manifest identity and chained assessment digests bind module and implementation evidence; changed bytes require a new provider identity. |
@@ -78,12 +78,15 @@ outside this module, so `audit_entities` rechecks owner and evaluator references
 | Algorithm validation presented as module validation | Route-level algorithm evidence and provider-level module evidence are separate mandatory fields for qualification. |
 | Stale standard or algorithm status | Policies are time-bounded revisions. A newer effective revision immediately invalidates a qualification tied to the older revision. |
 | Algorithm break or quantum transition | Rules carry temporal dispositions and quantum-readiness classification; policy replacement is supported without changing consumer interfaces. |
-| Weak randomness, key theft or key loss | These threats are mandatory before qualification, but actual entropy and custody controls remain unimplemented external gates. Keyed routes require a custody-evidence digest to become candidates. |
+| Weak randomness, key theft or key loss | These threats are mandatory before qualification. Secret-free handle metadata, cryptoperiods, role separation, lifecycle evidence and custody-policy binding are implemented; actual entropy, provider custody and recovery ceremonies remain external gates. Keyed routes require an exact custody-evidence digest to become candidates. |
+| Plaintext or low-entropy external locator exposure | Persistent manifests accept only a SHA-256 locator digest and never a locator or provider-native handle. A digest of a guessable locator can still permit offline guessing, so adapters must use provider-scoped high-entropy opaque locator material before hashing. |
+| Unauthorized lifecycle assertion | Transition and succession actors must be registered and hold the recorded custodian or separate recovery-authority role. These are structural facts only; actor authentication and authorization remain mandatory operational gates. |
+| Key reuse or lineage ambiguity | Successors bind an existing predecessor, exact next generation and a different locator digest; predecessor and successor participation is unique and recovery requires a recorded compromise. Actual provider-side non-reuse must still be tested. |
 | Misconfiguration or route substitution | Provider, function, algorithm, implementation-route identifier and implementation digest must agree across the manifest, observation and qualification; policy must independently allow the algorithm/function pair. |
 | Compromised device or platform | Platform evidence is recorded per route, but no platform is qualified by this repository yet. |
 | Malicious dependency | Source/build/license evidence digests are required; software-composition analysis and external review remain open. |
 | Side channel or implementation flaw | The model can record the threat and evidence, but measurement, fuzzing, constant-time review and sanitizer/platform qualification remain open. |
-| Filesystem corruption | Schema magic, bounded lengths/counts, enum ranges, a payload checksum, internal digest chains and full reconstruction validation reject damaged records. |
+| Filesystem corruption | Provider and custody schemas use magic/version checks, bounded lengths/counts, enum ranges, payload checksums, internal digest chains, canonical re-encoding and full reconstruction validation to reject damaged records. |
 | Unsafe file target or traversal | Shared immutable storage validates identifiers, rejects non-regular/link targets, bounds reads/writes, durably flushes temporary bytes and atomically publishes without replacement. |
 | Evidence used as permission | Public evaluation returns evidence flags only and hard-codes all operation, authentication, provenance and authorization outputs to false. |
 
@@ -145,15 +148,16 @@ conflict detection, bounded reads and file-type/path protection.
 The checksum is corruption detection, not a message-authentication code or
 signature. An attacker who can replace both payload and checksum is outside the
 protection of this layer. Authenticated storage, OS access control, signed release
-artifacts and key custody remain open.
+artifacts and operational key custody remain open.
 
 ## Residual risk and open gates
 
 - No real cryptographic library is linked, selected or approved.
 - No real validation certificate has been verified against a module binary and
   operational environment.
-- No secret-key lifecycle, hardware-backed custody, rotation, escrow, recovery
-  ceremony or destruction mechanism exists.
+- Secret-free lifecycle, rotation and recovery evidence records now exist, but
+  no hardware-backed custody, key generation/use, escrow or recovery ceremony,
+  native destruction mechanism, actor authentication or authorization exists.
 - No entropy-source health test or random-generation route is operational.
 - No fuzzing campaign, external security review, constant-time analysis or
   sanitizer/platform qualification has been completed for this module.

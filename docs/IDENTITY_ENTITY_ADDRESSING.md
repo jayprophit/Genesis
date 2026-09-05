@@ -31,8 +31,9 @@ organism identity, authentication, ownership authority or action permission.
 An entity address is a collision-resistant local registry address. It is not a
 cryptographic identity credential, global legal identifier or proof that an
 entity exists outside the registry. The current SHA-256 implementation supplies
-deterministic content addressing and corruption detection only. Authentication,
-signatures and key custody remain gated by `REQ-CRYPTO-001`.
+deterministic content addressing and corruption detection only. Authentication
+and signatures remain gated by `REQ-CRYPTO-001`; the secret-free key-custody
+evidence registry does not close the operational key or authentication gate.
 
 Only an entity registered with `EntityKind::organism` resolves through
 `organism_identity`. A name, account, person record, credential, shell or device

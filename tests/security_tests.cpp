@@ -870,7 +870,11 @@ void test_reference_baseline(const std::filesystem::path& path) {
                 == "reference_id\ttitle\tpublisher\tstatus\tretrieved_at\turl\tusage_boundary",
             "cryptographic reference baseline header drifted");
     const std::set<std::string> allowed_statuses{
-        "FINAL", "LIVE_PROGRAM", "DRAFT_MONITOR_ONLY", "CURRENT_GUIDANCE"};
+        "FINAL",
+        "LIVE_PROGRAM",
+        "DRAFT_MONITOR_ONLY",
+        "CURRENT_GUIDANCE",
+        "PLATFORM_DOCUMENTATION"};
     std::set<std::string> ids;
     std::size_t count = 0U;
     while (std::getline(input, line)) {
@@ -885,10 +889,11 @@ void test_reference_baseline(const std::filesystem::path& path) {
                 "cryptographic reference metadata missing");
         require(allowed_statuses.contains(fields[3]),
                 "cryptographic reference status is not evidence-gated");
-        require(fields[4] == "2026-09-04",
+        require(fields[4] == "2026-09-04" || fields[4] == "2026-09-05",
                 "cryptographic reference retrieval date drifted");
         require(fields[5].starts_with("https://csrc.nist.gov/")
-                    || fields[5].starts_with("https://www.ncsc.gov.uk/"),
+                    || fields[5].starts_with("https://www.ncsc.gov.uk/")
+                    || fields[5].starts_with("https://learn.microsoft.com/"),
                 "cryptographic reference is not an approved primary-source domain");
         require(fields[6] == "REFERENCE_ONLY_NO_AUTO_APPROVAL",
                 "external reference was granted automatic approval authority");

@@ -72,7 +72,9 @@ NETWORK-RECONCILIATION	NETWORK	Distributed reconciliation	REQ-OFFLINE-RECONCILE-
 SECURITY	GENESIS	Security and platform qualification	-	-	-	-	-	-	-	-	-	-
 SECURITY-CRYPTO	SECURITY	Cryptographic provider qualification registry	REQ-CRYPTO-PROVIDER-001,REQ-CRYPTO-PROVIDER-PERSIST-001,REQ-CRYPTO-AGILITY-001	1	1	1	1	1	0	1	1	0
 SECURITY-CRYPTO-OPERATIONS	SECURITY	Approved cryptographic provider operations	REQ-CRYPTO-001	1	0	0	0	0	0	0	1	0
-SECURITY-KEYS	SECURITY	Key custody and rotation	REQ-KEY-CUSTODY-001	1	0	0	0	0	0	0	0	0
+SECURITY-KEYS	SECURITY	Key custody, rotation and recovery program	-	-	-	-	-	-	-	-	-	-
+SECURITY-KEY-LIFECYCLE	SECURITY-KEYS	Secret-free key lifecycle metadata and evidence recovery	REQ-KEY-CUSTODY-001,REQ-KEY-CUSTODY-PERSIST-001,REQ-KEY-PREFLIGHT-001	1	1	1	1	1	0	1	1	0
+SECURITY-KEY-OPERATIONS	SECURITY-KEYS	Provider-backed key generation storage use and destruction	REQ-KEY-OPERATIONS-001	1	0	0	0	0	0	0	1	0
 SECURITY-MIGRATION	SECURITY	Migrations and recovery records	-	1	0	0	0	0	0	0	0	0
 SECURITY-FUZZ	SECURITY	Fuzzing	-	1	0	0	0	0	0	0	0	0
 SECURITY-SANITIZERS	SECURITY	Sanitizer qualification	-	1	0	0	0	0	0	0	0	0

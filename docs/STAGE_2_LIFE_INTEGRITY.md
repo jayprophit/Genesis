@@ -55,7 +55,9 @@ metadata, birth snapshots and origin-labelled memory.
 8. Life-record views never confer action authority, reassign organism identity
    or claim that a credential was cryptographically verified.
 9. Cryptographic signatures and authenticated provenance remain unavailable
-   until an approved provider and key-custody threat model are integrated.
+   until a provider and native key route are operationally qualified and joined
+   to actor authentication and deny-by-default authorization. The current
+   provider/key evidence registries do not perform those operations.
 
 ## Evidence boundary
 

@@ -76,7 +76,7 @@ Aetherius DNA combines identity, memory, capability and current state. Genesis m
 
 ### Security
 
-Do not reuse Aetherius authentication, encryption, signature, blockchain, backup or “consciousness transfer” implementations. Audit findings include unsigned base64 tokens, `Math.random()` secrets, XOR labeled as AES/AES-GCM/ChaCha20-Poly1305, unverified MFA/email codes, mutable audit records and simulated backup success. Genesis security remains gated on a threat model, approved cryptographic provider and key-custody design.
+Do not reuse Aetherius authentication, encryption, signature, blockchain, backup or “consciousness transfer” implementations. Audit findings include unsigned base64 tokens, `Math.random()` secrets, XOR labeled as AES/AES-GCM/ChaCha20-Poly1305, unverified MFA/email codes, mutable audit records and simulated backup success. Genesis now has evidence-only provider qualification and secret-free key-lifecycle metadata, but operational provider/key handling, authentication, authorization and platform qualification remain gated.
 
 ### Adapters and devices
 

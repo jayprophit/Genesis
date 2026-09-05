@@ -252,6 +252,12 @@ struct CryptoProviderAssessment final {
 
 struct CryptoProviderDecision final {
     ProviderState state{ProviderState::declared};
+    std::string provider_id;
+    std::string algorithm_id;
+    CryptoFunction function{CryptoFunction::secure_hash};
+    std::string implementation_route;
+    std::string implementation_digest;
+    std::string key_custody_evidence_digest;
     bool provider_found{false};
     bool capability_declared{false};
     bool provider_observed{false};

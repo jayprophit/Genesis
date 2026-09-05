@@ -30,3 +30,5 @@
 #include "genesis/runtime/runtime.hpp"
 #include "genesis/security/crypto_provider.hpp"
 #include "genesis/security/crypto_persistence.hpp"
+#include "genesis/security/key_custody.hpp"
+#include "genesis/security/key_custody_persistence.hpp"

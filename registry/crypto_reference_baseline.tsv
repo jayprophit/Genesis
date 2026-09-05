@@ -12,3 +12,8 @@ CRYPTO-REF-010	Stateless Hash-Based Digital Signature Standard FIPS 205	NIST	FIN
 CRYPTO-REF-011	Transition to Post-Quantum Cryptography Standards IR 8547	NIST	DRAFT_MONITOR_ONLY	2026-09-04	https://csrc.nist.gov/pubs/ir/8547/ipd	REFERENCE_ONLY_NO_AUTO_APPROVAL
 CRYPTO-REF-012	Post-Quantum Cryptography Migration Timelines	UK NCSC	CURRENT_GUIDANCE	2026-09-04	https://www.ncsc.gov.uk/guidance/pqc-migration-timelines	REFERENCE_ONLY_NO_AUTO_APPROVAL
 CRYPTO-REF-013	Protocol Design Principles Cryptographic Agility	UK NCSC	CURRENT_GUIDANCE	2026-09-04	https://www.ncsc.gov.uk/whitepaper/protocol-design-principles	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-014	A Framework for Designing Cryptographic Key Management Systems SP 800-130	NIST	FINAL	2026-09-05	https://csrc.nist.gov/pubs/sp/800/130/final	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-015	Recommendation for Cryptographic Key Generation SP 800-133 Rev 2	NIST	FINAL	2026-09-05	https://csrc.nist.gov/pubs/sp/800/133/r2/final	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-016	Recommendation for Cryptographic Key Generation SP 800-133 Rev 3	NIST	DRAFT_MONITOR_ONLY	2026-09-05	https://csrc.nist.gov/pubs/sp/800/133/r3/ipd	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-017	NIST Key Management Publications	NIST	LIVE_PROGRAM	2026-09-05	https://csrc.nist.gov/Projects/Key-Management/publications	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-018	CNG Key Storage Providers	Microsoft	PLATFORM_DOCUMENTATION	2026-09-05	https://learn.microsoft.com/en-us/windows/win32/seccertenroll/cng-key-storage-providers	REFERENCE_ONLY_NO_AUTO_APPROVAL

@@ -101,12 +101,14 @@ production-security claims.
 
 ## Next dependency gates
 
-1. Specify and implement key custody without placing secrets in registry or Git.
+1. Integrate provider-owned non-exportable key operations without placing
+   secrets, native handles or plaintext locators in the registry or Git.
 2. Select candidate providers only after license, supply-chain, platform,
    operational-environment and certificate review.
 3. Add a narrow operation interface whose default state is unavailable.
 4. Verify real module and algorithm evidence against exact provider artifacts.
-5. Add misuse-resistant key handles, rotation and recovery records.
+5. Connect the implemented key metadata/lifecycle records to misuse-resistant
+   native handles, authenticated actors and deny-by-default authorization.
 6. Run fuzzing, sanitizers, coverage and external security review.
 7. Qualify named OS/toolchain/provider configurations before enabling any route.
 

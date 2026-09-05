@@ -81,9 +81,10 @@ entries do not implement issuer signatures, revocation, selective disclosure
 or legal validity.
 
 For this reason the core life-record requirement is scored at 90%, with its
-security gate still open. Deny-by-default disclosure policy, an approved
-cryptographic provider, key custody and credential validation must be
-implemented and qualified separately before that gate can close.
+security gate still open. Deny-by-default disclosure policy, an operationally
+qualified cryptographic provider, provider-backed key handling, authentication,
+authorization and credential validation must be implemented and qualified
+separately before that gate can close.
 
 ## Immutable persistence
 
