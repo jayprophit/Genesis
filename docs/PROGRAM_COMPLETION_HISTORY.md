@@ -133,14 +133,37 @@ qualification: 42.5%. The denominator expansion prevents a safe observation
 slice from inflating platform or whole-program completion. A successful KSP
 open and a truthful native failure are evidence, not provider qualification.
 
-## Combined local working-tree view
+## 27.48% to 28.56% agent-control-plane increment
 
-The concurrent local agent-platform increment adds two requirements and two
-network components. When that scope and the 0.29 provider-open scope are generated
-together, the working tree contains 167 requirements and 121 components,
-networking is 21.43%, security is 26.94%, and Genesis is 28.27%. That combined
-figure is not the published security baseline until the agent-platform scope
-receives its own review and commit.
+The exact 0.30.0 snapshot adds the bounded agent definition, immutable platform
+definition persistence and evidence-bearing adapter lifecycle after the 0.29.0
+provider-open baseline.
+
+| Measure | 0.29.0 security snapshot | 0.30.0 agent snapshot | Change |
+|---|---:|---:|---:|
+| Requirements | 165 | 167 | +2 |
+| Completion components | 119 | 121 | +2 |
+| Networking family | 12.00% | 25.00% | +13.00 points |
+| Security family | 26.94% | 26.94% | unchanged |
+| Genesis total | 27.48% | 28.56% | +1.08 points |
+
+No requirement or completion component was removed. The added requirements are
+`REQ-AGENT-PLATFORM-001` and `REQ-AGENT-PLATFORM-PERSIST-001`; the added
+components are `NETWORK-AGENT-DEFINITIONS` and
+`NETWORK-AGENT-PERSISTENCE`.
+
+The definition leaf closes design, implementation, unit-test and documentation
+gates for 55%. The persistence leaf additionally closes recovery for 60%.
+Integration, benchmark, security review and platform qualification remain open.
+The adapter registry rejects caller-supplied observation or qualification,
+requires canonical probe and independent qualification evidence, checks finite
+validity at preflight, and demotes on a failed probe. Those controls are still a
+static control plane: no model, browser, scheduler, secret provider, API, UI or
+external action runs, and evidence inputs are not automatically trusted.
+
+Networking is one of 12 equally averaged top-level families. Its 13-point
+increase contributes approximately `13 / 12 = 1.0833` points; full-tree
+rounding produces the 28.56% Genesis result.
 
 ## Local uncommitted scopes
 

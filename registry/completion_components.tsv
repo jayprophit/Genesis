@@ -67,6 +67,8 @@ NETWORK	GENESIS	Networking and distributed cognition	-	-	-	-	-	-	-	-	-	-
 NETWORK-IDENTITY	NETWORK	Network identity and external federation boundary	REQ-NET-BOUNDARY-001,REQ-IDENTITY-FEDERATION-001	1	0	0	0	0	0	0	1	0
 NETWORK-SHARED	NETWORK	Shared domain and private-memory separation	REQ-SHARED-DOMAIN-001	1	0	0	0	0	0	0	1	0
 NETWORK-AGENTS	NETWORK	Specialist agent contracts	REQ-SPECIALIST-COGNITION-001	1	0	0	0	0	0	0	0	0
+NETWORK-AGENT-DEFINITIONS	NETWORK	Evidence-gated agent definition and static preflight	REQ-AGENT-PLATFORM-001	1	1	1	0	0	0	0	1	0
+NETWORK-AGENT-PERSISTENCE	NETWORK	Agent workflow and trigger snapshot foundation	REQ-AGENT-PLATFORM-PERSIST-001	1	1	1	0	0	0	1	1	0
 NETWORK-RECOVERY	NETWORK	Partition recovery and replay	REQ-OFFLINE-RECONCILE-001	1	0	0	0	0	0	0	0	0
 NETWORK-RECONCILIATION	NETWORK	Distributed reconciliation	REQ-OFFLINE-RECONCILE-001	1	0	0	0	0	0	0	0	0
 SECURITY	GENESIS	Security and platform qualification	-	-	-	-	-	-	-	-	-	-

@@ -1,5 +1,10 @@
 # Genesis
 
+The latest conversation intake and dependency-aware backlog are in
+[Conversation intake, 2026-09-05](docs/specifications/CONVERSATION_INTAKE_2026_09_05.md).
+The agent automation scaffold and its operational limits are documented in
+[Agent automation platform](docs/architecture/AGENT_AUTOMATION_PLATFORM.md).
+
 Genesis is a clean, C++-first research architecture for a digital organism. It is not a chatbot wrapper and does not claim consciousness, biological equivalence, or unmeasured capabilities.
 
 This repository is authoritative. Legacy folders are read-only research sources and are never linked or copied without licensing, provenance, quality, test, and benchmark decisions.

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://genesis.local/schemas/agent-definition.schema.json",
+  "title": "Genesis Agent Definition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "agentId", "displayName", "purpose", "modelRoute", "approvalMode", "sandboxRequired", "limits", "toolGrants"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "agentId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$" },
+    "displayName": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "purpose": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "modelRoute": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$" },
+    "approvalMode": { "enum": ["never", "risky_actions", "always"] },
+    "sandboxRequired": { "type": "boolean" },
+    "limits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maxRuntimeMs", "maxSteps", "maxToolCalls", "maxMemoryBytes"],
+      "properties": {
+        "maxRuntimeMs": { "type": "integer", "minimum": 1 }, "maxSteps": { "type": "integer", "minimum": 1 },
+        "maxToolCalls": { "type": "integer", "minimum": 1 }, "maxMemoryBytes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "toolGrants": { "type": "array", "items": { "$ref": "#/$defs/toolGrant" } }
+  },
+  "$defs": {
+    "toolGrant": {
+      "type": "object", "additionalProperties": false, "required": ["toolId", "allowedActions", "networkAllowed", "filesystemWriteAllowed"],
+      "properties": {
+        "toolId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$" },
+        "allowedActions": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$" } },
+        "networkAllowed": { "type": "boolean" }, "filesystemWriteAllowed": { "type": "boolean" }
+      }
+    }
+  }
+}

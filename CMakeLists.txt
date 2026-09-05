@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Genesis VERSION 0.29.0 LANGUAGES CXX)
+project(Genesis VERSION 0.30.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -7,6 +7,8 @@ option(GENESIS_ENABLE_SANITIZERS "Enable address and undefined-behaviour sanitiz
 include(GNUInstallDirs)
 
 add_library(genesis_core STATIC
+    src/agents/platform.cpp
+    src/agents/persistence.cpp
     src/common/immutable_snapshot.cpp
     src/common/text.cpp
     src/cognition/workspace.cpp
@@ -82,6 +84,10 @@ target_compile_options(genesis_runtime_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Cla
 add_test(NAME genesis_runtime_tests COMMAND genesis_runtime_tests)
 add_executable(genesis_runtime_bench benchmarks/runtime_benchmark.cpp)
 target_link_libraries(genesis_runtime_bench PRIVATE genesis_core)
+add_executable(genesis_agent_platform_tests tests/agent_platform_tests.cpp)
+target_link_libraries(genesis_agent_platform_tests PRIVATE genesis_core)
+target_compile_options(genesis_agent_platform_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_agent_platform_tests COMMAND genesis_agent_platform_tests)
 add_executable(genesis_genetics_tests tests/genetics_tests.cpp)
 target_link_libraries(genesis_genetics_tests PRIVATE genesis_core)
 target_compile_options(genesis_genetics_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)

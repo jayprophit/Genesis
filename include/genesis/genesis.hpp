@@ -2,6 +2,8 @@
 
 // Stable public umbrella header. Implementations live in the compiled
 // genesis_core library; clients can include narrower module headers instead.
+#include "genesis/agents/platform.hpp"
+#include "genesis/agents/persistence.hpp"
 #include "genesis/common/immutable_snapshot.hpp"
 #include "genesis/common/text.hpp"
 #include "genesis/cognition/workspace.hpp"

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0",
+  "agentId": "daily-research",
+  "displayName": "Daily Research",
+  "purpose": "Collect updates from explicitly approved sources and prepare a reviewable summary.",
+  "modelRoute": "operator-selected",
+  "approvalMode": "risky_actions",
+  "sandboxRequired": true,
+  "limits": { "maxRuntimeMs": 60000, "maxSteps": 16, "maxToolCalls": 8, "maxMemoryBytes": 1048576 },
+  "toolGrants": [
+    { "toolId": "browser.readonly", "allowedActions": ["read"], "networkAllowed": true, "filesystemWriteAllowed": false }
+  ]
+}
