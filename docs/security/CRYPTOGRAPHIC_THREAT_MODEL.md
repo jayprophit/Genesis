@@ -2,7 +2,7 @@
 
 Status: implemented foundation, security review still open
 
-Architecture version: 0.27.0
+Architecture version: 0.28.0
 
 Last reviewed: 2026-09-05
 

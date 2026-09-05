@@ -874,7 +874,8 @@ void test_reference_baseline(const std::filesystem::path& path) {
         "LIVE_PROGRAM",
         "DRAFT_MONITOR_ONLY",
         "CURRENT_GUIDANCE",
-        "PLATFORM_DOCUMENTATION"};
+        "PLATFORM_DOCUMENTATION",
+        "PLATFORM_API_DOCUMENTATION"};
     std::set<std::string> ids;
     std::size_t count = 0U;
     while (std::getline(input, line)) {

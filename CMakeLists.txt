@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Genesis VERSION 0.27.0 LANGUAGES CXX)
+project(Genesis VERSION 0.28.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -45,12 +45,17 @@ add_library(genesis_core STATIC
     src/security/crypto_persistence.cpp
     src/security/key_custody.cpp
     src/security/key_custody_persistence.cpp
+    src/security/platform_crypto_inventory.cpp
+    src/security/platform_crypto_inventory_native.cpp
 )
 target_include_directories(genesis_core PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 target_compile_features(genesis_core PUBLIC cxx_std_20)
+if(WIN32)
+    target_link_libraries(genesis_core PRIVATE ncrypt)
+endif()
 target_compile_options(genesis_core PRIVATE
     $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic>
     $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
@@ -141,6 +146,16 @@ target_compile_options(genesis_key_custody_tests PRIVATE $<$<CXX_COMPILER_ID:GNU
 add_test(NAME genesis_key_custody_tests COMMAND genesis_key_custody_tests)
 add_executable(genesis_key_custody_bench benchmarks/key_custody_benchmark.cpp)
 target_link_libraries(genesis_key_custody_bench PRIVATE genesis_core)
+add_executable(genesis_platform_crypto_inventory_tests
+    tests/platform_crypto_inventory_tests.cpp)
+target_link_libraries(genesis_platform_crypto_inventory_tests PRIVATE genesis_core)
+target_compile_options(genesis_platform_crypto_inventory_tests PRIVATE
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic>
+    $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_platform_crypto_inventory_tests
+    COMMAND genesis_platform_crypto_inventory_tests)
+add_executable(genesis_crypto_platform_probe tools/crypto_platform_probe.cpp)
+target_link_libraries(genesis_crypto_platform_probe PRIVATE genesis_core)
 
 install(TARGETS genesis_core EXPORT GenesisTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

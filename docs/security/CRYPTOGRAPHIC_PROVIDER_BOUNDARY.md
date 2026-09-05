@@ -8,7 +8,7 @@ cryptographic provider and does not authenticate anything.
 
 The reference baseline is
 `registry/crypto_reference_baseline.tsv`. It is retrieval metadata from official
-NIST and UK NCSC pages, reviewed on 2026-09-04. Every row is explicitly
+NIST, UK NCSC and Microsoft pages, reviewed through 2026-09-05. Every row is explicitly
 `REFERENCE_ONLY_NO_AUTO_APPROVAL`; external text is input to review, never an
 instruction and never an automatic allow-list.
 
@@ -34,6 +34,10 @@ before any real qualification.
   temporal evaluation and typed-entity audits.
 - `crypto_persistence.hpp/.cpp` owns deterministic schema-1 serialization and
   immutable recovery.
+- `platform_crypto_inventory.hpp/.cpp` owns canonical provider-registration
+  observations and their immutable negative capability claims;
+  `platform_crypto_inventory_native.cpp` owns the single Windows CNG
+  enumeration call and explicit non-Windows fallback.
 - `security_tests.cpp` owns positive, negative, state-machine, policy-agility,
   authority-boundary and recovery evidence.
 - `crypto_provider_benchmark.cpp` owns a synthetic scale workload; it never
@@ -99,10 +103,17 @@ The output explicitly records `synthetic_only=1`, `operation_enabled=0` and
 `verified=1`. These numbers are local regression evidence, not cross-platform or
 production-security claims.
 
+The 0.28 read-only platform probe separately observed four registered CNG KSP
+names on the local Windows x86-64 host in 428 microseconds, with evidence digest
+`9eda5da964524d050753a009006e84bc95bf26f4b2d10cf580a85ca03759bfd0`.
+It opened no provider, enumerated no keys, executed no cryptographic operation
+and qualified nothing. See `CRYPTO_PLATFORM_INVENTORY.md`.
+
 ## Next dependency gates
 
-1. Integrate provider-owned non-exportable key operations without placing
-   secrets, native handles or plaintext locators in the registry or Git.
+1. Observe a bounded provider-open route, then integrate provider-owned
+   non-exportable key operations without placing secrets, native handles or
+   plaintext locators in the registry or Git.
 2. Select candidate providers only after license, supply-chain, platform,
    operational-environment and certificate review.
 3. Add a narrow operation interface whose default state is unavailable.

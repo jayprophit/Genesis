@@ -11,8 +11,9 @@ Authorized legacy information enters through `docs/research/SOURCE_ABSTRACTIONS.
    and child.
 4. Security qualification foundation: threat models, temporal algorithm policy,
    provider identity/evidence states, secret-free key-custody metadata,
-   cryptoperiods, lifecycle/succession records and immutable recovery. These
-   registries do not enable operations; provider-backed key generation/use,
+   cryptoperiods, lifecycle/succession records, immutable recovery and
+   read-only native provider-registration inventory. Registration observation
+   does not enable operations; provider-backed key generation/use,
    authentication, authorization, security review and named platform
    qualification remain mandatory before external trust.
 5. Genome, three-strand inheritance, RNA expression, birth boundary, reproduction and mutation audit.

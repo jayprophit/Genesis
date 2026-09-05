@@ -79,7 +79,9 @@ SECURITY-MIGRATION	SECURITY	Migrations and recovery records	-	1	0	0	0	0	0	0	0	0
 SECURITY-FUZZ	SECURITY	Fuzzing	-	1	0	0	0	0	0	0	0	0
 SECURITY-SANITIZERS	SECURITY	Sanitizer qualification	-	1	0	0	0	0	0	0	0	0
 SECURITY-COVERAGE	SECURITY	Coverage thresholds	-	1	0	0	0	0	0	0	0	0
-SECURITY-PLATFORMS	SECURITY	Platform hardware and device evidence	REQ-PLAT-001	1	0	0	0	0	0	0	1	0
+SECURITY-PLATFORMS	SECURITY	Platform hardware and device evidence	-	-	-	-	-	-	-	-	-	-
+SECURITY-PLATFORM-INVENTORY	SECURITY-PLATFORMS	Read-only native cryptographic provider registration inventory	REQ-CRYPTO-PLATFORM-INVENTORY-001	1	1	1	1	0	0	0	1	0
+SECURITY-PLATFORM-QUALIFICATION	SECURITY-PLATFORMS	Named platform hardware device and provider qualification	REQ-PLAT-001	1	0	0	0	0	0	0	1	0
 SECURITY-DATA-SOVEREIGNTY	SECURITY	User data sovereignty and portability	REQ-DATA-SOVEREIGNTY-001	1	0	0	0	0	0	0	0	0
 EVOLUTION	GENESIS	Descendants and long-horizon evolution	-	-	-	-	-	-	-	-	-	-
 EVOLUTION-IDENTITY	EVOLUTION	Descendant identity boundaries	REQ-LIN-001,REQ-BIRTH-001	1	1	1	1	1	1	1	1	1

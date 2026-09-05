@@ -17,3 +17,6 @@ CRYPTO-REF-015	Recommendation for Cryptographic Key Generation SP 800-133 Rev 2	
 CRYPTO-REF-016	Recommendation for Cryptographic Key Generation SP 800-133 Rev 3	NIST	DRAFT_MONITOR_ONLY	2026-09-05	https://csrc.nist.gov/pubs/sp/800/133/r3/ipd	REFERENCE_ONLY_NO_AUTO_APPROVAL
 CRYPTO-REF-017	NIST Key Management Publications	NIST	LIVE_PROGRAM	2026-09-05	https://csrc.nist.gov/Projects/Key-Management/publications	REFERENCE_ONLY_NO_AUTO_APPROVAL
 CRYPTO-REF-018	CNG Key Storage Providers	Microsoft	PLATFORM_DOCUMENTATION	2026-09-05	https://learn.microsoft.com/en-us/windows/win32/seccertenroll/cng-key-storage-providers	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-019	NCryptEnumStorageProviders function	Microsoft	PLATFORM_API_DOCUMENTATION	2026-09-05	https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptenumstorageproviders	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-020	NCryptFreeBuffer function	Microsoft	PLATFORM_API_DOCUMENTATION	2026-09-05	https://learn.microsoft.com/en-us/windows/win32/api/ncrypt/nf-ncrypt-ncryptfreebuffer	REFERENCE_ONLY_NO_AUTO_APPROVAL
+CRYPTO-REF-021	WideCharToMultiByte function	Microsoft	PLATFORM_API_DOCUMENTATION	2026-09-05	https://learn.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-widechartomultibyte	REFERENCE_ONLY_NO_AUTO_APPROVAL
