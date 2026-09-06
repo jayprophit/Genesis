@@ -42,6 +42,8 @@ not global mutable state.
 - `src/`: one implementation tree mirroring the public capability tree.
 - `tests/`: deterministic unit and cross-component integration evidence.
 - `benchmarks/`: reproducible workloads with scale and machine-local results.
+- `assets/`: governed original visual sources, concepts, tokens and diagrams;
+  never runtime capability evidence.
 - `registry/`: permanent requirements, completion gates, domains and research indexes.
 - `provenance/`: accepted-source decisions and immutable source evidence.
 - `docs/`: architecture, threat boundaries, operating limits and truthful status.
@@ -124,3 +126,11 @@ against and not instructions to execute. Useful concepts are recorded with sourc
 license/provenance, decision and replacement rationale. Third-party code, models,
 firmware, services and devices require an approved provider, compatible license,
 version pin, integrity evidence, rollback route and qualification record before use.
+
+Cloud conversation projects are handled through private local locators and public
+opaque source IDs in dated bounded-intake registries. Direct cloud identifiers,
+titles and raw conversation text are not published merely because a repository is
+public. Reaching the oldest API page is not a lossless export when message bodies or
+attachments are unavailable or truncated. Their abstractions must extend existing
+owners, and private raw conversation text must not become organism memory or a
+runtime dependency.

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+  <title id="title">Genesis canonical system map</title>
+  <desc id="description">An evidence and identity foundation supports organism, cognition and development, which connect through qualified boundaries to tools, networks and embodiments.</desc>
+  <defs>
+    <style>
+      .bg{fill:#0e1317}.panel{fill:#171e23;stroke:#36444d;stroke-width:2}.core{fill:#20292f;stroke:#56b8ac;stroke-width:4}.external{fill:#171e23;stroke:#e0aa55;stroke-width:3;stroke-dasharray:10 8}.line{fill:none;stroke:#61717a;stroke-width:4}.gate{fill:#20292f;stroke:#e0aa55;stroke-width:3}.h{fill:#f3f0e8;font:600 30px system-ui,sans-serif}.t{fill:#a9b4b8;font:22px system-ui,sans-serif}.small{fill:#e0aa55;font:600 18px system-ui,sans-serif;letter-spacing:1px}
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#61717a"/></marker>
+  </defs>
+  <rect class="bg" width="1600" height="900"/>
+  <text class="h" x="72" y="72">GENESIS — CANONICAL OWNERS AND QUALIFIED BOUNDARIES</text>
+  <text class="t" x="72" y="110">Conceptual map; live authority and capability come from versioned evidence, not this diagram.</text>
+
+  <path class="line" marker-end="url(#arrow)" d="M800 730V650M800 540V465M800 355V275"/>
+  <path class="line" marker-end="url(#arrow)" d="M600 410H420M1000 410h180"/>
+  <path class="line" marker-end="url(#arrow)" d="M1220 360V245M1280 465v95"/>
+
+  <rect class="panel" x="420" y="690" width="760" height="120" rx="20"/>
+  <text class="h" x="800" y="740" text-anchor="middle">Requirements · provenance · identity · security</text>
+  <text class="t" x="800" y="780" text-anchor="middle">immutable evidence, ownership, policy and denial boundaries</text>
+
+  <rect class="core" x="600" y="540" width="400" height="110" rx="55"/>
+  <text class="h" x="800" y="590" text-anchor="middle">Digital organism</text>
+  <text class="t" x="800" y="625" text-anchor="middle">cells · tissues · organs · homeostasis</text>
+
+  <rect class="core" x="600" y="355" width="400" height="110" rx="20"/>
+  <text class="h" x="800" y="405" text-anchor="middle">Cognition and development</text>
+  <text class="t" x="800" y="440" text-anchor="middle">perception · memory · learning · self/world models</text>
+
+  <rect class="panel" x="110" y="350" width="310" height="120" rx="20"/>
+  <text class="h" x="265" y="400" text-anchor="middle">Genome and lineage</text>
+  <text class="t" x="265" y="437" text-anchor="middle">expression · descendants · containment</text>
+
+  <rect class="gate" x="650" y="205" width="300" height="70" rx="35"/>
+  <text class="small" x="800" y="248" text-anchor="middle">EVIDENCE + AUTHORITY GATE</text>
+
+  <rect class="external" x="1100" y="125" width="390" height="120" rx="20"/>
+  <text class="h" x="1295" y="177" text-anchor="middle">Models and tools</text>
+  <text class="t" x="1295" y="214" text-anchor="middle">replaceable adapters · bounded grants</text>
+
+  <rect class="external" x="1100" y="355" width="390" height="110" rx="20"/>
+  <text class="h" x="1295" y="405" text-anchor="middle">Networks and shared domains</text>
+  <text class="t" x="1295" y="440" text-anchor="middle">partition-safe · autobiography separated</text>
+
+  <rect class="external" x="1100" y="560" width="390" height="120" rx="20"/>
+  <text class="h" x="1295" y="612" text-anchor="middle">Bodies and devices</text>
+  <text class="t" x="1295" y="649" text-anchor="middle">registered shells · physical interlocks</text>
+
+  <rect class="external" x="110" y="125" width="390" height="120" rx="20"/>
+  <text class="h" x="305" y="177" text-anchor="middle">Operator Control Center</text>
+  <text class="t" x="305" y="214" text-anchor="middle">accessible view · explicit approval · no shadow state</text>
+  <path class="line" marker-end="url(#arrow)" d="M500 185H650"/>
+
+  <g transform="translate(72 835)"><circle r="11" fill="none" stroke="#56b8ac" stroke-width="4"/><text class="t" x="24" y="8">canonical owner</text><rect class="external" x="220" y="-16" width="32" height="32" rx="7"/><text class="t" x="270" y="8">qualified external boundary</text></g>
+</svg>

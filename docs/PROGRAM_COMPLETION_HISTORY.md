@@ -165,6 +165,53 @@ Networking is one of 12 equally averaged top-level families. Its 13-point
 increase contributes approximately `13 / 12 = 1.0833` points; full-tree
 rounding produces the 28.56% Genesis result.
 
+## 28.56% to 30.26% cloud-intake, design-asset and repository-audit increment
+
+The exact 0.31.0 snapshot adds a bounded inventory of the user-owned cloud
+ChatGPT Genesis project, an original accessible visual/asset foundation, and a
+deterministic whole-repository file manifest.
+
+| Measure | 0.30.0 agent snapshot | 0.31.0 audit/design snapshot | Change |
+|---|---:|---:|---:|
+| Requirements | 167 | 170 | +3 |
+| Completion components | 121 | 124 | +3 |
+| Foundation family | 38.57% | 43.89% | +5.32 points |
+| Platform family | 10.00% | 25.00% | +15.00 points |
+| Networking family | 25.00% | 25.00% | unchanged |
+| Security family | 26.94% | 26.94% | unchanged |
+| Genesis total | 28.56% | 30.26% | +1.70 points |
+
+No requirement or completion component was removed. The added requirements are
+`REQ-CHATGPT-PROJECT-INTAKE-001`,
+`REQ-DESIGN-ASSET-GOVERNANCE-001` and
+`REQ-REPOSITORY-CONTENT-AUDIT-001`. Their matching leaves are
+`FOUNDATION-CLOUD-INTAKE`, `PLATFORM-DESIGN-ASSETS` and
+`FOUNDATION-REPOSITORY-AUDIT`.
+
+The cloud traversal reached the oldest page for 47 conversations through 264
+pages, 2,400 turns and 4,522 returned message items. It explicitly records 994
+items truncated by the bounded reader, seven reported attachments whose image
+bytes were unavailable, and the absence of a stable raw cloud-object digest.
+Reaching the oldest page is therefore not labelled a lossless export. The public
+registry uses opaque sequential IDs; conversation titles, project identifiers
+and cloud locators are retained only in the ignored machine-local mapping.
+
+The asset foundation contains four original generated concept boards, two
+original SVGs, design tokens and the exact prompt record. The manifest validates
+paths, sizes, hashes, media types, dimensions, JSON and accessible SVG metadata.
+This closes a 70% asset-governance leaf, not the UI shell or any embodied-device
+implementation. Hardware, flight, sensing, life support, materials, safety,
+privacy and platform claims remain open.
+
+The repository inventory separately hashes every canonical file outside Git and
+disposable build metadata, using canonical-LF hashes for working text and raw
+hashes for preserved/binary input. Its manifest and dated audit report exclude
+themselves to prevent circular hashes; that exclusion is part of the requirement.
+
+Foundation and Platform are two of 12 equally averaged top-level families. Their
+combined 20.32-point increase contributes approximately
+`20.32 / 12 = 1.6933` points; full-tree rounding produces 30.26%.
+
 ## Local uncommitted scopes
 
 Completion reports generated from a dirty working tree are not published

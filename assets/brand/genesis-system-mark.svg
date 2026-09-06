@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title description">
+  <title id="title">Provisional Genesis system mark</title>
+  <desc id="description">Three connected cells surrounding a protected central seed.</desc>
+  <rect width="256" height="256" rx="52" fill="#0E1317"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="128" cy="128" r="75" stroke="#36444D" stroke-width="10"/>
+    <path d="M128 53 63 166h130L128 53Z" stroke="#56B8AC" stroke-width="8"/>
+    <path d="M128 82c-27 18-39 38-39 61 0 26 17 44 39 44s39-18 39-44c0-23-12-43-39-61Z" stroke="#F3F0E8" stroke-width="9"/>
+    <path d="M105 145c14-3 27-13 35-29 4 19 2 34-8 47" stroke="#62CDE0" stroke-width="7"/>
+  </g>
+  <g fill="#E0AA55" stroke="#0E1317" stroke-width="5">
+    <circle cx="128" cy="53" r="12"/>
+    <circle cx="63" cy="166" r="12"/>
+    <circle cx="193" cy="166" r="12"/>
+  </g>
+</svg>

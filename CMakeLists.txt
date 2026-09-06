@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(Genesis VERSION 0.30.0 LANGUAGES CXX)
+project(Genesis VERSION 0.31.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -68,6 +68,21 @@ if(GENESIS_ENABLE_SANITIZERS AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_link_options(genesis_core PUBLIC -fsanitize=address,undefined)
 endif()
 enable_testing()
+find_program(GENESIS_PWSH_EXECUTABLE NAMES pwsh)
+if(GENESIS_PWSH_EXECUTABLE)
+    add_test(NAME genesis_asset_registry_tests
+        COMMAND ${GENESIS_PWSH_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tools/validate_assets.ps1
+                -Root ${CMAKE_CURRENT_SOURCE_DIR})
+    add_test(NAME genesis_chatgpt_project_intake_tests
+        COMMAND ${GENESIS_PWSH_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tools/validate_chatgpt_project_intake.ps1
+                -Root ${CMAKE_CURRENT_SOURCE_DIR})
+    add_test(NAME genesis_repository_content_tests
+        COMMAND ${GENESIS_PWSH_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tools/validate_repository_content.ps1
+                -Root ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
 add_executable(genesis_tests tests/genesis_tests.cpp)
 target_link_libraries(genesis_tests PRIVATE genesis_core)
 target_compile_options(genesis_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)

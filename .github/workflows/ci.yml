@@ -26,6 +26,15 @@ jobs:
       - name: Validate registries
         shell: pwsh
         run: ./tools/validate_registry.ps1
+      - name: Validate governed assets
+        shell: pwsh
+        run: ./tools/validate_assets.ps1
+      - name: Validate ChatGPT project intake
+        shell: pwsh
+        run: ./tools/validate_chatgpt_project_intake.ps1
+      - name: Validate repository content inventory
+        shell: pwsh
+        run: ./tools/validate_repository_content.ps1
       - name: Secret scan
         shell: pwsh
         run: ./tools/secret_scan.ps1
