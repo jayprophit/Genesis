@@ -17,6 +17,14 @@ function Read-BigEndianUInt32([byte[]]$Bytes, [int]$Offset) {
            ([uint32]$Bytes[$Offset + 2] -shl 8) -bor
            [uint32]$Bytes[$Offset + 3]
 }
+function Canonical-LfBytes([byte[]]$Bytes) {
+    $output = [Collections.Generic.List[byte]]::new($Bytes.Length)
+    for ($index = 0; $index -lt $Bytes.Length; ++$index) {
+        if ($Bytes[$index] -eq 13 -and $index + 1 -lt $Bytes.Length -and $Bytes[$index + 1] -eq 10) { continue }
+        $output.Add($Bytes[$index])
+    }
+    return $output.ToArray()
+}
 
 $registryPath = Join-Path $Root 'registry/assets.tsv'
 if (-not (Test-Path -LiteralPath $registryPath -PathType Leaf)) { Fail 'registry/assets.tsv is missing' }
@@ -56,10 +64,12 @@ foreach ($row in $rows) {
     if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) { Fail "$($row.asset_id) file is missing" }
     $item = Get-Item -LiteralPath $fullPath
     if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { Fail "$($row.asset_id) may not be a reparse point" }
-    if ($item.Length -ne $expectedBytes) { Fail "$($row.asset_id) byte count changed" }
-    $actualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $fullPath).Hash
-    if ($actualHash -ne $row.sha256) { Fail "$($row.asset_id) SHA-256 changed" }
     $extension = [IO.Path]::GetExtension($fullPath).ToLowerInvariant()
+    $rawBytes = [IO.File]::ReadAllBytes($fullPath)
+    $contentBytes = if ($extension -in @('.svg','.json','.md')) { Canonical-LfBytes $rawBytes } else { $rawBytes }
+    if ($contentBytes.Length -ne $expectedBytes) { Fail "$($row.asset_id) canonical byte count changed" }
+    $actualHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($contentBytes))
+    if ($actualHash -ne $row.sha256) { Fail "$($row.asset_id) SHA-256 changed" }
     if (-not $allowedMedia.ContainsKey($extension) -or $allowedMedia[$extension] -ne $row.media_type) {
         Fail "$($row.asset_id) media type does not match $extension"
     }
@@ -69,11 +79,10 @@ foreach ($row in $rows) {
         if (-not [int]::TryParse($row.width, [ref]$width) -or -not [int]::TryParse($row.height, [ref]$height) -or $width -le 0 -or $height -le 0) {
             Fail "$($row.asset_id) has invalid PNG dimensions"
         }
-        $bytes = [IO.File]::ReadAllBytes($fullPath)
-        if ($bytes.Length -lt 24) { Fail "$($row.asset_id) is a truncated PNG" }
-        $signature = ($bytes[0..7] | ForEach-Object { $_.ToString('X2') }) -join ''
+        if ($rawBytes.Length -lt 24) { Fail "$($row.asset_id) is a truncated PNG" }
+        $signature = ($rawBytes[0..7] | ForEach-Object { $_.ToString('X2') }) -join ''
         if ($signature -ne '89504E470D0A1A0A') { Fail "$($row.asset_id) has an invalid PNG signature" }
-        if ((Read-BigEndianUInt32 $bytes 16) -ne $width -or (Read-BigEndianUInt32 $bytes 20) -ne $height) {
+        if ((Read-BigEndianUInt32 $rawBytes 16) -ne $width -or (Read-BigEndianUInt32 $rawBytes 20) -ne $height) {
             Fail "$($row.asset_id) PNG dimensions changed"
         }
     } elseif ($extension -eq '.svg') {

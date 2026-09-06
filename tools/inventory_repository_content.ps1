@@ -12,7 +12,7 @@ if (-not (Test-Path -LiteralPath $rootFull -PathType Container)) { throw "Reposi
 function Is-CanonicalText([string]$RelativePath) {
     $extension = [IO.Path]::GetExtension($RelativePath).ToLowerInvariant()
     $name = [IO.Path]::GetFileName($RelativePath)
-    return $extension -in @('.cpp','.hpp','.md','.ps1','.json','.tsv','.yml','.yaml','.cmake') -or
+    return $extension -in @('.cpp','.hpp','.md','.ps1','.json','.tsv','.yml','.yaml','.cmake','.svg') -or
            $name -in @('CMakeLists.txt','CMakePresets.json','.gitignore','.gitattributes','LICENSE')
 }
 function Canonical-LfBytes([byte[]]$Bytes) {
@@ -69,8 +69,8 @@ foreach ($item in Get-ChildItem -LiteralPath $rootFull -File -Recurse -Force) {
     $top = if ($relative.Contains('/')) { $relative.Split('/')[0] } else { 'ROOT' }
     $rows.Add([pscustomobject]@{
         path = $relative
-        bytes = $item.Length
-        lines = if ($mediaClass -eq 'text') { Line-Count $raw } else { 0 }
+        bytes = $hashBytes.Length
+        lines = if ($mediaClass -eq 'text') { Line-Count $hashBytes } else { 0 }
         extension = $extension
         media_class = $mediaClass
         category = $top

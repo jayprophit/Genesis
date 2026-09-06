@@ -29,17 +29,18 @@ The inventory recursively covers the authoritative checkout at
 - `docs/audit/REPOSITORY_CONTENT_AUDIT_*.md`, because this report describes the
   manifest and would otherwise create a circular update.
 
-Reparse-point source files are rejected. Working text uses SHA-256 after CRLF is
-normalized to LF so Windows and Linux CI can compare the same canonical
-content. Preserved source text and media use raw-byte SHA-256.
+Reparse-point source files are rejected. Working text uses byte counts and
+SHA-256 after CRLF is normalized to LF so Windows and Linux CI compare the same
+canonical content. Preserved source text and PNG media use raw bytes. SVG media
+uses canonical-LF bytes while retaining the `image` media class.
 
 ## Exact inventory snapshot
 
 | Measure | Result |
 |---|---:|
 | Canonical files | 226 |
-| Total bytes | 12,274,512 |
-| Counted text lines | 102,595 |
+| Canonical/raw bytes under the rule above | 12,271,200 |
+| Counted text lines | 102,604 |
 | Text files | 220 |
 | Image files | 6 |
 | Other binary files | 0 |
@@ -58,27 +59,27 @@ asset-tree file because it documents the registry itself.
 |---|---:|---:|---:|
 | `.github` | 1 | 1,076 | 40 |
 | `assets` | 9 | 8,679,641 | 172 |
-| `benchmarks` | 15 | 58,488 | 983 |
-| `docs` | 40 | 1,618,394 | 75,833 |
+| `benchmarks` | 15 | 58,485 | 983 |
+| `docs` | 40 | 1,618,349 | 75,833 |
 | `include` | 43 | 135,590 | 3,659 |
-| `provenance` | 2 | 10,021 | 69 |
-| `registry` | 29 | 820,152 | 4,329 |
-| repository root | 6 | 20,597 | 316 |
+| `provenance` | 2 | 10,019 | 69 |
+| `registry` | 29 | 816,355 | 4,329 |
+| repository root | 6 | 20,594 | 316 |
 | `schemas` | 1 | 2,042 | 36 |
 | `src` | 44 | 606,719 | 11,629 |
 | `templates` | 1 | 539 | 13 |
 | `tests` | 14 | 257,106 | 4,469 |
-| `tools` | 21 | 64,147 | 1,047 |
+| `tools` | 21 | 64,685 | 1,056 |
 
 ### File types
 
 | Extension | Files | Bytes |
 |---|---:|---:|
-| `.cpp` | 75 | 924,866 |
+| `.cpp` | 75 | 924,863 |
 | `.hpp` | 43 | 135,590 |
-| `.md` | 39 | 242,623 |
-| `.tsv` | 30 | 828,004 |
-| `.ps1` | 19 | 61,594 |
+| `.md` | 39 | 242,573 |
+| `.tsv` | 30 | 824,207 |
+| `.ps1` | 19 | 62,132 |
 | `.txt` | 6 | 1,407,061 |
 | `.json` | 4 | 5,029 |
 | `.png` | 4 | 8,662,571 |
