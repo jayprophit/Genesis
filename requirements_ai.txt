@@ -7,7 +7,7 @@
 fastapi>=0.110.0
 uvicorn[standard]>=0.29.0
 websockets>=12.0
-python-multipart>=0.0.9
+python-multipart>=0.0.31
 
 # Market data (free, no API key)
 yfinance>=0.2.37
