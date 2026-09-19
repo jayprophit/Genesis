@@ -1,0 +1,25 @@
+{
+  "session_id": "s-e9c34743c8",
+  "task_id": "9b69d9457d6a",
+  "start_time": "2026-09-10T08:57:53",
+  "status": "FAILED",
+  "step": 5,
+  "mode": "build",
+  "approval": "ASK_ALL_WRITES",
+  "workspace": "C:\\Users\\jpowe\\Desktop\\OpenCode-Agent-Test\\genesis_integration_01\\sandbox_genesis",
+  "models": {
+    "planner": "hhao/qwen2.5-coder-tools:3b",
+    "coder": "hhao/qwen2.5-coder-tools:3b",
+    "reviewer": "hhao/qwen2.5-coder-tools:3b",
+    "general": "hhao/qwen2.5-coder-tools:3b"
+  },
+  "revision": 1,
+  "files_touched": [
+    "genesis/core.py"
+  ],
+  "tests_run": 0,
+  "errors": 2,
+  "prompt_profile": "coder_v1+p1",
+  "terminal": true,
+  "fallback_log": []
+}

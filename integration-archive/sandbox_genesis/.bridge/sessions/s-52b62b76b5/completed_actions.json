@@ -1,0 +1,1 @@
+{"a-s-52b62b76b5-2-2": {"ok": true, "path": "genesis\\core.py", "patched": true, "hunks": [{"hunk": 0, "type": "replace", "range": [1, 14], "matched": true}], "verified": true}, "a-s-52b62b76b5-3-3": {"command": "python tests/test_core.py", "exit_code": 0, "stdout": "", "stderr": "", "duration_s": 0.39, "passed": true, "ok": true}}

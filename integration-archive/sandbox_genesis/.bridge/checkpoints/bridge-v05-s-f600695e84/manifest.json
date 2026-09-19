@@ -1,0 +1,10 @@
+{
+  "label": "bridge-v05-s-f600695e84",
+  "created": "2026-09-10T10:31:38",
+  "files": {
+    "genesis\\core.py": {
+      "existed": true,
+      "backup": ".bridge\\checkpoints\\bridge-v05-s-f600695e84\\blobs\\genesis__core.py"
+    }
+  }
+}
