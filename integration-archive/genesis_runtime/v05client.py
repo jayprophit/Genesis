@@ -5,11 +5,21 @@ enforce this: only `client` (plus stdlib) may come from the runtime tree.
 """
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
-_RUNTIME_DIR = Path(
-    "C:/Users/jpowe/Desktop/OpenCode-Agent-Test/agent_bridge_v05")
+
+def _runtime_dir() -> Path:
+    configured = os.environ.get("AGENT_BRIDGE_V05_ROOT", "")
+    if not configured:
+        raise RuntimeError(
+            "AGENT_BRIDGE_V05_ROOT is not set: point it at an "
+            "agent_bridge_v05 checkout (machine paths are not hardcoded).")
+    return Path(configured)
+
+
+_RUNTIME_DIR = _runtime_dir()
 if str(_RUNTIME_DIR) not in sys.path:
     sys.path.insert(0, str(_RUNTIME_DIR))
 

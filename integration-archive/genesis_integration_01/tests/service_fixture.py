@@ -1,13 +1,24 @@
 """Live v0.5 service fixture (subprocess; integration code stays HTTP-only)."""
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import time
 import urllib.request
 from pathlib import Path
 
-V05 = Path("C:/Users/jpowe/Desktop/OpenCode-Agent-Test/agent_bridge_v05")
+
+def _v05_root() -> Path:
+    configured = os.environ.get("AGENT_BRIDGE_V05_ROOT", "")
+    if not configured:
+        raise RuntimeError(
+            "AGENT_BRIDGE_V05_ROOT is not set: point it at an "
+            "agent_bridge_v05 checkout (machine paths are not hardcoded).")
+    return Path(configured)
+
+
+V05 = _v05_root()
 
 
 class LiveService:
