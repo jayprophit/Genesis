@@ -99,6 +99,7 @@ std::vector<runtime::StateTransitionRule> OrganismRules() {
         {"boot", "genesis.boot", "ready"},
         {"ready", "organism.event", "ready"},
         {"ready", "organism.checkpoint", "ready"},
+        {"ready", "organism.rollback", "ready"},
     };
 }
 
@@ -324,6 +325,72 @@ int CmdCheckpoint(const fs::path& root) {
 
 int CmdStatus(const fs::path& root) { return CmdCheckpoint(root); }
 
+// Rollback restores registry+memory contents of an earlier immutable version
+// as a NEW version (history is append-only; nothing is deleted). The restore
+// is recorded as an organism.rollback audit event in the new version.
+int CmdRollback(const fs::path& root, const std::string& to_version) {
+    LoadedState st;
+    std::string error;
+    if (!LoadState(root, st, error)) return Fail(error);
+
+    std::uint64_t target = 0;
+    if (to_version.size() < 2 || to_version[0] != 'v') {
+        return Fail("invalid --to-version '" + to_version + "': want vN");
+    }
+    try {
+        target = std::stoull(to_version.substr(1));
+    } catch (const std::exception&) {
+        return Fail("invalid --to-version '" + to_version + "': want vN");
+    }
+    if (target < 1 || target > st.manifest.version_number) {
+        return Fail("rollback target " + to_version + " not in [v1, " +
+                    st.manifest.version + "]; state untouched");
+    }
+    if (target == st.manifest.version_number) {
+        if (!st.registry.verify() || !st.graph->verify() || !st.machine->verify())
+            return Fail("current state failed verification");
+        std::cout << "rollback no-op: already at " << to_version << "\n";
+        return 0;
+    }
+
+    // Validate the target exists BEFORE mutating anything.
+    identity::EntityRegistryStore registry_store(root / "identity");
+    identity::EntityStoreError registry_error;
+    auto old_registry = registry_store.read(std::string(kNamespace), std::string(kOrganismKey),
+                                            to_version, &registry_error);
+    if (!old_registry)
+        return Fail("rollback target unreadable: " + registry_error.message);
+    memory::MemoryStore memory_store(root / "memory");
+    memory::MemoryStoreError memory_error;
+    auto old_graph = memory_store.read(st.manifest.organism_id, to_version, &memory_error);
+    if (!old_graph)
+        return Fail("rollback target unreadable: " + memory_error.message);
+
+    runtime::ReservationError budget_error;
+    auto reservation = st.accounts.try_reserve({{"events", 1}}, &budget_error);
+    if (!reservation) {
+        std::cerr << "genesis_runtime_host: event budget exhausted: "
+                  << budget_error.message << "\n";
+        return 3;
+    }
+
+    const std::string from_version = st.manifest.version;
+    st.registry = std::move(*old_registry);
+    st.graph.emplace(std::move(*old_graph));
+
+    std::size_t observed = 0;
+    const auto outcome = ApplyEvent(st, "organism.rollback",
+                                    "rollback to " + to_version + " from " + from_version,
+                                    false, observed, error);
+    if (!outcome) return Fail(error);
+    if (!reservation->commit()) return Fail("resource commit failed");
+    if (!PersistState(root, st, error)) return Fail(error);
+    std::cout << "rolled back to " << to_version << " as " << st.manifest.version
+              << " identity=" << st.manifest.organism_id
+              << " audit=" << outcome->event.event_id() << "\n";
+    return 0;
+}
+
 int RunArgv(const std::vector<std::string>& args);
 
 int CmdSelfTest(const fs::path& scratch) {
@@ -356,14 +423,48 @@ int CmdSelfTest(const fs::path& scratch) {
     if (step({"--checkpoint", "--data-root", r}) != 0)
         return Fail("self-test: checkpoint failed");
     // Restart continuity: reload and confirm identity + memory + sequence.
-    LoadedState st;
-    std::string error;
-    if (!LoadState(root, st, error)) return Fail("self-test: reload: " + error);
-    if (st.manifest.organism_id != id_a)
-        return Fail("self-test: identity changed across restart");
-    if (st.graph->size() < 2) return Fail("self-test: memory lost across restart");
-    if (st.manifest.next_sequence < 3)
-        return Fail("self-test: sequence did not advance");
+    {
+        LoadedState st;
+        std::string error;
+        if (!LoadState(root, st, error)) return Fail("self-test: reload: " + error);
+        if (st.manifest.organism_id != id_a)
+            return Fail("self-test: identity changed across restart");
+        if (st.graph->size() < 2) return Fail("self-test: memory lost across restart");
+        if (st.manifest.next_sequence < 3)
+            return Fail("self-test: sequence did not advance");
+    }
+    // Rollback: v3 state (birth + 2 events) restored to v1 as new v4, with audit.
+    if (step({"--rollback", "--data-root", r, "--to-version", "v1"}) != 0)
+        return Fail("self-test: rollback failed");
+    {
+        LoadedState st;
+        std::string error;
+        if (!LoadState(root, st, error)) return Fail("self-test: post-rollback reload: " + error);
+        if (st.manifest.organism_id != id_a)
+            return Fail("self-test: rollback changed identity");
+        if (st.manifest.version != "v4")
+            return Fail("self-test: rollback did not append v4");
+        if (st.graph->find("evt-1") == nullptr)
+            return Fail("self-test: rollback lost birth memory");
+        if (st.graph->find("evt-2") != nullptr || st.graph->find("evt-3") != nullptr)
+            return Fail("self-test: rollback kept discarded events");
+        if (st.graph->find("evt-4") == nullptr)
+            return Fail("self-test: rollback audit event missing");
+        if (st.manifest.next_sequence < 5)
+            return Fail("self-test: sequence did not advance past rollback");
+    }
+    // Invalid rollback: state untouched, nonzero exit.
+    if (step({"--rollback", "--data-root", r, "--to-version", "v99"}) == 0)
+        return Fail("self-test: invalid rollback should fail");
+    {
+        bool present_now = false;
+        const auto manifest = LoadManifest(root, &present_now);
+        if (!present_now || manifest.version != "v4")
+            return Fail("self-test: invalid rollback corrupted state");
+    }
+    // No-op rollback to current version succeeds without new versions.
+    if (step({"--rollback", "--data-root", r, "--to-version", "v4"}) != 0)
+        return Fail("self-test: no-op rollback failed");
     std::cout << "self-test ok identity=" << id_a << "\n";
     fs::remove_all(root, ec);
     return 0;
@@ -371,12 +472,12 @@ int CmdSelfTest(const fs::path& scratch) {
 
 int RunArgv(const std::vector<std::string>& args) {
     std::string verb, root = ".genesis-host", topic = "organism.event",
-                payload, model_route;
+                payload, model_route, to_version;
     bool fault_demo = false;
     for (std::size_t i = 0; i < args.size(); ++i) {
         const auto& a = args[i];
         if (a == "--boot" || a == "--event" || a == "--checkpoint" ||
-            a == "--status" || a == "--self-test") {
+            a == "--status" || a == "--self-test" || a == "--rollback") {
             verb = a;
         } else if (a == "--data-root" && i + 1 < args.size()) {
             root = args[++i];
@@ -386,6 +487,8 @@ int RunArgv(const std::vector<std::string>& args) {
             payload = args[++i];
         } else if (a == "--model-route" && i + 1 < args.size()) {
             model_route = args[++i];
+        } else if (a == "--to-version" && i + 1 < args.size()) {
+            to_version = args[++i];
         } else if (a == "--fault-demo") {
             fault_demo = true;
         } else {
@@ -396,15 +499,19 @@ int RunArgv(const std::vector<std::string>& args) {
     if (verb == "--event") return CmdEvent(root, topic, payload, fault_demo);
     if (verb == "--checkpoint") return CmdCheckpoint(root);
     if (verb == "--status") return CmdStatus(root);
+    if (verb == "--rollback") {
+        if (to_version.empty()) return Fail("--rollback needs --to-version vN");
+        return CmdRollback(root, to_version);
+    }
     if (verb == "--self-test") {
         std::error_code ec;
         const fs::path scratch = fs::temp_directory_path(ec);
         if (ec) return Fail("no temp dir");
         return CmdSelfTest(scratch);
     }
-    return Fail("usage: --boot|--event|--checkpoint|--status|--self-test "
+    return Fail("usage: --boot|--event|--checkpoint|--status|--rollback|--self-test "
                 "[--data-root DIR] [--topic T] [--payload P] "
-                "[--model-route R] [--fault-demo]");
+                "[--model-route R] [--to-version vN] [--fault-demo]");
 }
 
 } // namespace
