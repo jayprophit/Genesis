@@ -40,6 +40,7 @@ add_library(genesis_core STATIC
     src/memory/graph.cpp
     src/memory/persistence.cpp
     src/organism/anatomy.cpp
+    src/organism/loop.cpp
     src/organism/systems.cpp
     src/provenance/ledger.cpp
     src/requirements/registry.cpp
@@ -199,6 +200,10 @@ add_test(NAME genesis_provider_open_observation_tests
 add_executable(genesis_crypto_provider_open_probe
     tools/crypto_provider_open_probe.cpp)
 target_link_libraries(genesis_crypto_provider_open_probe PRIVATE genesis_core)
+add_executable(genesis_organism_loop_tests tests/organism_loop_tests.cpp)
+target_link_libraries(genesis_organism_loop_tests PRIVATE genesis_core)
+target_compile_options(genesis_organism_loop_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_organism_loop_tests COMMAND genesis_organism_loop_tests)
 add_executable(genesis_runtime_host tools/genesis_runtime_host.cpp)
 target_link_libraries(genesis_runtime_host PRIVATE genesis_core)
 target_compile_options(genesis_runtime_host PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
