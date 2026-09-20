@@ -199,6 +199,10 @@ add_test(NAME genesis_provider_open_observation_tests
 add_executable(genesis_crypto_provider_open_probe
     tools/crypto_provider_open_probe.cpp)
 target_link_libraries(genesis_crypto_provider_open_probe PRIVATE genesis_core)
+add_executable(genesis_runtime_host tools/genesis_runtime_host.cpp)
+target_link_libraries(genesis_runtime_host PRIVATE genesis_core)
+target_compile_options(genesis_runtime_host PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_runtime_host_selftest COMMAND genesis_runtime_host --self-test)
 
 install(TARGETS genesis_core EXPORT GenesisTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
