@@ -196,11 +196,29 @@ LoopReceipt LoopDriver::step(const LoopInput& input, std::string* error) {
     world_observation.evidence_digest = outcome.event.envelope_digest();
     world_observation.observed_at = now;
     world_observation.confidence = 0.8;
+    const std::string observed_value = world_observation.value_digest;
+    const std::string observed_evidence = world_observation.evidence_digest;
     if (!world_->observe_state(std::move(world_observation), &step_error))
         return fail(step_error.c_str());
     Mark(receipt.stages, LoopStage::observe, true);
-    MarkMissing(receipt.stages, LoopStage::prediction_error_na,
-                "no error broadcast; resolve_prediction is manual");
+
+    // PREDICTION ERROR: resolve the loop-issued prediction against the
+    // observation. resolve_prediction compares digests, records evidence,
+    // and recalibrates the hypothesis (support vs counterevidence).
+    if (receipt.prediction_issued) {
+        const std::string prediction_id = "loop-pred-" + event_id;
+        if (!world_->resolve_prediction(prediction_id, observed_value, observed_evidence,
+                                        now, &step_error))
+            return fail(step_error.c_str());
+        const auto* resolved = world_->find_prediction(prediction_id);
+        const bool confirmed = resolved != nullptr &&
+                               resolved->state == cognition::PredictionState::confirmed;
+        Mark(receipt.stages, LoopStage::prediction_error, true,
+             confirmed ? "prediction confirmed" : "prediction refuted");
+    } else {
+        Mark(receipt.stages, LoopStage::prediction_error, false,
+             "SKIPPED: no prediction issued");
+    }
 
     // LEARN: register + touch a trace for this event.
     learning::LearningTrace trace;

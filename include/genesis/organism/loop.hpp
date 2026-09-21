@@ -34,7 +34,7 @@ enum class LoopStage {
     safety_gate,
     action_na,
     observe,
-    prediction_error_na,
+    prediction_error,
     learn,
     memory_update,
     homeostasis,

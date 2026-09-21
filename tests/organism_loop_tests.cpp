@@ -100,6 +100,13 @@ void TestAllowedPass() {
           "homeostasis evaluated");
     Check(HasMark(first, organism::LoopStage::sense, true), "sense executed");
     Check(HasMark(first, organism::LoopStage::safety_gate, true), "gate executed");
+    Check(HasMark(first, organism::LoopStage::prediction_error, true),
+          "prediction error resolved");
+    const auto* hyp = fx.world.find_hypothesis("loop-hyp-1");
+    Check(hyp != nullptr, "hypothesis still registered");
+    // Observed receipt digest differs from expected "effect": refuted once.
+    Check(hyp->support_count + hyp->counterevidence_count == 1, "error evidence recorded");
+    Check(hyp->counterevidence_count == 1, "mismatch counted as counterevidence");
     Check(HasMark(first, organism::LoopStage::interoception_na, false), "interoception marked");
     Check(HasMark(first, organism::LoopStage::drive_na, false), "drive marked");
     Check(HasMark(first, organism::LoopStage::goal_na, false), "goal marked");
