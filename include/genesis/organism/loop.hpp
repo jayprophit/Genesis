@@ -25,7 +25,7 @@ enum class LoopStage {
     perceive,
     interoception,
     attention_proxy,
-    mental_state_na,
+    mental_state,
     recall,
     predict,
     drive,
@@ -53,6 +53,14 @@ struct LoopInput final {
     std::string payload;
     std::string capability_id;
     cognition::AuthorizationDecision authorization;
+};
+
+struct MentalState final {
+    std::size_t admitted{0};
+    std::size_t inhibited{0};
+    double mean_confidence{0.0};
+    double uncertainty{1.0};
+    [[nodiscard]] std::string digest() const;
 };
 
 struct InteroceptiveSnapshot final {
@@ -89,6 +97,7 @@ struct LoopReceipt final {
     CompensatoryAction preemptive_action{CompensatoryAction::none};
     Drive drive;
     Goal goal;
+    MentalState mental_state;
     std::vector<LoopStageMark> stages;
     [[nodiscard]] std::string digest() const;
 };

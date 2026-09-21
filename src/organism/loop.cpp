@@ -84,6 +84,15 @@ bool LoopDriver::initialize(std::string* error) {
     return true;
 }
 
+std::string MentalState::digest() const {
+    std::string material{"genesis.loop.mental.v1"};
+    material += std::to_string(admitted) + "|";
+    material += std::to_string(inhibited) + "|";
+    material += std::to_string(mean_confidence) + "|";
+    material += std::to_string(uncertainty);
+    return runtime::sha256(material);
+}
+
 std::string InteroceptiveSnapshot::digest() const {
     std::string material{"genesis.loop.interoception.v1"};
     material += std::to_string(memory_fill) + "|";
@@ -177,7 +186,19 @@ LoopReceipt LoopDriver::step(const LoopInput& input, std::string* error) {
     }
     receipt.focused = workspace_->focus().size();
     Mark(receipt.stages, LoopStage::attention_proxy, true, "proxy: ConsciousWorkspace focus");
-    MarkMissing(receipt.stages, LoopStage::mental_state_na, "no belief/affect integrator");
+
+    // MENTAL STATE: belief/affect integration readout over the focused
+    // workspace. introspect() aggregates admitted vs inhibited items with
+    // mean confidence; no new module, no invented affect numbers.
+    // (Dedicated AffectRegulator binding remains future work.)
+    const auto introspection = workspace_->introspect();
+    receipt.mental_state.admitted = introspection.admitted;
+    receipt.mental_state.inhibited = introspection.inhibited;
+    receipt.mental_state.mean_confidence = introspection.mean_confidence;
+    receipt.mental_state.uncertainty = introspection.uncertainty;
+    Mark(receipt.stages, LoopStage::mental_state, true,
+         "admitted=" + std::to_string(introspection.admitted) +
+             " inhibited=" + std::to_string(introspection.inhibited));
 
     // MEMORY RECALL.
     const auto recalled = memory_->activate({input.topic}, input.topic, 8);

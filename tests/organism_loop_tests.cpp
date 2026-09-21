@@ -101,6 +101,11 @@ void TestAllowedPass() {
           "homeostasis evaluated");
     Check(HasMark(first, organism::LoopStage::sense, true), "sense executed");
     Check(HasMark(first, organism::LoopStage::safety_gate, true), "gate executed");
+    Check(HasMark(first, organism::LoopStage::mental_state, true), "mental state executed");
+    Check(first.mental_state.admitted == first.focused, "admitted matches focus");
+    Check(first.mental_state.uncertainty >= 0.0 && first.mental_state.uncertainty <= 1.0,
+          "uncertainty bounded");
+    Check(!first.mental_state.digest().empty(), "mental digest");
     Check(HasMark(first, organism::LoopStage::prediction_error, true),
           "prediction error resolved");
     const auto* hyp = fx.world.find_hypothesis("loop-hyp-1");
