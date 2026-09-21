@@ -202,7 +202,26 @@ LoopReceipt LoopDriver::step(const LoopInput& input, std::string* error) {
     } else {
         Mark(receipt.stages, LoopStage::predict, false, "SKIPPED: no hypothesis registered");
     }
-    MarkMissing(receipt.stages, LoopStage::drive_na, "no drive/motivation selector");
+    // DRIVE: signal-driven selector over live internal state already in
+    // hand (interoceptive gauges + prediction outcome). Runs before the
+    // authority check per the agency pipeline: drive proposes, the gate
+    // disposes. No new module: selection only reads existing signals.
+    {
+        // NOTE: the memory_pressure band treats fill below target_min as
+        // low_warning, but low pressure means room to spare, so only
+        // high-side levels drive conservation.
+        const auto level = receipt.interoception.memory_pressure.level;
+        if (level == PressureLevel::critical_low || level == PressureLevel::critical_high) {
+            receipt.drive = Drive{"conserve", 0.9};
+        } else if (level == PressureLevel::high_warning) {
+            receipt.drive = Drive{"conserve", 0.5};
+        } else if (!receipt.prediction_issued) {
+            receipt.drive = Drive{"resolve-uncertainty", 0.6};
+        } else {
+            receipt.drive = Drive{"consolidate", 0.3};
+        }
+    }
+    Mark(receipt.stages, LoopStage::drive, true, "drive=" + receipt.drive.name);
     MarkMissing(receipt.stages, LoopStage::goal_na, "no goal type");
     MarkMissing(receipt.stages, LoopStage::plan_na, "no action planner");
 

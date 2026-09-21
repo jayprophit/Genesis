@@ -114,7 +114,7 @@ void TestAllowedPass() {
     Check(first.interoception.memory_pressure.level != organism::PressureLevel::invalid,
           "interoceptive pressure evaluated");
     Check(!first.interoception.digest().empty(), "interoception digest");
-    Check(HasMark(first, organism::LoopStage::drive_na, false), "drive marked");
+    Check(HasMark(first, organism::LoopStage::drive, true), "drive marked executed");
     Check(HasMark(first, organism::LoopStage::goal_na, false), "goal marked");
     Check(HasMark(first, organism::LoopStage::plan_na, false), "plan marked");
     Check(HasMark(first, organism::LoopStage::action_na, false), "action marked");
@@ -148,6 +148,53 @@ void TestAllostasisArmsBeforeBreach() {
     Check(!fx.driver.step(AllowedInput(), &error).event_id.empty(), "loop continues");
 }
 
+void TestDriveSelection() {
+    // Nominal + prediction issued -> consolidate.
+    {
+        Fixture fx;
+        std::string error;
+        Check(fx.driver.initialize(&error), "driver initialize (drive)");
+        Check(AllowCapability(fx), "capability qualified (drive)");
+        Check(RegisterHypothesis(fx), "hypothesis registered (drive)");
+        const auto receipt = fx.driver.step(AllowedInput(), &error);
+        Check(error.empty(), "drive step error");
+        Check(HasMark(receipt, organism::LoopStage::drive, true), "drive executed");
+        Check(receipt.drive.name == "consolidate", "nominal drive consolidates");
+        Check(receipt.drive.urgency == 0.3, "consolidate urgency");
+    }
+    // High pressure -> conserve (pre-update fill 7/8 on capacity-8 memory).
+    {
+        Fixture fx(8);
+        std::string error;
+        Check(fx.driver.initialize(&error), "driver initialize (drive-pressure)");
+        Check(AllowCapability(fx), "capability qualified (drive-pressure)");
+        Check(RegisterHypothesis(fx), "hypothesis registered (drive-pressure)");
+        organism::LoopReceipt receipt;
+        for (int i = 0; i < 8; ++i) {
+            receipt = fx.driver.step(AllowedInput(), &error);
+            Check(error.empty(), "drive-pressure step error");
+        }
+        Check(receipt.drive.name == "conserve", "pressured drive conserves");
+        Check(receipt.drive.urgency == 0.5, "conserve urgency");
+    }
+    // No hypothesis -> no prediction -> resolve-uncertainty, even when denied
+    // (drive proposes before the authority check disposes).
+    {
+        Fixture fx;
+        std::string error;
+        Check(fx.driver.initialize(&error), "driver initialize (drive-denied)");
+        organism::LoopInput input;
+        input.topic = "organism.event";
+        input.payload = "denied probe";
+        input.capability_id = "loop.unknown";
+        input.authorization = cognition::AuthorizationDecision{false, false, false, ""};
+        const auto receipt = fx.driver.step(input, &error);
+        Check(receipt.safety_denied, "drive-denied receipt");
+        Check(HasMark(receipt, organism::LoopStage::drive, true), "drive precedes gate");
+        Check(receipt.drive.name == "resolve-uncertainty", "denied drive seeks evidence");
+    }
+}
+
 void TestDeniedStopsBeforeMutation() {
     Fixture fx;
     std::string error;
@@ -177,6 +224,7 @@ void TestDeniedStopsBeforeMutation() {
 
 int main() {
     TestAllowedPass();
+    TestDriveSelection();
     TestAllostasisArmsBeforeBreach();
     TestDeniedStopsBeforeMutation();
     if (g_failures == 0) {

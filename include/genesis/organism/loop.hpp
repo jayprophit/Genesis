@@ -28,7 +28,7 @@ enum class LoopStage {
     mental_state_na,
     recall,
     predict,
-    drive_na,
+    drive,
     goal_na,
     plan_na,
     safety_gate,
@@ -63,6 +63,11 @@ struct InteroceptiveSnapshot final {
     [[nodiscard]] std::string digest() const;
 };
 
+struct Drive final {
+    std::string name{"idle"};
+    double urgency{0.0};
+};
+
 struct LoopReceipt final {
     bool completed{false};
     bool safety_denied{false};
@@ -77,6 +82,7 @@ struct LoopReceipt final {
     double projected_fill{0.0};
     bool allostasis_armed{false};
     CompensatoryAction preemptive_action{CompensatoryAction::none};
+    Drive drive;
     std::vector<LoopStageMark> stages;
     [[nodiscard]] std::string digest() const;
 };
