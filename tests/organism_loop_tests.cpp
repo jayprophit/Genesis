@@ -115,7 +115,7 @@ void TestAllowedPass() {
           "interoceptive pressure evaluated");
     Check(!first.interoception.digest().empty(), "interoception digest");
     Check(HasMark(first, organism::LoopStage::drive, true), "drive marked executed");
-    Check(HasMark(first, organism::LoopStage::goal_na, false), "goal marked");
+    Check(HasMark(first, organism::LoopStage::goal, true), "goal marked executed");
     Check(HasMark(first, organism::LoopStage::plan_na, false), "plan marked");
     Check(HasMark(first, organism::LoopStage::action_na, false), "action marked");
     Check(!first.digest().empty(), "receipt digest");
@@ -161,6 +161,9 @@ void TestDriveSelection() {
         Check(HasMark(receipt, organism::LoopStage::drive, true), "drive executed");
         Check(receipt.drive.name == "consolidate", "nominal drive consolidates");
         Check(receipt.drive.urgency == 0.3, "consolidate urgency");
+        Check(HasMark(receipt, organism::LoopStage::goal, true), "goal executed");
+        Check(receipt.goal.description == "consolidate recent traces", "goal follows drive");
+        Check(receipt.goal.priority == 0.3, "goal priority inherits urgency");
     }
     // High pressure -> conserve (pre-update fill 7/8 on capacity-8 memory).
     {
@@ -176,6 +179,7 @@ void TestDriveSelection() {
         }
         Check(receipt.drive.name == "conserve", "pressured drive conserves");
         Check(receipt.drive.urgency == 0.5, "conserve urgency");
+        Check(receipt.goal.description == "reduce memory pressure", "pressured goal");
     }
     // No hypothesis -> no prediction -> resolve-uncertainty, even when denied
     // (drive proposes before the authority check disposes).
@@ -192,6 +196,7 @@ void TestDriveSelection() {
         Check(receipt.safety_denied, "drive-denied receipt");
         Check(HasMark(receipt, organism::LoopStage::drive, true), "drive precedes gate");
         Check(receipt.drive.name == "resolve-uncertainty", "denied drive seeks evidence");
+        Check(receipt.goal.description == "gather evidence", "denied goal");
     }
 }
 

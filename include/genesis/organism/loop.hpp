@@ -29,7 +29,7 @@ enum class LoopStage {
     recall,
     predict,
     drive,
-    goal_na,
+    goal,
     plan_na,
     safety_gate,
     action_na,
@@ -68,6 +68,11 @@ struct Drive final {
     double urgency{0.0};
 };
 
+struct Goal final {
+    std::string description{"none"};
+    double priority{0.0};
+};
+
 struct LoopReceipt final {
     bool completed{false};
     bool safety_denied{false};
@@ -83,6 +88,7 @@ struct LoopReceipt final {
     bool allostasis_armed{false};
     CompensatoryAction preemptive_action{CompensatoryAction::none};
     Drive drive;
+    Goal goal;
     std::vector<LoopStageMark> stages;
     [[nodiscard]] std::string digest() const;
 };

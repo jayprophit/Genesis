@@ -222,7 +222,17 @@ LoopReceipt LoopDriver::step(const LoopInput& input, std::string* error) {
         }
     }
     Mark(receipt.stages, LoopStage::drive, true, "drive=" + receipt.drive.name);
-    MarkMissing(receipt.stages, LoopStage::goal_na, "no goal type");
+
+    // GOAL: one committed objective derived from the selected drive.
+    // Loop-local type; planning (how) stays a later stage.
+    if (receipt.drive.name == "conserve") {
+        receipt.goal = Goal{"reduce memory pressure", receipt.drive.urgency};
+    } else if (receipt.drive.name == "resolve-uncertainty") {
+        receipt.goal = Goal{"gather evidence", receipt.drive.urgency};
+    } else {
+        receipt.goal = Goal{"consolidate recent traces", receipt.drive.urgency};
+    }
+    Mark(receipt.stages, LoopStage::goal, true, "goal=" + receipt.goal.description);
     MarkMissing(receipt.stages, LoopStage::plan_na, "no action planner");
 
     // RIGHTS / SAFETY / AUTHORITY CHECK: fail-closed gate before any mutation.
