@@ -14,6 +14,19 @@ void MarkMissing(std::vector<LoopStageMark>& stages, LoopStage stage, std::strin
     Mark(stages, stage, false, "NOT_IMPLEMENTED: " + std::move(what));
 }
 
+// Severity rank for comparing reactive vs projected pressure levels.
+int LevelRank(PressureLevel level) {
+    switch (level) {
+        case PressureLevel::nominal: return 0;
+        case PressureLevel::low_warning:
+        case PressureLevel::high_warning: return 1;
+        case PressureLevel::critical_low:
+        case PressureLevel::critical_high: return 2;
+        case PressureLevel::invalid: return -1;
+    }
+    return -1;
+}
+
 } // namespace
 
 LoopDriver::LoopDriver(std::string organism_id,
@@ -275,7 +288,32 @@ LoopReceipt LoopDriver::step(const LoopInput& input, std::string* error) {
     receipt.memory_pressure = homeostasis_->evaluate(Metric::memory_pressure, pressure);
     receipt.error_rate = homeostasis_->evaluate(Metric::error_rate, 0.0);
     Mark(receipt.stages, LoopStage::homeostasis, true, "reactive evaluate only");
-    MarkMissing(receipt.stages, LoopStage::allostasis_na, "no predictive regulation");
+
+    // ALLOSTASIS: predict needs before homeostatic failure. Project the
+    // memory-fill trend (bounded 8-sample history, 4-step horizon) and ask
+    // the existing controller what it WOULD report for the projected value.
+    // Armed only when the projection is strictly worse than the live level.
+    fill_history_.push_back(pressure);
+    if (fill_history_.size() > 8) fill_history_.erase(fill_history_.begin());
+    receipt.projected_fill = pressure;
+    if (fill_history_.size() >= 3) {
+        const std::size_t n = fill_history_.size() < 4 ? fill_history_.size() : 4;
+        const double first = *(fill_history_.end() - static_cast<std::ptrdiff_t>(n));
+        const double last = fill_history_.back();
+        const double slope = (last - first) / static_cast<double>(n - 1);
+        if (slope > 0.0) {
+            const double projected = last + slope * 4.0;
+            const auto future =
+                homeostasis_->evaluate(Metric::memory_pressure, projected);
+            receipt.projected_fill = projected;
+            if (LevelRank(future.level) > LevelRank(receipt.memory_pressure.level)) {
+                receipt.allostasis_armed = true;
+                receipt.preemptive_action = future.action;
+            }
+        }
+    }
+    Mark(receipt.stages, LoopStage::allostasis, true,
+         receipt.allostasis_armed ? "pre-emptive action armed" : "no breach projected");
 
     // RECEIPT: audit event closing the pass.
     runtime::EventDraft receipt_event;

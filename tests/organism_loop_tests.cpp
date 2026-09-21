@@ -26,10 +26,11 @@ void Check(bool condition, const char* what) {
 }
 
 struct Fixture {
+    explicit Fixture(std::size_t memory_capacity = 64) : memory{"organism-test", memory_capacity, 128} {}
     runtime::DeterministicDispatcher dispatcher{1024, 1, 0};
     perception::PerceptionPipeline perception{"organism-test", 16, 64, 64};
     cognition::ConsciousWorkspace workspace{16};
-    memory::MemoryGraph memory{"organism-test", 64, 128};
+    memory::MemoryGraph memory;
     cognition::WorldDynamics world{"organism-test", 64, 16, 16};
     cognition::SelfCapabilityModel capabilities{"organism-test", 16};
     learning::ConsolidationScheduler scheduler{64, 16};
@@ -125,6 +126,28 @@ void TestAllowedPass() {
     Check(second.sequence == first.sequence + 2, "sequence advances 2 per pass");
 }
 
+void TestAllostasisArmsBeforeBreach() {
+    Fixture fx(8); // small capacity: fill rises 1/8 per allowed step
+    std::string error;
+    Check(fx.driver.initialize(&error), "driver initialize (allostasis)");
+    Check(AllowCapability(fx), "capability qualified (allostasis)");
+
+    organism::LoopReceipt receipt;
+    for (int i = 0; i < 6; ++i) {
+        receipt = fx.driver.step(AllowedInput(), &error);
+        Check(error.empty(), "allostasis step error");
+        Check(receipt.completed, "allostasis step completes");
+    }
+    Check(HasMark(receipt, organism::LoopStage::allostasis, true), "allostasis executed");
+    // Fill 6/8 = 0.75 (nominal) but projection 0.75 + 4/8 = 1.25 breaches:
+    // pre-emptive action must arm BEFORE the reactive level turns critical.
+    Check(receipt.allostasis_armed, "pre-emptive action armed");
+    Check(receipt.preemptive_action != organism::CompensatoryAction::none,
+          "pre-emptive action selected");
+    Check(receipt.projected_fill > 0.8, "projection exceeds target band");
+    Check(!fx.driver.step(AllowedInput(), &error).event_id.empty(), "loop continues");
+}
+
 void TestDeniedStopsBeforeMutation() {
     Fixture fx;
     std::string error;
@@ -154,6 +177,7 @@ void TestDeniedStopsBeforeMutation() {
 
 int main() {
     TestAllowedPass();
+    TestAllostasisArmsBeforeBreach();
     TestDeniedStopsBeforeMutation();
     if (g_failures == 0) {
         std::cout << "organism_loop_tests: all assertions passed\n";

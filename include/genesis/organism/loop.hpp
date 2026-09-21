@@ -38,7 +38,7 @@ enum class LoopStage {
     learn,
     memory_update,
     homeostasis,
-    allostasis_na,
+    allostasis,
     receipt,
 };
 
@@ -74,6 +74,9 @@ struct LoopReceipt final {
     HomeostasisDecision memory_pressure;
     HomeostasisDecision error_rate;
     InteroceptiveSnapshot interoception;
+    double projected_fill{0.0};
+    bool allostasis_armed{false};
+    CompensatoryAction preemptive_action{CompensatoryAction::none};
     std::vector<LoopStageMark> stages;
     [[nodiscard]] std::string digest() const;
 };
@@ -109,6 +112,7 @@ private:
     learning::ConsolidationScheduler* scheduler_{nullptr};
     HomeostasisController* homeostasis_{nullptr};
     std::uint64_t step_{0};
+    std::vector<double> fill_history_;
 };
 
 } // namespace genesis::organism
