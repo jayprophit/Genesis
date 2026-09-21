@@ -23,7 +23,7 @@ enum class LoopStage {
     world_event,
     sense,
     perceive,
-    interoception_na,
+    interoception,
     attention_proxy,
     mental_state_na,
     recall,
@@ -55,6 +55,14 @@ struct LoopInput final {
     cognition::AuthorizationDecision authorization;
 };
 
+struct InteroceptiveSnapshot final {
+    double memory_fill{0.0};
+    HomeostasisDecision memory_pressure;
+    HomeostasisDecision error_rate;
+    std::uint64_t tick{0};
+    [[nodiscard]] std::string digest() const;
+};
+
 struct LoopReceipt final {
     bool completed{false};
     bool safety_denied{false};
@@ -65,6 +73,7 @@ struct LoopReceipt final {
     bool prediction_issued{false};
     HomeostasisDecision memory_pressure;
     HomeostasisDecision error_rate;
+    InteroceptiveSnapshot interoception;
     std::vector<LoopStageMark> stages;
     [[nodiscard]] std::string digest() const;
 };

@@ -71,6 +71,15 @@ bool LoopDriver::initialize(std::string* error) {
     return true;
 }
 
+std::string InteroceptiveSnapshot::digest() const {
+    std::string material{"genesis.loop.interoception.v1"};
+    material += std::to_string(memory_fill) + "|";
+    material += std::to_string(static_cast<int>(memory_pressure.level)) + "|";
+    material += std::to_string(static_cast<int>(error_rate.level)) + "|";
+    material += std::to_string(tick);
+    return runtime::sha256(material);
+}
+
 std::string LoopReceipt::digest() const {
     std::string material{"genesis.loop.receipt.v1"};
     material += event_id + "|" + std::to_string(sequence) + "|";
@@ -133,7 +142,21 @@ LoopReceipt LoopDriver::step(const LoopInput& input, std::string* error) {
     if (!perception_->derive(std::move(feature), &step_error)) return fail(step_error.c_str());
     const auto projection = perception_->project("loop-obs-" + event_id, 8);
     Mark(receipt.stages, LoopStage::perceive, true);
-    MarkMissing(receipt.stages, LoopStage::interoception_na, "no unified self-state module");
+
+    // INTEROCEPTION: pre-update snapshot of live internal gauges. Memory
+    // fill is live; error_rate is open-loop 0.0 until an error counter
+    // exists (same honesty note as the reactive homeostasis stage below).
+    const double live_fill = memory_->node_capacity() == 0
+        ? 0.0
+        : static_cast<double>(memory_->size()) /
+              static_cast<double>(memory_->node_capacity());
+    receipt.interoception.memory_fill = live_fill;
+    receipt.interoception.memory_pressure =
+        homeostasis_->evaluate(Metric::memory_pressure, live_fill);
+    receipt.interoception.error_rate = homeostasis_->evaluate(Metric::error_rate, 0.0);
+    receipt.interoception.tick = tick;
+    Mark(receipt.stages, LoopStage::interoception, true,
+         "pre-update gauge snapshot; error_rate open-loop");
 
     // ATTENTION (proxy): bounded workspace focus over the projected candidate.
     if (projection.workspace_candidate.has_value()) {

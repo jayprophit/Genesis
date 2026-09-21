@@ -107,7 +107,12 @@ void TestAllowedPass() {
     // Observed receipt digest differs from expected "effect": refuted once.
     Check(hyp->support_count + hyp->counterevidence_count == 1, "error evidence recorded");
     Check(hyp->counterevidence_count == 1, "mismatch counted as counterevidence");
-    Check(HasMark(first, organism::LoopStage::interoception_na, false), "interoception marked");
+    Check(HasMark(first, organism::LoopStage::interoception, true),
+          "interoception executed");
+    Check(first.interoception.memory_fill == 0.0, "empty memory fill snapshot");
+    Check(first.interoception.memory_pressure.level != organism::PressureLevel::invalid,
+          "interoceptive pressure evaluated");
+    Check(!first.interoception.digest().empty(), "interoception digest");
     Check(HasMark(first, organism::LoopStage::drive_na, false), "drive marked");
     Check(HasMark(first, organism::LoopStage::goal_na, false), "goal marked");
     Check(HasMark(first, organism::LoopStage::plan_na, false), "plan marked");
