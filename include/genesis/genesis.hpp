@@ -17,6 +17,7 @@
 #include "genesis/genetics/reproduction.hpp"
 #include "genesis/identity/entity_persistence.hpp"
 #include "genesis/identity/entity_registry.hpp"
+#include "genesis/identity/genesis_identity.hpp"
 #include "genesis/identity/life_persistence.hpp"
 #include "genesis/identity/life_record.hpp"
 #include "genesis/identity/lineage.hpp"

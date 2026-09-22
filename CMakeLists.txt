@@ -30,6 +30,7 @@ add_library(genesis_core STATIC
     src/genetics/reproduction.cpp
     src/identity/entity_persistence.cpp
     src/identity/entity_registry.cpp
+    src/identity/genesis_identity.cpp
     src/identity/life_persistence.cpp
     src/identity/life_record.cpp
     src/identity/lineage.cpp
@@ -158,6 +159,10 @@ add_executable(genesis_identity_tests tests/identity_tests.cpp)
 target_link_libraries(genesis_identity_tests PRIVATE genesis_core)
 target_compile_options(genesis_identity_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
 add_test(NAME genesis_identity_tests COMMAND genesis_identity_tests)
+add_executable(genesis_genesis_identity_tests tests/genesis_identity_tests.cpp)
+target_link_libraries(genesis_genesis_identity_tests PRIVATE genesis_core)
+target_compile_options(genesis_genesis_identity_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_genesis_identity_tests COMMAND genesis_genesis_identity_tests)
 add_executable(genesis_identity_bench benchmarks/identity_benchmark.cpp)
 target_link_libraries(genesis_identity_bench PRIVATE genesis_core)
 add_executable(genesis_life_record_tests tests/life_record_tests.cpp)

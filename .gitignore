@@ -1,4 +1,5 @@
 /build/
+/build-host/
 /.genesis-local/
 *.log
 benchmark-results/

@@ -53,6 +53,27 @@ Other relations retain their typed endpoints without implying a permission.
 Custody, legal ownership, credentials, life records and succession each remain
 separate registered increments and are not claimed complete by this foundation.
 
+## One persistent Genesis identity (P22/1)
+
+There is exactly one persistent Genesis identity per organism root
+(`genesis::identity::GenesisIdentityRoot`, explicit bootstrap only).
+Models, providers, sessions, projects, workers, avatars and interface modes
+are runtime bindings (`IdentityBinding`) that reference the root id; binding
+takes the root by const reference and can never mutate, replace or fork it.
+Schema migration changes the schema version, never the person.
+
+Workers are `service`-kind entities with an `operates` supervision relation
+from the organism (`register_supervised_worker`); only `organism`-kind
+entities resolve through `organism_identity`, so a worker can never BE
+Genesis. Owners are `person`/`account` entities and must never resolve to
+the organism (`owner_is_distinct_from_organism`). Loading distinguishes
+uninitialized / ready / corrupt (`classify_identity_store`); corrupt state
+surfaces, it is never silently replaced with a fresh identity. Cross-system
+references (Aetherius services, Agent Bridge principals, IDE sessions) carry
+the Genesis id as an opaque reference plus `on_behalf_of` owner context;
+they do not duplicate the canonical root. Proven by
+`genesis_genesis_identity_tests`.
+
 ## Persistence and recovery invariants
 
 1. A persisted registry must contain the declared registrar as an organism
