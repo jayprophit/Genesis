@@ -93,6 +93,20 @@ if(GENESIS_PWSH_EXECUTABLE)
         COMMAND ${GENESIS_PWSH_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tools/validate_repository_content.ps1
                 -Root ${CMAKE_CURRENT_SOURCE_DIR})
+    # The content inventory must describe committed content and serialize
+    # deterministically; both properties were real defects.
+    add_test(NAME genesis_repository_content_inventory_tests
+        COMMAND ${GENESIS_PWSH_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tools/test_repository_content_inventory.ps1
+                -Root ${CMAKE_CURRENT_SOURCE_DIR})
+else()
+    # Without this the three content/asset gates above do not merely fail, they
+    # do not exist - and a machine without pwsh would report a clean run.
+    message(WARNING
+        "pwsh was not found: genesis_asset_registry_tests, "
+        "genesis_chatgpt_project_intake_tests, genesis_repository_content_tests "
+        "and genesis_repository_content_inventory_tests are NOT registered. "
+        "Install PowerShell 7 to run them; do not read their absence as a pass.")
 endif()
 add_executable(genesis_tests tests/genesis_tests.cpp)
 target_link_libraries(genesis_tests PRIVATE genesis_core)

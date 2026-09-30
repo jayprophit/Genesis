@@ -145,14 +145,49 @@ function Role([string]$Path) {
 }
 
 $rows = [Collections.Generic.List[object]]::new()
-foreach ($item in Get-ChildItem -LiteralPath $rootFull -File -Recurse -Force) {
-    $absolute = $item.FullName
-    $relative = $absolute.Substring($rootFull.Length + 1).Replace('\','/')
-    if ($relative -match '^(\.git|\.genesis-local|build(?:-[^/]+)?)(/|$)' -or
-        $relative -eq 'registry/repository_content.tsv' -or
+# Repository content means COMMITTED content. A filesystem walk also picks up
+# whatever a developer happens to have locally - compiled __pycache__ bytecode,
+# an untracked third-party reference tree - so the recorded audit changed with
+# the machine that generated it and could never be reproduced from a clean
+# clone. That is not hypothetical: the previous manifest listed 20 untracked
+# .pyc files and was stale against the committed tree by 39 files and 136
+# content hashes.
+#
+# The tracked list comes from git, read as raw UTF-8 bytes. core.quotepath
+# defaults to true, which escapes non-ASCII names to octal ("...\342\200\221")
+# and makes them unopenable; -z plus an explicit UTF-8 decode avoids both the
+# escaping and the console code page.
+$trackedPaths = [Collections.Generic.List[string]]::new()
+$psi = [Diagnostics.ProcessStartInfo]::new()
+$psi.FileName = 'git'
+$psi.Arguments = "-C `"$rootFull`" ls-files -z"
+$psi.RedirectStandardOutput = $true
+$psi.RedirectStandardError = $true
+$psi.UseShellExecute = $false
+$psi.StandardOutputEncoding = [Text.Encoding]::UTF8
+$psi.StandardErrorEncoding = [Text.Encoding]::UTF8
+$process = [Diagnostics.Process]::Start($psi)
+$rawListing = $process.StandardOutput.ReadToEnd()
+$gitError = $process.StandardError.ReadToEnd()
+$process.WaitForExit()
+if ($process.ExitCode -ne 0) { throw "git ls-files failed in $rootFull : $gitError" }
+foreach ($entry in $rawListing.Split([char]0)) {
+    if ($entry) { $trackedPaths.Add($entry) }
+}
+if ($trackedPaths.Count -eq 0) {
+    throw "git ls-files returned nothing for $rootFull; refusing to record an empty inventory"
+}
+foreach ($relative in $trackedPaths) {
+    $relative = $relative.Replace('\','/')
+    $absolute = Join-Path $rootFull ($relative.Replace('/','\'))
+    if ($relative -eq 'registry/repository_content.tsv' -or
         $relative -like 'docs/audit/REPOSITORY_CONTENT_AUDIT_*.md') { continue }
+    if (-not (Test-Path -LiteralPath $absolute -PathType Leaf)) {
+        throw "Tracked path is missing from the working tree: $relative"
+    }
+    $item = Get-Item -LiteralPath $absolute -Force
     if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw "Repository source may not be a reparse point: $relative" }
-    $raw = [IO.File]::ReadAllBytes($item.FullName)
+    $raw = [IO.File]::ReadAllBytes($absolute)
     $canonicalText = Is-CanonicalText $relative
     $hashBytes = if ($canonicalText) { Canonical-LfBytes $raw } else { $raw }
     $extension = [IO.Path]::GetExtension($relative).ToLowerInvariant()
@@ -173,10 +208,20 @@ foreach ($item in Get-ChildItem -LiteralPath $rootFull -File -Recurse -Force) {
     })
 }
 
-$rows = @($rows | Sort-Object path)
+# Ordinal sort, deliberately. Sort-Object compares with the current culture, and
+# under culture rules 'affect.hpp' and 'affect_persistence.hpp' tie at the
+# primary weight, so their relative order falls back to enumeration order. The
+# file list comes from git and from the filesystem in different orders, so a
+# culture sort made the same content serialize two different ways and the
+# manifest compared unequal to itself.
+$byPath = @{}
+foreach ($row in $rows) { $byPath[$row.path] = $row }
+$orderedPaths = [string[]]@($byPath.Keys)
+[Array]::Sort($orderedPaths, [StringComparer]::Ordinal)
 $lines = [Collections.Generic.List[string]]::new()
 $lines.Add("path`tbytes`tlines`textension`tmedia_class`tcategory`trole`thash_mode`tsha256`taudited_at")
-foreach ($row in $rows) {
+foreach ($path in $orderedPaths) {
+    $row = $byPath[$path]
     $lines.Add(($row.path,$row.bytes,$row.lines,$row.extension,$row.media_class,$row.category,$row.role,$row.hash_mode,$row.sha256,$row.audited_at -join "`t"))
 }
 $outputPath = if ([IO.Path]::IsPathRooted($Output)) { $Output } else { Join-Path $rootFull $Output }
