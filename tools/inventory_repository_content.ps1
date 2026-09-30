@@ -9,11 +9,28 @@ $ErrorActionPreference = 'Stop'
 $rootFull = [IO.Path]::GetFullPath($Root).TrimEnd([IO.Path]::DirectorySeparatorChar)
 if (-not (Test-Path -LiteralPath $rootFull -PathType Container)) { throw "Repository root does not exist: $rootFull" }
 
-function Is-CanonicalText([string]$RelativePath) {
+function Test-ImagePath([string]$RelativePath) {
     $extension = [IO.Path]::GetExtension($RelativePath).ToLowerInvariant()
-    $name = [IO.Path]::GetFileName($RelativePath)
-    return $extension -in @('.cpp','.hpp','.md','.ps1','.json','.tsv','.yml','.yaml','.cmake','.svg') -or
-           $name -in @('CMakeLists.txt','CMakePresets.json','.gitignore','.gitattributes','LICENSE')
+    return $extension -in @('.png','.jpg','.jpeg','.gif','.webp','.ico','.bmp','.svg')
+}
+# Text is decided by CONTENT, not by an extension allow-list. The allow-list
+# was how a clean clone and a working tree came to disagree about the same
+# commit: core.autocrlf=true rewrites LF to CRLF on checkout, so any text file
+# outside the list was hashed raw and differed between the two trees - 136 of
+# them, including every .ts and .tsx source file. A file is text when it decodes
+# as UTF-8 and carries no NUL, and text is always hashed as canonical LF so the
+# recorded audit describes the committed content rather than one machine's
+# line-ending convention.
+function Test-TextBytes([byte[]]$Bytes) {
+    if (-not $Bytes -or $Bytes.Length -eq 0) { return $true }
+    foreach ($b in $Bytes) { if ($b -eq 0) { return $false } }
+    try {
+        $strict = [Text.UTF8Encoding]::new($false, $true)
+        $null = $strict.GetString($Bytes)
+        return $true
+    } catch {
+        return $false
+    }
 }
 function Canonical-LfBytes([byte[]]$Bytes) {
     $output = [Collections.Generic.List[byte]]::new($Bytes.Length)
@@ -188,11 +205,17 @@ foreach ($relative in $trackedPaths) {
     $item = Get-Item -LiteralPath $absolute -Force
     if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw "Repository source may not be a reparse point: $relative" }
     $raw = [IO.File]::ReadAllBytes($absolute)
-    $canonicalText = Is-CanonicalText $relative
-    $hashBytes = if ($canonicalText) { Canonical-LfBytes $raw } else { $raw }
+    # media_class and hash_mode are separate questions. An SVG is an image for
+    # classification purposes but it is still UTF-8 text, so it is hashed as
+    # canonical LF; a PNG is binary whatever it looks like. Deciding the hash
+    # mode from media_class is what let the two .svg assets disagree between a
+    # working tree and a clean clone.
+    $isImage = Test-ImagePath $relative
+    $isText = Test-TextBytes $raw
+    $hashBytes = if ($isText) { Canonical-LfBytes $raw } else { $raw }
     $extension = [IO.Path]::GetExtension($relative).ToLowerInvariant()
     if ([string]::IsNullOrEmpty($extension)) { $extension = '-' }
-    $mediaClass = if ($extension -in @('.png','.svg')) { 'image' } elseif ($canonicalText -or $extension -eq '.txt') { 'text' } else { 'binary' }
+    $mediaClass = if ($isImage) { 'image' } elseif ($isText) { 'text' } else { 'binary' }
     $top = if ($relative.Contains('/')) { $relative.Split('/')[0] } else { 'ROOT' }
     $rows.Add([pscustomobject]@{
         path = $relative
@@ -202,7 +225,7 @@ foreach ($relative in $trackedPaths) {
         media_class = $mediaClass
         category = $top
         role = Role $relative
-        hash_mode = if ($canonicalText) { 'CANONICAL_LF_SHA256' } else { 'RAW_SHA256' }
+        hash_mode = if ($isText) { 'CANONICAL_LF_SHA256' } else { 'RAW_SHA256' }
         sha256 = Sha256 $hashBytes
         audited_at = $AuditDate
     })
