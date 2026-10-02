@@ -6,3 +6,7 @@ benchmark-results/
 __pycache__/
 *.pyc
 *.pyo
+
+# Local verification build directory (fresh configure per machine)
+/build-verify/
+
