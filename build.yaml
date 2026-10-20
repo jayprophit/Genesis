@@ -1,0 +1,180 @@
+# =============================================================================
+# BUILD MANIFEST — Genesis
+# =============================================================================
+# Authoritative record of how this project is built, tested and verified, and
+# of what is still broken. Read by Aetherius-OS's build manifest registry
+# (docs/BUILD-MANIFEST-REGISTRY.yaml) and validated by
+# src/programme/buildManifest.ts.
+# =============================================================================
+schema_version: "1.0.0"
+
+project:
+  id: genesis
+  name: Genesis
+  kind: library
+  domain: genesis
+  description: >-
+    The Genesis digital-organism / nanobrain runtime. C++20 static library
+    plus a family of test and benchmark executables, driven by CTest and
+    registered against the requirement, provenance and research registries.
+  repository: true
+  branch: main
+  languages: [cpp, cmake, powershell, python]
+
+toolchain:
+  build_system: cmake/ninja
+  package_manager: none
+  requirements:
+    - name: cmake
+      version: ">=3.24"
+      required: true
+      purpose: configure and build
+    - name: ninja
+      version: ">=1.10"
+      required: false
+      purpose: faster generator; the checked-in preset uses MinGW Makefiles
+    - name: cxx-compiler
+      version: "c++20"
+      required: true
+      purpose: MSVC or GCC/Clang with C++20 support
+    - name: pwsh
+      version: ">=7"
+      required: false
+      purpose: four content and asset gate tests; without it they are not registered
+    - name: python
+      version: ">=3.11"
+      required: false
+      purpose: registry generation tooling
+
+commands:
+  - name: configure
+    command: cmake --preset local-release
+    working_directory: .
+    timeout_minutes: 10
+  - name: build
+    command: cmake --build --preset local-release
+    working_directory: .
+    timeout_minutes: 30
+    requires: [configure]
+  - name: test
+    command: ctest --preset local-release
+    working_directory: .
+    timeout_minutes: 30
+    requires: [build]
+  - name: verify
+    command: cmake --preset local-release && cmake --build --preset local-release && ctest --preset local-release
+    working_directory: .
+    timeout_minutes: 60
+    requires: [configure, build, test]
+  - name: clean
+    command: cmake -E remove_directory build
+    working_directory: .
+    timeout_minutes: 5
+
+dependencies:
+  projects: []
+  external: []
+  # No third-party libraries are vendored or fetched. Genesis builds from the
+  # standard library alone, plus ncrypt on Windows for the key-custody module.
+
+status:
+  state: VERIFIED
+  last_verified: "2026-10-20"
+  summary: >-
+    The canonical build tree configures, compiles and passes. 119 build
+    steps and 22 registered CTest gates, of which all 22 pass. The stale
+    CMake cache that blocked every configure attempt has been discarded
+    and the tree reconfigured at its current location.
+  evidence:
+    - "cmake -S . -B build -G Ninja -> Configuring done (16.3s), Generating done"
+    - "cmake --build build -> 119/119 targets built and linked"
+    - "ctest --test-dir build --output-on-failure -> 22/22 tests passed, 184.98s"
+    - "tools/validate_repository_content.ps1 -> passed: 609 canonical files, 92754727 bytes, 553 text files, 54 images"
+    - "tools/test_repository_content_inventory.ps1 -> passed: 609 tracked files, untracked files ignored, deterministic ordering"
+    - "CMakePresets.json local-release -> generator MinGW Makefiles, binaryDir ${sourceDir}/build"
+
+known_issues:
+  - id: GEN-BLD-001
+    severity: critical
+    summary: >-
+      The build tree held a CMake cache bound to the repository's previous
+      location, so every configure attempt failed before compiling anything.
+    evidence: >-
+      CMake Error: The source
+      "C:/Users/jpowe/Desktop/Projects/Genesis/CMakeLists.txt" does not match
+      the source "C:/Users/jpowe/Desktop/Genesis/CMakeLists.txt" used to
+      generate cache.
+    status: FIXED
+    todo_ref: TODO-GEN-001
+    notes: >-
+      Resolved 2026-10-20. The stale CMakeCache.txt and CMakeFiles were
+      discarded and the tree reconfigured. The build directory now holds
+      the correct path. The repository content manifest was regenerated
+      afterwards, because that guard correctly detected the source change.
+  - id: GEN-BLD-002
+    severity: medium
+    summary: >-
+      The genesis_core source list named eight security translation units
+      twice, so the same files were compiled twice into the same target.
+    evidence: >-
+      CMakeLists.txt lines 52-58 and 59-65 repeated
+      src/security/crypto_provider.cpp, crypto_persistence.cpp, key_custody.cpp,
+      key_custody_persistence.cpp, platform_crypto_inventory.cpp,
+      platform_crypto_inventory_native.cpp, provider_open_observation.cpp and
+      provider_open_observation_native.cpp.
+    status: FIXED
+    todo_ref: TODO-GEN-002
+    notes: >-
+      Resolved 2026-10-20. The duplicate block was removed and the build
+      links cleanly.
+  - id: GEN-LIC-001
+    severity: critical
+    summary: >-
+      Forty-seven files of unlicensed Google AI Studio applet source were
+      tracked in this repository, which is exactly what the Aetherius-OS
+      provenance guard exists to prevent.
+    evidence: >-
+      Commit 19dc2c8 "Fix: commit pending changes from workspace cleanup"
+      added all 47 files under references/omniagent-runtime-&-workspace. The
+      directory carries no LICENSE, LICENCE, NOTICE or COPYING file.
+    status: FIXED
+    todo_ref: TODO-GEN-006
+    notes: >-
+      Resolved 2026-10-20 in commit 58de72f. The files were untracked with
+      git rm --cached and remain on disk so the guard can still inspect
+      them. references/ is deliberately still not gitignored, so the guard
+      is not the only thing standing between the tree and a future
+      careless add.
+  - id: GEN-BLD-003
+    severity: medium
+    summary: >-
+      The V0 directive gap analysis records a large set of unimplemented
+      stages, and the organism is still missing its plan and action stages.
+    evidence: >-
+      GENESIS_V0_GAP_ANALYSIS.md: section 12 core cognitive loop MISSING;
+      P4-MENTAL leaves exactly 2 missing stages (plan, action).
+    status: OPEN
+    todo_ref: TODO-GEN-003
+  - id: GEN-BLD-004
+    severity: low
+    summary: >-
+      Local commits to main are blocked by an environment deny-rule, so the
+      verified work exists only on this machine.
+    evidence: >-
+      native/BUILD-TODO.md records PUSH BLOCKED for the P4 stage commits
+      (d930d22, bac7aa1, ea0bb8d, d26875a, 58376e2, 0e5c475).
+    status: ACCEPTED
+    todo_ref: TODO-GEN-004
+
+notes:
+  - >-
+    The checked-in preset (local-release, MinGW Makefiles, binaryDir
+    ${sourceDir}/build) is the canonical build tree. Do not create
+    stage-named build folders; the preset exists to stop that.
+  - >-
+    MSVC and GCC/Clang are both supported. The sanitiser option
+    (GENESIS_ENABLE_SANITIZERS) applies to GCC/Clang only.
+  - >-
+    Four of the CTest gates are PowerShell scripts. On a host without pwsh
+    they are not merely failing, they are not registered at all, and a clean
+    run would not reveal that.
