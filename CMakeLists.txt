@@ -9,6 +9,7 @@ include(GNUInstallDirs)
 add_library(genesis_core STATIC
     src/agents/platform.cpp
     src/agents/action_proposal.cpp
+    src/agents/authority.cpp
     src/agents/persistence.cpp
     src/common/immutable_snapshot.cpp
     src/common/text.cpp
@@ -121,6 +122,12 @@ add_executable(genesis_agent_platform_tests tests/agent_platform_tests.cpp)
 target_link_libraries(genesis_agent_platform_tests PRIVATE genesis_core)
 target_compile_options(genesis_agent_platform_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
 add_test(NAME genesis_agent_platform_tests COMMAND genesis_agent_platform_tests)
+# The authority engine: what an agent is actually allowed to do, and the
+# rule that a delegated grant can only narrow.
+add_executable(genesis_authority_tests tests/authority_tests.cpp)
+target_link_libraries(genesis_authority_tests PRIVATE genesis_core)
+target_compile_options(genesis_authority_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_authority_tests COMMAND genesis_authority_tests)
 # Genesis proposes; P25 authorizes; Agent Bridge executes. This suite covers the
 # proposal half of that chain and proves it never authorizes or performs.
 add_executable(genesis_action_proposal_tests tests/action_proposal_tests.cpp)
