@@ -256,7 +256,30 @@ LoopReceipt LoopDriver::step(const LoopInput& input, std::string* error) {
         receipt.goal = Goal{"consolidate recent traces", receipt.drive.urgency};
     }
     Mark(receipt.stages, LoopStage::goal, true, "goal=" + receipt.goal.description);
-    MarkMissing(receipt.stages, LoopStage::plan_na, "no action planner");
+
+    // PLAN: the goal becomes a plan. The planner structures what the
+    // caller proposes, and refuses a proposal it cannot execute. A plan
+    // is a proposal: the safety gate below is still what decides whether
+    // anything may happen.
+    if (planner_ != nullptr) {
+        agents::Plan plan;
+        agents::PlanError plan_error{agents::PlanError::none};
+        if (planner_->plan(receipt.goal.description, plan, &plan_error)) {
+            plan_ = plan;
+            planned_ = true;
+            receipt.plan = plan;
+            receipt.planned = true;
+            receipt.planned_steps = plan.steps.size();
+            Mark(receipt.stages, LoopStage::plan_na, true,
+                 "plan=" + plan.plan_id + " steps=" + std::to_string(plan.steps.size()));
+        } else {
+            MarkMissing(receipt.stages, LoopStage::plan_na,
+                        std::string("planner refused: ") +
+                            std::string(agents::to_string(plan_error)));
+        }
+    } else {
+        MarkMissing(receipt.stages, LoopStage::plan_na, "no action planner");
+    }
 
     // RIGHTS / SAFETY / AUTHORITY CHECK: fail-closed gate before any mutation.
     if (!capabilities_->may_execute(input.capability_id, input.authorization)) {

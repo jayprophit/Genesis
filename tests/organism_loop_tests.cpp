@@ -10,9 +10,15 @@
 #include "genesis/learning/consolidation.hpp"
 #include "genesis/memory/graph.hpp"
 #include "genesis/organism/loop.hpp"
+
+#include "genesis/agents/planner.hpp"
 #include "genesis/organism/systems.hpp"
 #include "genesis/perception/pipeline.hpp"
 #include "genesis/runtime/runtime.hpp"
+
+// The counter is the harness's, so the summary line reports the
+// checks that were really made.
+int& g_checks = genesis::testing::g_checks;
 
 namespace {
 
@@ -20,6 +26,9 @@ using namespace genesis;
 
 int g_failures = 0;
 void Check(bool condition, const char* what) {
+    // The check is counted whether it passed or failed, so that the
+    // summary line reports the checks that were really made.
+    ++g_checks;
     if (!condition) {
         ++g_failures;
         std::cerr << "FAIL: " << what << "\n";
@@ -122,7 +131,8 @@ void TestAllowedPass() {
     Check(!first.interoception.digest().empty(), "interoception digest");
     Check(HasMark(first, organism::LoopStage::drive, true), "drive marked executed");
     Check(HasMark(first, organism::LoopStage::goal, true), "goal marked executed");
-    Check(HasMark(first, organism::LoopStage::plan_na, false), "plan marked");
+    Check(HasMark(first, organism::LoopStage::plan_na, false),
+          "plan marked missing when there is no planner");
     Check(HasMark(first, organism::LoopStage::action_na, false), "action marked");
     Check(!first.digest().empty(), "receipt digest");
 
@@ -231,6 +241,71 @@ void TestDeniedStopsBeforeMutation() {
     Check(deny_event, "denial audit event published");
 }
 
+/// The loop asks its planner for a plan and records what came back.
+void test_the_loop_plans_when_a_planner_is_given() {
+    Fixture fx;
+    // A planner that proposes two steps, the second depending on the
+    // first, so that the plan carries a dependency rather than a flat
+    // list.
+    agents::Planner planner(
+        [](const std::string& objective, const std::string&,
+           std::vector<agents::PlanStep>& out) {
+            // The objective reaches the decomposer, and it comes back on
+            // the plan, so the caller can see what was planned for.
+            if (objective.empty()) {
+                return false;
+            }
+            agents::PlanStep first;
+            first.step_id = "observe";
+            first.title = "observe";
+            first.tool_id = "tool";
+            first.action = "read";
+            agents::PlanStep second;
+            second.step_id = "record";
+            second.title = "record";
+            second.tool_id = "tool";
+            second.action = "write";
+            second.depends_on = {"observe"};
+            out = {first, second};
+            return true;
+        });
+    // The loop borrows the planner, as it borrows every other module.
+    organism::LoopDriver planned{"organism-test", &fx.dispatcher, &fx.perception,
+                                 &fx.workspace, &fx.memory,     &fx.world,
+                                 &fx.capabilities, &fx.scheduler, &fx.homeostasis,
+                                 &planner};
+
+    std::string error;
+    Check(planned.initialize(&error), "the planned driver initialises");
+    Check(AllowCapability(fx), "capability qualified");
+    Check(RegisterHypothesis(fx), "hypothesis registered");
+
+    const auto receipt = planned.step(AllowedInput(), &error);
+    if (!error.empty()) std::cerr << "step error: " << error << "\n";
+    Check(error.empty(), "the planned step has no error");
+    Check(HasMark(receipt, organism::LoopStage::plan_na, true),
+          "the plan stage is executed when a planner is given");
+    Check(receipt.planned, "the receipt records that a plan was made");
+    Check(receipt.planned_steps == 2, "the plan holds two steps");
+    Check(receipt.plan.steps.size() == 2, "the receipt carries the plan");
+    Check(receipt.plan.steps[1].depends_on.count("observe") == 1,
+          "the plan carries the dependency between the steps");
+    Check(!receipt.plan.objective.empty(), "the plan carries the objective");
+}
+
+/// The stage is still honestly missing when there is no planner.
+void test_the_loop_without_a_planner_says_so() {
+    Fixture fx;
+    std::string error;
+    Check(fx.driver.initialize(&error), "the driver without a planner initialises");
+    Check(AllowCapability(fx), "capability qualified");
+    Check(RegisterHypothesis(fx), "hypothesis registered");
+    const auto receipt = fx.driver.step(AllowedInput(), &error);
+    Check(HasMark(receipt, organism::LoopStage::plan_na, false),
+          "the plan stage is missing without a planner");
+    Check(!receipt.planned, "no plan is recorded without a planner");
+}
+
 } // namespace
 
 /**
@@ -240,17 +315,17 @@ void TestDeniedStopsBeforeMutation() {
  * press that never comes.
  */
 static int run_suite() {
-TestAllowedPass();
+    TestAllowedPass();
     TestDriveSelection();
     TestAllostasisArmsBeforeBreach();
     TestDeniedStopsBeforeMutation();
+    test_the_loop_plans_when_a_planner_is_given();
+    test_the_loop_without_a_planner_says_so();
     if (g_failures == 0) {
         std::cout << "organism_loop_tests: all assertions passed\n";
-        return 0;
     }
     std::cerr << "organism_loop_tests: " << g_failures << " failures\n";
-    return 1;
-
+    return g_failures == 0 ? 0 : 1;
 }
 
 int main() {
