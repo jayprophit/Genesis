@@ -10,3 +10,5 @@ __pycache__/
 # Local verification build directory (fresh configure per machine)
 /build-verify/
 
+# Absorbed projects. Each keeps its own repository and remote; the parent project must not track them.
+absorbed/VirtualAssistant/
