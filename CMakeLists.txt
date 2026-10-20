@@ -55,14 +55,6 @@ add_library(genesis_core STATIC
     src/security/platform_crypto_inventory_native.cpp
     src/security/provider_open_observation.cpp
     src/security/provider_open_observation_native.cpp
-    src/security/crypto_provider.cpp
-    src/security/crypto_persistence.cpp
-    src/security/key_custody.cpp
-    src/security/key_custody_persistence.cpp
-    src/security/platform_crypto_inventory.cpp
-    src/security/platform_crypto_inventory_native.cpp
-    src/security/provider_open_observation.cpp
-    src/security/provider_open_observation_native.cpp
 )
 target_include_directories(genesis_core PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

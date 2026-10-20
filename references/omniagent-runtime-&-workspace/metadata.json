@@ -1,6 +1,0 @@
-{
-  "name": "OmniAgent Runtime & Workspace",
-  "description": "Open-source agent runtime and managed cloud assistant workspace featuring multi-model adapters, parallel sub-agents, desktop bridge, skills loop, and security trust boundaries.",
-  "requestFramePermissions": ["camera", "microphone"],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
