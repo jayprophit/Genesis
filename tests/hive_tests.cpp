@@ -99,14 +99,23 @@ struct Fixture {
     Hive hive{authority};
 
     Fixture() {
-        hive.register_agent(make_agent("coordinator", HiveRole::coordinator));
-        hive.register_agent(make_agent("researcher", HiveRole::researcher));
-        hive.register_agent(make_agent("coder", HiveRole::coder));
+        // The fixture checks its own setup: a fixture that silently
+        // failed to register an agent would make every test below it
+        // prove something other than what it claims.
+        require(hive.register_agent(make_agent("coordinator", HiveRole::coordinator)),
+                "the coordinator should be registered");
+        require(hive.register_agent(make_agent("researcher", HiveRole::researcher)),
+                "the researcher should be registered");
+        require(hive.register_agent(make_agent("coder", HiveRole::coder)),
+                "the coder should be registered");
 
-        hive.grant(make_grant("coordinator", "documents",
-                               {"read", "write", "summarise"}, true, true, 9'000));
-        hive.grant(make_grant("researcher", "documents", {"read"}, false, false, 9'000));
-        hive.grant(make_grant("coder", "code", {"read", "write"}, false, true, 9'000));
+        require(hive.grant(make_grant("coordinator", "documents",
+                                     {"read", "write", "summarise"}, true, true, 9'000)),
+                "the coordinator's grant should be registered");
+        require(hive.grant(make_grant("researcher", "documents", {"read"}, false, false, 9'000)),
+                "the researcher's grant should be registered");
+        require(hive.grant(make_grant("coder", "code", {"read", "write"}, false, true, 9'000)),
+                "the coder's grant should be registered");
     }
 };
 
@@ -448,7 +457,6 @@ test_an_agent_is_registered();
     test_the_history_records_what_was_sent();
     test_the_hive_borrows_its_authority();
     test_a_refused_delegation_leaves_the_child_untouched();
-
     return 0;
 }
 

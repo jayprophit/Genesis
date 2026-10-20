@@ -465,8 +465,6 @@ test_emits_an_evidence_bearing_proposal();
     }
     std::cout << "genesis action proposal tests passed\n";
     return EXIT_SUCCESS;
-
-    return 0;
 }
 
 int main() {

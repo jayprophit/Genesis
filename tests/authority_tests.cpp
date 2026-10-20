@@ -412,7 +412,6 @@ test_an_ungranted_capability_is_refused();
     test_a_second_delegation_to_the_same_child_is_refused();
     test_a_delegation_chain_stays_narrow();
     test_a_malformed_request_is_refused();
-
     return 0;
 }
 

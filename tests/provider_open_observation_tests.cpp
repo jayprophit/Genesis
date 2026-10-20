@@ -330,8 +330,6 @@ try {
                   << '\n';
         return 1;
     }
-
-    return 0;
 }
 
 int main() {

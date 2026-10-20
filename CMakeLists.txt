@@ -13,6 +13,7 @@ add_library(genesis_core STATIC
     src/agents/hive.cpp
     src/agents/tasks.cpp
     src/agents/admission.cpp
+    src/agents/planner.cpp
     src/agents/persistence.cpp
     src/common/immutable_snapshot.cpp
     src/common/text.cpp
@@ -156,6 +157,14 @@ add_executable(genesis_admission_tests tests/admission_tests.cpp)
 target_link_libraries(genesis_admission_tests PRIVATE genesis_core)
 target_compile_options(genesis_admission_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
 add_test(NAME genesis_admission_tests COMMAND genesis_admission_tests)
+
+# The planner: how an objective becomes a plan. The steps carry their
+# dependencies, a plan that cannot run is refused, and a failed step is
+# re-planned rather than restarted.
+add_executable(genesis_planner_tests tests/planner_tests.cpp)
+target_link_libraries(genesis_planner_tests PRIVATE genesis_core)
+target_compile_options(genesis_planner_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_planner_tests COMMAND genesis_planner_tests)
 # Genesis proposes; P25 authorizes; Agent Bridge executes. This suite covers the
 # proposal half of that chain and proves it never authorizes or performs.
 add_executable(genesis_action_proposal_tests tests/action_proposal_tests.cpp)

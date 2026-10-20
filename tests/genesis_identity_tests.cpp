@@ -206,8 +206,6 @@ try {
     }
     std::cout << "genesis_identity_tests PASS\n";
     return EXIT_SUCCESS;
-
-    return 0;
 }
 
 int main() {

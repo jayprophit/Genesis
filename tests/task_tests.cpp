@@ -523,7 +523,6 @@ test_a_task_is_submitted_and_is_pending();
     test_the_store_refuses_an_unsafe_owner();
     test_the_store_refuses_an_unknown_version();
     test_a_crash_between_the_checkpoint_and_the_completion_loses_nothing();
-
     return 0;
 }
 

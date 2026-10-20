@@ -445,8 +445,6 @@ try {
         std::cerr << "FAIL: " << exception.what() << '\n';
         return EXIT_FAILURE;
     }
-
-    return 0;
 }
 
 int main() {

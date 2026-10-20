@@ -251,8 +251,6 @@ try {
         std::cerr << "FAIL: " << error.what() << '\n';
         return EXIT_FAILURE;
     }
-
-    return 0;
 }
 
 int main() {

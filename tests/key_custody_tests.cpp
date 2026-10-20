@@ -831,8 +831,6 @@ try {
         std::cerr << "key custody tests failed: " << exception.what() << '\n';
         return 1;
     }
-
-    return 0;
 }
 
 int main() {

@@ -251,7 +251,6 @@ TestAllowedPass();
     std::cerr << "organism_loop_tests: " << g_failures << " failures\n";
     return 1;
 
-    return 0;
 }
 
 int main() {
