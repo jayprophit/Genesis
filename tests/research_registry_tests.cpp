@@ -108,6 +108,8 @@ void test_class_schema(const char* path) {
 } // namespace
 
 static int run_suite(int argc, char** argv) {
+    (void)argc;
+    (void)argv;
 
     try {
         check(argc == 4, "research item, class and dead-end registry paths required");
@@ -125,9 +127,6 @@ static int run_suite(int argc, char** argv) {
         std::cerr << "FAIL: " << error.what() << '\n';
         return EXIT_FAILURE;
     }
-    (void)argc;
-    (void)argv;
-    return 0;
 }
 
 int main(int argc, char** argv) {

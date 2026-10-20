@@ -907,6 +907,8 @@ void test_reference_baseline(const std::filesystem::path& path) {
 } // namespace
 
 static int run_suite(int argc, char** argv) {
+    (void)argc;
+    (void)argv;
 
     try {
         require(argc == 2, "security tests require the reference baseline path");
@@ -923,9 +925,6 @@ static int run_suite(int argc, char** argv) {
         std::cerr << "security tests failed: " << exception.what() << '\n';
         return 1;
     }
-    (void)argc;
-    (void)argv;
-    return 0;
 }
 
 int main(int argc, char** argv) {

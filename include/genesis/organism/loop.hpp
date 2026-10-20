@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "genesis/agents/planner.hpp"
+
 #include "genesis/cognition/capability.hpp"
 #include "genesis/cognition/workspace.hpp"
 #include "genesis/cognition/world_model.hpp"
@@ -97,6 +99,12 @@ struct LoopReceipt final {
     CompensatoryAction preemptive_action{CompensatoryAction::none};
     Drive drive;
     Goal goal;
+    /// The plan the planner produced for the goal, when it produced one.
+    agents::Plan plan;
+    /// Whether a plan was produced at all.
+    bool planned{false};
+    /// How many steps the plan holds.
+    std::size_t planned_steps{0};
     MentalState mental_state;
     std::vector<LoopStageMark> stages;
     [[nodiscard]] std::string digest() const;
@@ -113,7 +121,8 @@ public:
                cognition::WorldDynamics* world,
                cognition::SelfCapabilityModel* capabilities,
                learning::ConsolidationScheduler* scheduler,
-               HomeostasisController* homeostasis);
+               HomeostasisController* homeostasis,
+               agents::Planner* planner = nullptr);
 
     LoopDriver(const LoopDriver&) = delete;
     LoopDriver& operator=(const LoopDriver&) = delete;
@@ -132,6 +141,13 @@ private:
     cognition::SelfCapabilityModel* capabilities_{nullptr};
     learning::ConsolidationScheduler* scheduler_{nullptr};
     HomeostasisController* homeostasis_{nullptr};
+    // Borrowed, like every other module here: the caller owns it. The
+    // planner is what turns the goal into steps, and the loop records
+    // what it produced.
+    agents::Planner* planner_{nullptr};
+    // The plan the last step produced, when there was one.
+    agents::Plan plan_{};
+    bool planned_{false};
     std::uint64_t step_{0};
     std::vector<double> fill_history_;
 };

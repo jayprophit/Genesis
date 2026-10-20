@@ -100,6 +100,8 @@ void validate_cycle_detection() {
 } // namespace
 
 static int run_suite(int argc, char** argv) {
+    (void)argc;
+    (void)argv;
 
     try {
         check(argc == 5, "requirement registry, source manifest, domain registry and canonical source paths required");
@@ -159,9 +161,6 @@ static int run_suite(int argc, char** argv) {
         std::cerr << "FAIL: " << error.what() << '\n';
         return EXIT_FAILURE;
     }
-    (void)argc;
-    (void)argv;
-    return 0;
 }
 
 int main(int argc, char** argv) {

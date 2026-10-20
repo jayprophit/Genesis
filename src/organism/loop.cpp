@@ -37,7 +37,8 @@ LoopDriver::LoopDriver(std::string organism_id,
                        cognition::WorldDynamics* world,
                        cognition::SelfCapabilityModel* capabilities,
                        learning::ConsolidationScheduler* scheduler,
-                       HomeostasisController* homeostasis)
+                       HomeostasisController* homeostasis,
+                       agents::Planner* planner)
     : organism_id_(std::move(organism_id)),
       dispatcher_(dispatcher),
       perception_(perception),
@@ -46,7 +47,8 @@ LoopDriver::LoopDriver(std::string organism_id,
       world_(world),
       capabilities_(capabilities),
       scheduler_(scheduler),
-      homeostasis_(homeostasis) {}
+      homeostasis_(homeostasis),
+      planner_(planner) {}
 
 bool LoopDriver::initialize(std::string* error) {
     auto fail = [&](const char* message) {
