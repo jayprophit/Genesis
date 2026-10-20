@@ -12,6 +12,7 @@ add_library(genesis_core STATIC
     src/agents/authority.cpp
     src/agents/hive.cpp
     src/agents/tasks.cpp
+    src/agents/admission.cpp
     src/agents/persistence.cpp
     src/common/immutable_snapshot.cpp
     src/common/text.cpp
@@ -147,6 +148,14 @@ add_executable(genesis_task_tests tests/task_tests.cpp)
 target_link_libraries(genesis_task_tests PRIVATE genesis_core)
 target_compile_options(genesis_task_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
 add_test(NAME genesis_task_tests COMMAND genesis_task_tests)
+
+# The free-first admission gate: what may be called, and what may be
+# spent. A local model costs nothing and is admitted; an endpoint of
+# unknown cost is refused; money is refused unless it is budgeted.
+add_executable(genesis_admission_tests tests/admission_tests.cpp)
+target_link_libraries(genesis_admission_tests PRIVATE genesis_core)
+target_compile_options(genesis_admission_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_admission_tests COMMAND genesis_admission_tests)
 # Genesis proposes; P25 authorizes; Agent Bridge executes. This suite covers the
 # proposal half of that chain and proves it never authorizes or performs.
 add_executable(genesis_action_proposal_tests tests/action_proposal_tests.cpp)
