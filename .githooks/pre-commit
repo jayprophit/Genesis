@@ -1,0 +1,16 @@
+#!/bin/sh
+# Genesis pre-commit hook.
+#
+# Refuses a commit that would track third-party source that is not ours to
+# ship. The Aetherius-OS provenance guard proves the same thing, but it is
+# a test and a test only runs when something runs it. A blanket
+# `git add -A` once re-staged forty-seven files of unlicensed source and
+# the commit went out before the test was consulted.
+#
+# Install with:  git config core.hooksPath .githooks
+#
+# The hook is a symlink target on Unix and a real file on Windows, so the
+# script is kept in tools/ and invoked from here.
+
+exec_dir=$(dirname "$0")
+sh "$exec_dir/../tools/check_third_party_tracking.sh"
