@@ -145,6 +145,19 @@ known_issues:
       them. references/ is deliberately still not gitignored, so the guard
       is not the only thing standing between the tree and a future
       careless add.
+  - id: GEN-LIC-002
+    severity: medium
+    summary: >-
+      The unlicensed OmniAgent source is untracked and the Aetherius-OS
+      guard proves it, but this repository's own provenance record does
+      not say so, and nothing records where the tree came from for anyone
+      who finds it again.
+    evidence: >-
+      Commit 58de72f untracked the tree and
+      docs/omniagent-reference.provenance.test.ts now passes 11 of 11. The
+      Genesis provenance record does not mention the change.
+    status: OPEN
+    todo_ref: TODO-ARC-002
   - id: GEN-BLD-003
     severity: medium
     summary: >-
