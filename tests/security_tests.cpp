@@ -1,4 +1,5 @@
 #include "genesis/genesis.hpp"
+#include "test_support.hpp"
 
 #include <algorithm>
 #include <atomic>
@@ -905,7 +906,8 @@ void test_reference_baseline(const std::filesystem::path& path) {
 
 } // namespace
 
-int main(int argc, char** argv) {
+static int run_suite(int argc, char** argv) {
+
     try {
         require(argc == 2, "security tests require the reference baseline path");
         test_enum_codecs_and_identity_derivation();
@@ -921,4 +923,11 @@ int main(int argc, char** argv) {
         std::cerr << "security tests failed: " << exception.what() << '\n';
         return 1;
     }
+    (void)argc;
+    (void)argv;
+    return 0;
+}
+
+int main(int argc, char** argv) {
+    return genesis::testing::run([&] { return run_suite(argc, argv); }, "security_tests");
 }

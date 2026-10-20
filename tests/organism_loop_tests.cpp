@@ -1,6 +1,7 @@
 // P4: organism loop driver integration tests. The driver wires existing
 // modules; missing stages must be marked NOT_IMPLEMENTED, never faked.
 #include <iostream>
+#include "test_support.hpp"
 #include <string>
 
 #include "genesis/cognition/capability.hpp"
@@ -232,8 +233,14 @@ void TestDeniedStopsBeforeMutation() {
 
 } // namespace
 
-int main() {
-    TestAllowedPass();
+/**
+ * The suite, wrapped so that a failing check prints what failed and
+ * returns a non-zero exit code. The Microsoft C++ runtime shows a modal
+ * dialog on an unhandled exception, and a modal dialog waits for a key
+ * press that never comes.
+ */
+static int run_suite() {
+TestAllowedPass();
     TestDriveSelection();
     TestAllostasisArmsBeforeBreach();
     TestDeniedStopsBeforeMutation();
@@ -243,4 +250,10 @@ int main() {
     }
     std::cerr << "organism_loop_tests: " << g_failures << " failures\n";
     return 1;
+
+    return 0;
+}
+
+int main() {
+    return genesis::testing::run(run_suite, "organism_loop_tests");
 }

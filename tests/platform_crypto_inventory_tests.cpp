@@ -1,4 +1,5 @@
 #include "genesis/security/platform_crypto_inventory.hpp"
+#include "test_support.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -179,8 +180,14 @@ void test_native_probe() {
 
 } // namespace
 
-int main() {
-    try {
+/**
+ * The suite, wrapped so that a failing check prints what failed and
+ * returns a non-zero exit code. The Microsoft C++ runtime shows a modal
+ * dialog on an unhandled exception, and a modal dialog waits for a key
+ * press that never comes.
+ */
+static int run_suite() {
+try {
         test_status_codec();
         test_canonical_observation_and_tamper_detection();
         test_invalid_state_rejection();
@@ -193,4 +200,10 @@ int main() {
                   << '\n';
         return 1;
     }
+
+    return 0;
+}
+
+int main() {
+    return genesis::testing::run(run_suite, "platform_crypto_inventory_tests");
 }

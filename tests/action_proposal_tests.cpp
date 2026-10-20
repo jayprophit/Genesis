@@ -11,6 +11,7 @@
 //   - the same intent always yields the same proposal id.
 
 #include "genesis/genesis.hpp"
+#include "test_support.hpp"
 
 #include <cstdlib>
 #include <iostream>
@@ -437,8 +438,14 @@ void test_disposition_vocabulary_is_stable() {
 
 } // namespace
 
-int main() {
-    test_emits_an_evidence_bearing_proposal();
+/**
+ * The suite, wrapped so that a failing check prints what failed and
+ * returns a non-zero exit code. The Microsoft C++ runtime shows a modal
+ * dialog on an unhandled exception, and a modal dialog waits for a key
+ * press that never comes.
+ */
+static int run_suite() {
+test_emits_an_evidence_bearing_proposal();
     test_proposal_is_stable_for_the_same_intent();
     test_refuses_without_a_canonical_genesis_identity();
     test_safety_gate_denial_stops_the_proposal_at_genesis();
@@ -458,4 +465,10 @@ int main() {
     }
     std::cout << "genesis action proposal tests passed\n";
     return EXIT_SUCCESS;
+
+    return 0;
+}
+
+int main() {
+    return genesis::testing::run(run_suite, "action_proposal_tests");
 }

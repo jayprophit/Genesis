@@ -1,4 +1,5 @@
 #include "genesis/organism/anatomy.hpp"
+#include "test_support.hpp"
 #include "genesis/organism/systems.hpp"
 
 #include <cstdlib>

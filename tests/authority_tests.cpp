@@ -1,4 +1,5 @@
 #include "genesis/agents/authority.hpp"
+#include "test_support.hpp"
 
 #include <iostream>
 #include <set>
@@ -13,7 +14,9 @@ using genesis::agents::AuthorityRegistry;
 using genesis::agents::CapabilityRequest;
 using genesis::agents::DelegationError;
 
-int g_checks = 0;
+// The counter is the harness's, so the summary line reports
+// the checks that were really made.
+int& g_checks = genesis::testing::g_checks;
 
 void require(bool condition, const char* message) {
     ++g_checks;
@@ -376,8 +379,14 @@ void test_a_malformed_request_is_refused() {
 
 } // namespace
 
-int main() {
-    test_an_ungranted_capability_is_refused();
+/**
+ * The suite, wrapped so that a failing check prints what failed and
+ * returns a non-zero exit code. The Microsoft C++ runtime shows a modal
+ * dialog on an unhandled exception, and a modal dialog waits for a key
+ * press that never comes.
+ */
+static int run_suite() {
+test_an_ungranted_capability_is_refused();
     test_an_empty_registry_refuses_everything();
     test_a_grant_covers_only_its_capability();
     test_a_grant_covers_only_its_actions();
@@ -404,6 +413,9 @@ int main() {
     test_a_delegation_chain_stays_narrow();
     test_a_malformed_request_is_refused();
 
-    std::cout << g_checks << " checks, 0 failures\n";
     return 0;
+}
+
+int main() {
+    return genesis::testing::run(run_suite, "authority_tests");
 }

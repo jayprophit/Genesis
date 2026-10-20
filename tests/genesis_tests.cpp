@@ -1,4 +1,5 @@
 #include "genesis/genesis.hpp"
+#include "test_support.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -98,7 +99,8 @@ void validate_cycle_detection() {
 
 } // namespace
 
-int main(int argc, char** argv) {
+static int run_suite(int argc, char** argv) {
+
     try {
         check(argc == 5, "requirement registry, source manifest, domain registry and canonical source paths required");
 
@@ -157,4 +159,11 @@ int main(int argc, char** argv) {
         std::cerr << "FAIL: " << error.what() << '\n';
         return EXIT_FAILURE;
     }
+    (void)argc;
+    (void)argv;
+    return 0;
+}
+
+int main(int argc, char** argv) {
+    return genesis::testing::run([&] { return run_suite(argc, argv); }, "genesis_tests");
 }

@@ -1,4 +1,5 @@
 #include "genesis/genesis.hpp"
+#include "test_support.hpp"
 
 #include <algorithm>
 #include <cstdlib>
@@ -106,7 +107,8 @@ void test_class_schema(const char* path) {
 
 } // namespace
 
-int main(int argc, char** argv) {
+static int run_suite(int argc, char** argv) {
+
     try {
         check(argc == 4, "research item, class and dead-end registry paths required");
         const auto rows = read_rows(argv[1]);
@@ -123,4 +125,11 @@ int main(int argc, char** argv) {
         std::cerr << "FAIL: " << error.what() << '\n';
         return EXIT_FAILURE;
     }
+    (void)argc;
+    (void)argv;
+    return 0;
+}
+
+int main(int argc, char** argv) {
+    return genesis::testing::run([&] { return run_suite(argc, argv); }, "research_registry_tests");
 }

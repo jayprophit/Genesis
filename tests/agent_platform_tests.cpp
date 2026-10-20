@@ -1,4 +1,5 @@
 #include "genesis/agents/platform.hpp"
+#include "test_support.hpp"
 #include "genesis/agents/persistence.hpp"
 #include "genesis/runtime/runtime.hpp"
 
@@ -210,8 +211,14 @@ void test_adapter_evidence_lifecycle() {
 }
 }
 
-int main() {
-    try {
+/**
+ * The suite, wrapped so that a failing check prints what failed and
+ * returns a non-zero exit code. The Microsoft C++ runtime shows a modal
+ * dialog on an unhandled exception, and a modal dialog waits for a key
+ * press that never comes.
+ */
+static int run_suite() {
+try {
         test_preflight_boundaries();
         test_adapter_evidence_lifecycle();
         genesis::agents::AgentFactory factory;
@@ -293,4 +300,10 @@ int main() {
         std::cerr << "FAIL: " << error.what() << '\n';
         return EXIT_FAILURE;
     }
+
+    return 0;
+}
+
+int main() {
+    return genesis::testing::run(run_suite, "agent_platform_tests");
 }

@@ -1,4 +1,5 @@
 #include "genesis/learning/consolidation.hpp"
+#include "test_support.hpp"
 #include "genesis/learning/persistence.hpp"
 #include <cstdlib>
 #include <filesystem>

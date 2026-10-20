@@ -1,4 +1,5 @@
 #include "genesis/agents/hive.hpp"
+#include "test_support.hpp"
 
 #include <iostream>
 #include <set>
@@ -17,7 +18,9 @@ using genesis::agents::HiveRole;
 using genesis::agents::MessageError;
 using genesis::agents::MessageKind;
 
-int g_checks = 0;
+// The counter is the harness's, so the summary line reports
+// the checks that were really made.
+int& g_checks = genesis::testing::g_checks;
 
 void require(bool condition, const char* message) {
     ++g_checks;
@@ -339,9 +342,12 @@ void test_an_expired_grant_refuses_the_message() {
 
 void test_messages_are_delivered_in_order() {
     Fixture f;
-    f.hive.send(make_message("m1", "researcher", "coder", "documents", "read", "first"), 2'000);
-    f.hive.send(make_message("m2", "researcher", "coder", "documents", "read", "second"), 2'100);
-    f.hive.send(make_message("m3", "researcher", "coder", "documents", "read", "third"), 2'200);
+    require_equal(f.hive.send(make_message("m1", "researcher", "coder", "documents", "read", "first"), 2'000), MessageError::none,
+                 "the message should be accepted");
+    require_equal(f.hive.send(make_message("m2", "researcher", "coder", "documents", "read", "second"), 2'100), MessageError::none,
+                 "the message should be accepted");
+    require_equal(f.hive.send(make_message("m3", "researcher", "coder", "documents", "read", "third"), 2'200), MessageError::none,
+                 "the message should be accepted");
     const auto inbox = f.hive.inbox("coder");
     require(inbox.size() == 3, "the coder should have three messages");
     require(inbox[0].body == "first", "the first message should be first");
@@ -351,7 +357,8 @@ void test_messages_are_delivered_in_order() {
 
 void test_a_message_is_taken_once() {
     Fixture f;
-    f.hive.send(make_message("m1", "researcher", "coder", "documents", "read", "once"), 2'000);
+    require_equal(f.hive.send(make_message("m1", "researcher", "coder", "documents", "read", "once"), 2'000), MessageError::none,
+                 "the message should be accepted");
     const auto taken = f.hive.take("coder");
     require(taken.has_value(), "the message should be there to take");
     require(taken->body == "once", "the taken message should be the one sent");
@@ -375,8 +382,10 @@ void test_a_broadcast_reaches_everyone_but_the_sender() {
 
 void test_the_history_records_what_was_sent() {
     Fixture f;
-    f.hive.send(make_message("m1", "researcher", "coder", "documents", "read", "one"), 2'000);
-    f.hive.send(make_message("m2", "researcher", "coder", "documents", "read", "two"), 2'100);
+    require_equal(f.hive.send(make_message("m1", "researcher", "coder", "documents", "read", "one"), 2'000), MessageError::none,
+                 "the message should be accepted");
+    require_equal(f.hive.send(make_message("m2", "researcher", "coder", "documents", "read", "two"), 2'100), MessageError::none,
+                 "the message should be accepted");
     require(f.hive.history().size() == 2, "the history should hold both messages");
     require(f.hive.history()[0].body == "one", "the history should be in order");
 }
@@ -404,8 +413,14 @@ void test_a_refused_delegation_leaves_the_child_untouched() {
 
 } // namespace
 
-int main() {
-    test_an_agent_is_registered();
+/**
+ * The suite, wrapped so that a failing check prints what failed and
+ * returns a non-zero exit code. The Microsoft C++ runtime shows a modal
+ * dialog on an unhandled exception, and a modal dialog waits for a key
+ * press that never comes.
+ */
+static int run_suite() {
+test_an_agent_is_registered();
     test_a_duplicate_agent_is_refused();
     test_an_agent_without_an_id_is_refused();
     test_a_delegation_may_narrow();
@@ -434,6 +449,9 @@ int main() {
     test_the_hive_borrows_its_authority();
     test_a_refused_delegation_leaves_the_child_untouched();
 
-    std::cout << "hive tests: " << g_checks << " checks passed\n";
     return 0;
+}
+
+int main() {
+    return genesis::testing::run(run_suite, "hive_tests");
 }

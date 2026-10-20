@@ -1,4 +1,5 @@
 #include "genesis/genesis.hpp"
+#include "test_support.hpp"
 
 #include <cstdlib>
 #include <filesystem>
@@ -426,8 +427,14 @@ void test_persistence_and_recovery() {
 
 } // namespace
 
-int main() {
-    try {
+/**
+ * The suite, wrapped so that a failing check prints what failed and
+ * returns a non-zero exit code. The Microsoft C++ runtime shows a modal
+ * dialog on an unhandled exception, and a modal dialog waits for a key
+ * press that never comes.
+ */
+static int run_suite() {
+try {
         test_enum_codecs();
         test_typed_addresses_and_bounds();
         test_versioned_relation_boundaries();
@@ -438,4 +445,10 @@ int main() {
         std::cerr << "FAIL: " << exception.what() << '\n';
         return EXIT_FAILURE;
     }
+
+    return 0;
+}
+
+int main() {
+    return genesis::testing::run(run_suite, "identity_tests");
 }

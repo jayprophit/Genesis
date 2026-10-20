@@ -11,6 +11,7 @@ add_library(genesis_core STATIC
     src/agents/action_proposal.cpp
     src/agents/authority.cpp
     src/agents/hive.cpp
+    src/agents/tasks.cpp
     src/agents/persistence.cpp
     src/common/immutable_snapshot.cpp
     src/common/text.cpp
@@ -137,6 +138,15 @@ add_executable(genesis_hive_tests tests/hive_tests.cpp)
 target_link_libraries(genesis_hive_tests PRIVATE genesis_core)
 target_compile_options(genesis_hive_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
 add_test(NAME genesis_hive_tests COMMAND genesis_hive_tests)
+
+# The durable task registry: work that survives a restart. An idempotency
+# key so the work is done once, a lease so only one worker holds it, a
+# checkpoint so the work continues where it stopped, and recovery so a
+# dead worker's task is picked up again.
+add_executable(genesis_task_tests tests/task_tests.cpp)
+target_link_libraries(genesis_task_tests PRIVATE genesis_core)
+target_compile_options(genesis_task_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic> $<$<CXX_COMPILER_ID:MSVC>:/W4;/permissive->)
+add_test(NAME genesis_task_tests COMMAND genesis_task_tests)
 # Genesis proposes; P25 authorizes; Agent Bridge executes. This suite covers the
 # proposal half of that chain and proves it never authorizes or performs.
 add_executable(genesis_action_proposal_tests tests/action_proposal_tests.cpp)

@@ -1,4 +1,5 @@
 #include "genesis/cognition/workspace.hpp"
+#include "test_support.hpp"
 #include "genesis/cognition/capability.hpp"
 #include "genesis/cognition/capability_persistence.hpp"
 #include "genesis/cognition/continuity.hpp"

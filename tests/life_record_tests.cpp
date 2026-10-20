@@ -1,4 +1,5 @@
 #include "genesis/genesis.hpp"
+#include "test_support.hpp"
 
 #include <atomic>
 #include <cstdlib>
@@ -564,8 +565,14 @@ void test_shared_immutable_snapshot_files() {
 
 } // namespace
 
-int main() {
-    try {
+/**
+ * The suite, wrapped so that a failing check prints what failed and
+ * returns a non-zero exit code. The Microsoft C++ runtime shows a modal
+ * dialog on an unhandled exception, and a modal dialog waits for a key
+ * press that never comes.
+ */
+static int run_suite() {
+try {
         test_enum_codecs();
         test_birth_and_immutable_identity();
         test_name_history_and_supersession();
@@ -578,4 +585,10 @@ int main() {
         std::cerr << "FAIL: " << exception.what() << '\n';
         return EXIT_FAILURE;
     }
+
+    return 0;
+}
+
+int main() {
+    return genesis::testing::run(run_suite, "life_record_tests");
 }

@@ -1,4 +1,5 @@
 #include "genesis/runtime/runtime.hpp"
+#include "test_support.hpp"
 
 #include <algorithm>
 #include <array>
@@ -167,8 +168,14 @@ void test_state_machine() {
 
 } // namespace
 
-int main() {
-    try {
+/**
+ * The suite, wrapped so that a failing check prints what failed and
+ * returns a non-zero exit code. The Microsoft C++ runtime shows a modal
+ * dialog on an unhandled exception, and a modal dialog waits for a key
+ * press that never comes.
+ */
+static int run_suite() {
+try {
         test_hash_and_clock();
         test_dispatcher();
         test_resources();
@@ -179,4 +186,10 @@ int main() {
         std::cerr << "FAIL: " << error.what() << '\n';
         return EXIT_FAILURE;
     }
+
+    return 0;
+}
+
+int main() {
+    return genesis::testing::run(run_suite, "runtime_tests");
 }
