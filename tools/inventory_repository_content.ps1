@@ -250,5 +250,18 @@ foreach ($path in $orderedPaths) {
 $outputPath = if ([IO.Path]::IsPathRooted($Output)) { $Output } else { Join-Path $rootFull $Output }
 $outputDirectory = Split-Path -Parent $outputPath
 if (-not (Test-Path -LiteralPath $outputDirectory)) { New-Item -ItemType Directory -Path $outputDirectory | Out-Null }
-[IO.File]::WriteAllLines($outputPath, $lines, [Text.UTF8Encoding]::new($false))
+# The manifest is written with LF on every platform.
+#
+# [IO.File]::WriteAllLines uses the platform's newline, so the file it
+# wrote on Windows had CRLF while the commit held LF, because git
+# normalises the line endings on the way in. The two trees therefore
+# disagreed, and the disagreement was invisible until the manifest was
+# compared on Linux, where the checkout and the writer agree with each
+# other and not with the commit.
+#
+# A generated file has one form. LF is that form, it is what the
+# repository holds, and writing it explicitly means the tool, the
+# commit and every checkout say the same thing.
+$text = ($lines -join "`n") + "`n"
+[IO.File]::WriteAllText($outputPath, $text, [Text.UTF8Encoding]::new($false))
 Write-Output "Repository content inventory wrote $($rows.Count) canonical source files to $outputPath"
