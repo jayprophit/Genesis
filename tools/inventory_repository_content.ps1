@@ -17,20 +17,27 @@ function Test-ImagePath([string]$RelativePath) {
 # was how a clean clone and a working tree came to disagree about the same
 # commit: core.autocrlf=true rewrites LF to CRLF on checkout, so any text file
 # outside the list was hashed raw and differed between the two trees - 136 of
-# them, including every .ts and .tsx source file. A file is text when it decodes
-# as UTF-8 and carries no NUL, and text is always hashed as canonical LF so the
-# recorded audit describes the committed content rather than one machine's
-# line-ending convention.
+# them, including every .ts and .tsx source file. A file is text when it
+# carries no NUL, and text is always hashed as canonical LF so the recorded
+# audit describes the committed content rather than one machine's line-ending
+# convention.
+#
+# The test is GIT's test, and that is the whole point. Git decides what to
+# normalise on the way in and out by looking for a NUL, not by asking whether
+# the bytes decode as UTF-8. A file that git treats as text is checked out
+# with CRLF on a Windows machine and with LF on a Linux one, so hashing it RAW
+# would make the manifest depend on the machine. Two audit reports in this
+# repository are CP1252 rather than UTF-8, and the older rule called them
+# binary and hashed them raw, which is why the manifest was green on Windows
+# and stale on Linux for the same commit.
+#
+# So: no NUL means text, and text is hashed as canonical LF. Whether the
+# bytes also decode as UTF-8 is a different question, and it belongs to the
+# content, not to the hash mode.
 function Test-TextBytes([byte[]]$Bytes) {
     if (-not $Bytes -or $Bytes.Length -eq 0) { return $true }
     foreach ($b in $Bytes) { if ($b -eq 0) { return $false } }
-    try {
-        $strict = [Text.UTF8Encoding]::new($false, $true)
-        $null = $strict.GetString($Bytes)
-        return $true
-    } catch {
-        return $false
-    }
+    return $true
 }
 function Canonical-LfBytes([byte[]]$Bytes) {
     $output = [Collections.Generic.List[byte]]::new($Bytes.Length)

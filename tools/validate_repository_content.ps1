@@ -11,7 +11,36 @@ try {
     $expected = [IO.File]::ReadAllBytes($manifestPath)
     $actual = [IO.File]::ReadAllBytes($temporary)
     if ($expected.Length -ne $actual.Length -or -not [Linq.Enumerable]::SequenceEqual[byte]($expected, $actual)) {
-        Fail 'manifest is stale; run tools/inventory_repository_content.ps1 after all source changes'
+        # "The manifest is stale" is not a diagnosis. It says that
+        # something differs and leaves the reader to find out what,
+        # which on a second operating system means a bisect through a
+        # six hundred row file. So the difference is named: the paths
+        # whose rows differ, and how many.
+        $expectedRows = @{}
+        foreach ($row in @([IO.File]::ReadAllLines($manifestPath))) {
+            $parts = $row -split "`t"
+            if ($parts.Count -ge 2 -and $parts[0]) { $expectedRows[$parts[0]] = $row }
+        }
+        $differing = [Collections.Generic.List[string]]::new()
+        $onlyInRegenerated = [Collections.Generic.List[string]]::new()
+        foreach ($row in @([IO.File]::ReadAllLines($temporary))) {
+            $parts = $row -split "`t"
+            if ($parts.Count -lt 2 -or -not $parts[0]) { continue }
+            if (-not $expectedRows.ContainsKey($parts[0])) {
+                $onlyInRegenerated.Add($parts[0])
+            } elseif ($expectedRows[$parts[0]] -ne $row) {
+                $differing.Add($parts[0])
+            }
+        }
+        $detail = "manifest is stale; $($differing.Count) row(s) differ and $($onlyInRegenerated.Count) path(s) are only in the regenerated manifest."
+        if ($differing.Count -gt 0) {
+            $detail += " The differing paths are: " + (($differing | Select-Object -First 12) -join ', ') + '.'
+        }
+        if ($onlyInRegenerated.Count -gt 0) {
+            $detail += " The paths only in the regenerated manifest are: " + (($onlyInRegenerated | Select-Object -First 12) -join ', ') + '.'
+        }
+        $detail += " Run tools/inventory_repository_content.ps1 after all source changes."
+        Fail $detail
     }
     $rows = @(Import-Csv -Delimiter "`t" -LiteralPath $manifestPath)
     if ($rows.Count -eq 0) { Fail 'manifest is empty' }
