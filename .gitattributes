@@ -4,3 +4,17 @@ docs/specifications/source/genesis2.txt binary
 docs/specifications/source/genesis3.txt binary
 docs/specifications/source/genesis4.txt binary
 docs/specifications/source/technology_mining_addendum.txt binary
+
+# The repository content manifest is a GENERATED file, and it is compared
+# byte for byte against what the inventory tool produces.
+#
+# It has to be LF everywhere, for two reasons that are the same reason.
+# The tool writes LF explicitly, so that a Windows run and a Linux run
+# produce the same bytes. And git has to check it out as LF, so that the
+# working tree and the commit agree: with core.autocrlf=true a Windows
+# checkout would otherwise hand back CRLF, and the file would show as
+# modified the moment it was regenerated.
+#
+# Without this the manifest gate passed on both operating systems and
+# still described two different files.
+registry/repository_content.tsv text eol=lf
