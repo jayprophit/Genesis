@@ -62,12 +62,24 @@ try {
 }
 
 if ($tracked.Count -gt 0) {
+    # -Force is not optional. On Unix a file whose name begins with a dot
+    # is a HIDDEN file, and Get-Item leaves hidden files out unless it is
+    # told not to: the scan reached .gitattributes, Test-Path said the
+    # file was there, and Get-Item then said it could not find it. On
+    # Windows a dotfile is an ordinary name, so the same script worked
+    # there and failed here.
+    #
+    # It is not only a crash. Without -Force the scan would have passed
+    # over every dotfile in the tree, and a dotfile is exactly where a
+    # .env or a .npmrc or a .git-credentials would live.
     $files = $tracked | ForEach-Object {
         $full = Join-Path $Root $_
-        if (Test-Path -LiteralPath $full -PathType Leaf) { Get-Item -LiteralPath $full }
+        if (Test-Path -LiteralPath $full -PathType Leaf) {
+            Get-Item -LiteralPath $full -Force
+        }
     }
 } else {
-    $files = Get-ChildItem -LiteralPath $Root -Recurse -File | Where-Object {
+    $files = Get-ChildItem -LiteralPath $Root -Recurse -File -Force | Where-Object {
         $full = $_.FullName
         -not ($excluded | Where-Object { $full -match $_ }) -and $_.Length -lt 5MB
     }
