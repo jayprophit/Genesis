@@ -1,4 +1,4 @@
-"""Tokenize a corpus into a flat memmap shard for real training runs.
+"""Tokenize a local corpus into a flat memmap shard.
 
 Example:
     python scripts/tokenize_corpus.py ^
@@ -7,51 +7,31 @@ Example:
         --vocab-size 8192
 
 Then:
-    python -m genesis_model.cli train --preset seed_30m ^
+    python -m genesis_model.cli train --preset local_6m ^
         --shard data/tokenized/shard_0000.bin ^
         --tokenizer data/tokenized/tokenizer.json ^
-        --out runs/seed_30m
+        --out runs/local_6m
 """
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 import time
 from pathlib import Path
-from typing import Iterator
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from genesis_model.corpus import (  # noqa: E402
+    corpus_manifest,
+    document_sample,
+    expand_paths,
+    iter_documents,
+    sha256_file,
+)
 from genesis_model.data import tokenize_to_shard  # noqa: E402
 from genesis_model.tokenizer import Tokenizer  # noqa: E402
-
-
-def iter_documents(paths: list[Path]) -> Iterator[str]:
-    for path in paths:
-        suffix = path.suffix.lower()
-        if suffix == ".jsonl":
-            with path.open("r", encoding="utf-8") as handle:
-                for line in handle:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    record = json.loads(line)
-                    text = record.get("text") or record.get("content")
-                    if isinstance(text, str):
-                        yield text
-        else:
-            yield path.read_text(encoding="utf-8", errors="replace")
-
-
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1 << 20), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def main() -> int:
@@ -59,34 +39,26 @@ def main() -> int:
     parser.add_argument("--corpus", action="append", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--vocab-size", type=int, default=8192)
-    parser.add_argument("--max-tokenizer-chars", type=int, default=2_000_000)
+    parser.add_argument("--max-tokenizer-chars", type=int, default=500_000)
     parser.add_argument("--shard-name", default="shard_0000.bin")
     parser.add_argument("--dtype", default="uint32", choices=["uint16", "uint32"])
+    parser.add_argument("--reuse-tokenizer", action="store_true")
     args = parser.parse_args()
 
-    corpus = [Path(p) for p in args.corpus]
-    missing = [str(p) for p in corpus if not p.exists()]
-    if missing:
-        raise SystemExit(f"missing corpus files: {missing}")
-
+    corpus = expand_paths(args.corpus)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     tokenizer_path = out / "tokenizer.json"
 
     started = time.time()
-    if tokenizer_path.exists():
+    if args.reuse_tokenizer and tokenizer_path.exists():
         tokenizer = Tokenizer.load(tokenizer_path)
         print(f"loaded tokenizer: vocab={tokenizer.vocab_size}", flush=True)
     else:
-        sample: list[str] = []
-        chars = 0
-        for document in iter_documents(corpus):
-            sample.append(document)
-            chars += len(document)
-            if chars >= args.max_tokenizer_chars:
-                break
+        sample = document_sample(corpus, max_chars=args.max_tokenizer_chars)
         if not sample:
             raise SystemExit("no documents found")
+        chars = sum(len(document) for document in sample)
         print(f"training tokenizer on {chars:,} characters...", flush=True)
         tokenizer = Tokenizer.train(sample, vocab_size=args.vocab_size, verbose=True)
         tokenizer.save(tokenizer_path)
@@ -109,10 +81,7 @@ def main() -> int:
         "shard_bytes": shard_path.stat().st_size,
         "tokenizer": str(tokenizer_path),
         "tokenizer_vocab": tokenizer.vocab_size,
-        "sources": [
-            {"path": str(p), "sha256": sha256_file(p), "bytes": p.stat().st_size}
-            for p in corpus
-        ],
+        "sources": corpus_manifest(corpus),
     }
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     print(json.dumps(manifest, indent=2))

@@ -78,11 +78,50 @@ class ModelConfig:
         return cls.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
 
 
+def estimate_parameters(config: ModelConfig) -> int:
+    """Analytic decoder parameter count for the text backbone.
+
+    Tied embeddings are counted once. The small per-layer norms and the final
+    norm are included. This is a planning estimate; ``GenesisModel`` is the
+    authority for an instantiated checkpoint.
+    """
+    d = config.d_model
+    kv = config.n_kv_heads * config.head_dim
+    attention = d * d + 2 * d * kv + d * d
+    mlp = 3 * d * config.d_ff
+    norms = 2 * d
+    per_layer = attention + mlp + norms
+    return config.vocab_size * d + config.n_layers * per_layer + d
+
+
 # Named presets. "tiny" is for correctness tests on CPU, not for product quality.
+# The "local_*" presets are text-first and sized for a 4 GB consumer GPU or a
+# CPU-only run. Vision is available in "tiny" and the larger seed presets; a
+# local vision tower can be added later without changing the text weights.
 PRESETS: dict[str, ModelConfig] = {
     "tiny": ModelConfig(
         vocab_size=4096, d_model=128, n_layers=2, n_heads=4, n_kv_heads=1,
         d_ff=344, max_seq_len=256, vision=VisionConfig(width=64, layers=1, heads=4),
+    ),
+    "local_1m": ModelConfig(
+        vocab_size=4096, d_model=128, n_layers=4, n_heads=4, n_kv_heads=1,
+        d_ff=344, max_seq_len=256, vision=None,
+    ),
+    "local_3m": ModelConfig(
+        vocab_size=8192, d_model=192, n_layers=4, n_heads=6, n_kv_heads=2,
+        d_ff=512, max_seq_len=384, vision=None,
+    ),
+    "local_6m": ModelConfig(
+        vocab_size=8192, d_model=256, n_layers=6, n_heads=8, n_kv_heads=2,
+        d_ff=688, max_seq_len=512, vision=None,
+    ),
+    "local_15m": ModelConfig(
+        vocab_size=8192, d_model=384, n_layers=8, n_heads=8, n_kv_heads=2,
+        d_ff=1024, max_seq_len=512, vision=None,
+    ),
+    "local_30m": ModelConfig(
+        vocab_size=8192, d_model=512, n_layers=8, n_heads=8, n_kv_heads=2,
+        d_ff=1408, max_seq_len=512, vision=None,
     ),
     "seed_30m": ModelConfig(
         vocab_size=16384, d_model=512, n_layers=8, n_heads=8, n_kv_heads=2,

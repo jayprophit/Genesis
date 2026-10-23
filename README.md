@@ -11,7 +11,7 @@ This repository is the missing **model layer** of the Genesis estate. It is deli
 - `Aetherius-OS` (host/supervisor);
 - `IDE-Workspace` (UI).
 
-The full estate analysis, global model-landscape review and component-by-component specification are in [`docs/ECOSYSTEM_ANALYSIS_2026-10-23.md`](docs/ECOSYSTEM_ANALYSIS_2026-10-23.md). The regional deep-dive is in [`docs/GLOBAL_MODEL_LANDSCAPE.md`](docs/GLOBAL_MODEL_LANDSCAPE.md), and the hardware/cost plan is in [`docs/COMPUTE_PLAN.md`](docs/COMPUTE_PLAN.md).
+The full estate analysis, global model-landscape review and component-by-component specification are in [`docs/ECOSYSTEM_ANALYSIS_2026-10-23.md`](docs/ECOSYSTEM_ANALYSIS_2026-10-23.md). The regional deep-dive is in [`docs/GLOBAL_MODEL_LANDSCAPE.md`](docs/GLOBAL_MODEL_LANDSCAPE.md). The local-first training/use plan is in [`docs/LOCAL_FIRST.md`](docs/LOCAL_FIRST.md); the later hardware/cost plan is in [`docs/COMPUTE_PLAN.md`](docs/COMPUTE_PLAN.md).
 
 ---
 
@@ -27,10 +27,14 @@ The full estate analysis, global model-landscape review and component-by-compone
 | Native agent loop (plan → tool → observe → answer) | **Implemented** | `tests/test_agent.py` |
 | Data pipeline: packed text, memmap token shards, image captions, chat SFT | **Implemented** | `tests/test_data.py` |
 | Training loop: text + image caption + tool SFT, AMP, resume, manifests | **Implemented** | `tests/test_training.py` |
+| Local presets (`local_1m` … `local_30m`) sized for 4 GB VRAM | **Implemented** | `tests/test_local.py` |
+| True resume: model, tokenizer, optimizer, step/token counters, history | **Implemented** | `tests/test_local.py` |
+| One-command local pipeline (corpus → tokenizer → shard → train) | **Implemented** | `scripts/local_train.py` |
+| Interactive local chat with no API or network | **Implemented** | `python -m genesis_model.cli chat` |
 | Checkpoint format with safe `weights_only` loading | **Implemented** | `tests/test_training.py` |
 | Local HTTP runtime (`/health`, `/v1/chat/completions`, `/v1/agent`, `/v1/tools`) | **Implemented (minimal)** | `genesis_model/server.py` |
 | Evaluation: bits-per-byte, tool-format accuracy, throughput | **Implemented (baseline)** | `genesis_model/eval.py` |
-| Trained production checkpoint | **Not yet** | requires corpus + GPU run |
+| Trained production checkpoint | **Not yet** | needs a local corpus and a completed run |
 | Real-world vision / speech / native C++ kernels | **Not yet** | roadmap phases 2–4 |
 
 No claim in this repository should be read as a benchmark result unless it names a checkpoint, dataset, command and date.
@@ -44,26 +48,24 @@ cd C:\Users\jpowe\Desktop\Projects\Genesis-Model
 $env:PYTHONPATH = (Get-Location)
 python -m pytest tests -q
 
-# Correctness-scale training on CPU (a few seconds to a minute)
-python -m genesis_model.cli train --preset tiny --steps 40 --out runs/tiny
+# Check that the local GPU is visible
+python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
 
-# Generate (the tiny model is not expected to be coherent)
-python -m genesis_model.cli generate --checkpoint runs/tiny/genesis.pt --prompt "Hello"
+# One-command local run: put .txt/.md/.jsonl files in a folder first.
+# Start small; resume is supported if the time limit is reached.
+python scripts\local_train.py --corpus data\local\books --preset local_1m `
+  --tokens 20000000 --device cuda --out runs\local_1m
 
-# Native agent with built-in tools
-python -m genesis_model.cli agent --checkpoint runs/tiny/genesis.pt --task "What is 17 * 24?"
+# Chat with the checkpoint locally; no API key, no network.
+python -m genesis_model.cli chat --checkpoint runs\local_1m\genesis.pt --device cuda
 
 # Inspect / evaluate / serve
-python -m genesis_model.cli inspect --checkpoint runs/tiny/genesis.pt
-python -m genesis_model.cli eval --checkpoint runs/tiny/genesis.pt
-python -m genesis_model.cli serve --checkpoint runs/tiny/genesis.pt --port 8420
-
-# Real-run data path: tokenize once, then train from a memmap shard
-python scripts/tokenize_corpus.py --corpus data/corpus/genesis_seed.txt --out data/tokenized --vocab-size 8192
-python -m genesis_model.cli train --preset seed_30m --shard data/tokenized/shard_0000.bin --tokenizer data/tokenized/tokenizer.json --out runs/seed_30m
+python -m genesis_model.cli inspect --checkpoint runs\local_1m\genesis.pt
+python -m genesis_model.cli eval --checkpoint runs\local_1m\genesis.pt
+python -m genesis_model.cli serve --checkpoint runs\local_1m\genesis.pt --port 8420
 ```
 
-The tiny preset exists to verify gradients, caching, checkpointing and the agent control flow. It is **not** a useful assistant. `seed_30m` and `seed_120m` are the first real training targets.
+The `tiny` preset exists to verify gradients, caching, checkpointing and the agent control flow. It is **not** a useful assistant. The `local_*` presets are the first real targets; `seed_30m` and `seed_120m` are optional later runs on larger hardware. See [`docs/LOCAL_FIRST.md`](docs/LOCAL_FIRST.md) for measured-time guidance and memory rules.
 
 ---
 
@@ -89,8 +91,13 @@ image ── patch conv ── ViT ┘          │
 | Preset | Parameters (approx.) | Context | Purpose |
 |---|---|---|---|
 | `tiny` | 0.5M | 256 | CI and correctness |
-| `seed_30m` | 30M | 2k | first real training run |
-| `seed_120m` | 120M | 4k | first usable local model |
+| `local_1m` | 1.2M | 256 | first real run; 20M tokens in 8–12 min measured |
+| `local_3m` | 3.1M | 384 | 60M tokens in 30–40 min measured |
+| `local_6m` | 6.3M | 512 | main 4 GB quality target; 120M in 2.5–4 h |
+| `local_15m` | 15.5M | 512 | 300M tokens in 13–16 h measured |
+| `local_30m` | 26.7M | 512 | 300M tokens in 25–32 h measured |
+| `seed_30m` | 30M | 2k | optional larger-context run |
+| `seed_120m` | 120M | 4k | rented GPU / larger machine |
 | `genesis_1b` | 1B | 8k | scale target (rented compute) |
 
 ---
@@ -137,11 +144,11 @@ The C++ Genesis authority/tool executor remains the production authority. This r
 
 ## Roadmap
 
-1. **Now:** correctness tests, tiny training, native agent loop, local runtime.
-2. **Next:** 2B-token corpus manifest; train `seed_30m`; first model card with real numbers.
-3. **Then:** 20B tokens for `seed_120m`; tool-use SFT; 8k context.
-4. **Then:** real image-text/OCR data; C++/CUDA inference kernels; quantization.
-5. **Later:** MoE/MLA experiments, GRPO for tool use, 1B–3B scale, speech from scratch.
+1. **Now:** local-first pipeline; train `local_1m`–`local_6m` on a real local corpus; local chat; first honest model card.
+2. **Next:** real image-text data and a small vision tower; tool-use SFT; measured held-out evaluation.
+3. **Then:** `local_15m`/`local_30m` long runs; C++/CUDA inference kernels.
+4. **Optional later:** `seed_30m`/`seed_120m` on rented or larger hardware; 1B+ scale; MoE/MLA experiments.
+5. **Long term:** speech from scratch, GRPO for tool use, distributed training.
 
 ---
 

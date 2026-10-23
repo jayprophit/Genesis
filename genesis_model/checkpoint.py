@@ -96,6 +96,19 @@ def load_checkpoint(path: str | Path, map_location: str | torch.device = "cpu"):
     return model, tokenizer, meta
 
 
+def load_optimizer_state(
+    path: str | Path, map_location: str | torch.device = "cpu"
+) -> dict[str, Any] | None:
+    """Load only the optimiser state from a checkpoint.
+
+    ``weights_only=True`` is kept here as well: optimizer state is tensors and
+    primitive containers, so a checkpoint still cannot execute code.
+    """
+    payload = torch.load(path, map_location=map_location, weights_only=True)
+    state = payload.get("optimizer")
+    return state if isinstance(state, dict) else None
+
+
 def inspect_checkpoint(path: str | Path) -> dict[str, Any]:
     payload = torch.load(path, map_location="cpu", weights_only=True)
     config = ModelConfig.from_dict(payload["config"])

@@ -20,8 +20,21 @@ First scaffold of the independent Genesis model layer.
 - Safe checkpoint format (`weights_only=True`).
 - Local HTTP runtime with `/health`, `/v1/models`, `/v1/tools`, `/v1/chat/completions`, `/v1/agent`.
 - Evaluation: bits-per-byte, tool-format accuracy, decode throughput.
-- 24 tests and an end-to-end smoke test.
+- Local-first presets: `local_1m`, `local_3m`, `local_6m`, `local_15m`, `local_30m`.
+- One-command local pipeline: corpus discovery, tokenizer, shard, training, checkpoint.
+- True resume: model, tokenizer, optimizer, step/token counters and history.
+- Interactive local chat (`genesis-model chat`) with no API or network.
+- Time-limited runs that still write a resumable checkpoint.
+- Throughput logging (`tok_s`) and peak VRAM in the training manifest.
+- Pascal-aware AMP fallback: FP32 on the GTX 1050 Ti, BF16 on Ampere+.
+- Verified CUDA training on the GTX 1050 Ti (`torch 2.14.1+cu126`, sm_61): all
+  five local presets trained and checkpointed, with measured steady throughput
+  from 41k tok/s (`local_1m`) to 3.4k tok/s (`local_30m`).
+- Fixed top-p sampling on CUDA: zero and renormalise filtered probabilities
+  instead of passing `-inf` weights to `torch.multinomial`.
+- 29 tests and an end-to-end smoke test.
 - Estate analysis and C01–C28 component specification.
+- Local-first guide (`docs/LOCAL_FIRST.md`) with measured times and VRAM.
 
 ### Not included
 

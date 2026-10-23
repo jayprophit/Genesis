@@ -5,16 +5,16 @@ Status legend: **DONE** (implemented and tested here), **PARTIAL**, **SPEC** (sp
 | ID | Component | Status | Where | Next action |
 |---|---|---|---|---|
 | C01 | Corpus/provenance registry | PARTIAL | `docs/DATASET_REGISTRY.md`, `corpus_digest` | Add first real dataset records |
-| C02 | Byte-level BPE tokenizer | DONE | `genesis_model/tokenizer.py` | Train 32k vocab on the real corpus |
+| C02 | Byte-level BPE tokenizer | DONE | `genesis_model/tokenizer.py` | Train 8k on the local corpus; 32k for larger runs |
 | C03 | Data pipeline | DONE (packed + memmap) | `genesis_model/data.py`, `scripts/tokenize_corpus.py` | Dedup, language tags, streaming web ingest |
 | C04 | Decoder backbone | DONE | `genesis_model/model.py` | Scale preset + throughput tuning |
 | C05 | Vision tower | DONE (synthetic) | `genesis_model/model.py` | Real licensed image-text data |
 | C06 | Native tool protocol | DONE | `genesis_model/tools.py` | Constrained JSON decoding |
 | C07 | Native tool registry | DONE | `genesis_model/tools.py` | More tools; OS sandbox |
 | C08 | Agent loop | DONE | `genesis_model/agent.py` | Wire to C++ authority |
-| C09 | Training engine | DONE (single device) | `genesis_model/train.py` | Distributed launch, sharding |
+| C09 | Training engine | DONE (single device; local presets verified on GTX 1050 Ti; resume) | `genesis_model/train.py`, `scripts/local_train.py` | Distributed launch, sharding |
 | C10 | Checkpoint/registry | DONE | `genesis_model/checkpoint.py` | Replace `MODEL-NONE` after eval |
-| C11 | Inference runtime | PARTIAL | `genesis_model/model.py`, `server.py` | Preallocated cache, streaming, batching |
+| C11 | Inference runtime | PARTIAL | `genesis_model/model.py`, `server.py`, CLI `chat` | Preallocated cache, streaming, batching |
 | C12 | Real multimodal data | SPEC | — | Licence review + dataset build |
 | C13 | Long context | SPEC | — | RoPE scaling + needle tests |
 | C14 | Alignment/safety | SPEC | — | SFT/DPO/GRPO + red team |

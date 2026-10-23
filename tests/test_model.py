@@ -59,3 +59,15 @@ def test_generate_extends_sequence():
     out = model.generate_ids([1, 5, 6], max_new_tokens=5, temperature=0.0)
     assert isinstance(out, list)
     assert len(out) <= 5
+
+
+def test_generate_top_p_sampling_stays_in_vocab():
+    torch.manual_seed(0)
+    model = GenesisModel(tiny_config())
+    out = model.generate_ids(
+        [1, 5, 6], max_new_tokens=8, temperature=0.8, top_k=20, top_p=0.9,
+        forbidden_ids=[0],
+    )
+    assert isinstance(out, list)
+    assert len(out) <= 8
+    assert all(0 < token_id < 300 for token_id in out)

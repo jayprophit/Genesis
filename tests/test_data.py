@@ -9,8 +9,8 @@ from genesis_model.tokenizer import EOS, Tokenizer
 def test_packed_text_blocks_are_shifted():
     dataset = PackedTextDataset(list(range(20)), block_size=4)
     x, y = dataset[0]
-    assert x.tolist() == [0, 1, 2, 3]
-    assert y.tolist() == [1, 2, 3, EOS]
+    assert x.tolist() == [0, 1, 2]
+    assert y.tolist() == [1, 2, 3]
     assert len(dataset) == 5
 
 

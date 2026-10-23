@@ -53,6 +53,8 @@ Safety is not a refusal string. It is a gate that can name why it refused.
 
 @dataclass
 class TrainConfig:
+    # Total target optimizer steps. When resuming, training continues from
+    # checkpoint meta.steps up to this number rather than restarting at zero.
     steps: int = 200
     batch_size: int = 4
     seq_len: int = 128
@@ -64,6 +66,9 @@ class TrainConfig:
     clip_grad: float = 1.0
     log_every: int = 10
     save_every: int = 0
+    # Stop after this many seconds at the end of a step. 0 means no limit.
+    # A local run can use this to fit a session without losing the checkpoint.
+    max_seconds: float = 0.0
     seed: int = 42
     device: str = "auto"
     vision_weight: float = 0.5
@@ -87,6 +92,14 @@ def _resolve_device(requested: str) -> torch.device:
     if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
         return torch.device("mps")
     return torch.device("cpu")
+
+
+def _move_optimizer_state(optimizer: torch.optim.Optimizer, device: torch.device) -> None:
+    """Move loaded Adam state to the training device."""
+    for state in optimizer.state.values():
+        for key, value in list(state.items()):
+            if torch.is_tensor(value):
+                state[key] = value.to(device)
 
 
 def _lr_at(step: int, config: TrainConfig) -> float:
@@ -113,9 +126,16 @@ def train(
 ) -> dict:
     random.seed(config.seed)
     torch.manual_seed(config.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(config.seed)
     device = _resolve_device(config.device)
     out_dir = Path(config.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    start_step = 0
+    tokens_seen = 0
+    history: list[dict] = []
+    resume_meta = None
 
     # -- corpus -------------------------------------------------------------
     texts: list[str] = []
@@ -145,9 +165,22 @@ def train(
     if resume_from:
         from .checkpoint import load_checkpoint
 
-        model, tokenizer, _ = load_checkpoint(resume_from, map_location=device)
+        model, tokenizer, resume_meta = load_checkpoint(resume_from, map_location=device)
         model.to(device)
         model.train()
+        start_step = max(0, int(resume_meta.steps))
+        tokens_seen = max(0, int(resume_meta.tokens_seen))
+        history = list(resume_meta.training_history)
+        if config.shard_path and resume_meta.corpus_sha256 and digest != resume_meta.corpus_sha256:
+            raise ValueError(
+                "resume corpus digest does not match the checkpoint; use the same shard"
+            )
+        if config.tokenizer_path:
+            on_disk = Tokenizer.load(config.tokenizer_path)
+            if on_disk.to_dict() != tokenizer.to_dict():
+                raise ValueError(
+                    "resume tokenizer does not match the checkpoint tokenizer"
+                )
     elif config.tokenizer_path:
         tokenizer = Tokenizer.load(config.tokenizer_path)
         model_config = ModelConfig.from_dict(
@@ -222,19 +255,43 @@ def train(
         model.parameters(), lr=config.lr, betas=(0.9, 0.95),
         weight_decay=config.weight_decay, fused=False,
     )
-    amp_enabled = device.type == "cuda"
+    # Consumer Pascal cards (including the GTX 1050 Ti, compute 6.1) have very
+    # slow FP16 arithmetic and no tensor cores. Train in FP32 there. Volta and
+    # newer use FP16, and Ampere and newer use BF16.
+    cuda_major = (
+        torch.cuda.get_device_capability(device)[0] if device.type == "cuda" else 0
+    )
+    amp_enabled = device.type == "cuda" and cuda_major >= 7
+    if amp_enabled and torch.cuda.is_bf16_supported():
+        amp_dtype = torch.bfloat16
+    elif amp_enabled:
+        amp_dtype = torch.float16
+    else:
+        amp_dtype = torch.float32
     scaler = torch.amp.GradScaler("cuda", enabled=amp_enabled)
 
-    history: list[dict] = []
-    tokens_seen = 0
+    if resume_from and resume_meta is not None:
+        from .checkpoint import load_optimizer_state
+
+        optimizer_state = load_optimizer_state(resume_from, map_location="cpu")
+        if optimizer_state is not None:
+            optimizer.load_state_dict(optimizer_state)
+            _move_optimizer_state(optimizer, device)
+
     started = time.time()
     text_iter = _cycle(text_loader)
     vision_iter = _cycle(vision_loader) if vision_loader is not None else None
     sft_iter = _cycle(sft_loader) if sft_loader is not None else None
 
     model.train()
-    for step in range(config.steps):
+    completed_steps = start_step
+    timed_out = False
+    if device.type == "cuda":
+        torch.cuda.reset_peak_memory_stats()
+    for step in range(start_step, config.steps):
         lr = _lr_at(step, config)
+        step_started = time.time()
+        step_text_tokens = 0
         for group in optimizer.param_groups:
             group["lr"] = lr
 
@@ -245,7 +302,8 @@ def train(
         for _ in range(config.grad_accum):
             x, y = next(text_iter)
             x, y = x.to(device), y.to(device)
-            with torch.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=amp_enabled):
+            step_text_tokens += x.numel()
+            with torch.autocast(device_type=device.type, dtype=amp_dtype, enabled=amp_enabled):
                 _, text_loss = model(x, targets=y)
                 loss = text_loss
                 vision_loss = torch.zeros((), device=device)
@@ -281,6 +339,8 @@ def train(
         torch.nn.utils.clip_grad_norm_(model.parameters(), config.clip_grad)
         scaler.step(optimizer)
         scaler.update()
+        completed_steps = step + 1
+        step_seconds = max(1e-9, time.time() - step_started)
 
         if step == 0 or (step + 1) % config.log_every == 0 or step == config.steps - 1:
             record = {
@@ -291,17 +351,27 @@ def train(
                 "sft_ce": round(totals["sft"] / config.grad_accum, 4),
                 "total": round(totals["total"] / config.grad_accum, 4),
                 "tokens": tokens_seen,
+                "tok_s": round(step_text_tokens / step_seconds, 1),
             }
             history.append(record)
             print(json.dumps(record), flush=True)
 
         if config.save_every and (step + 1) % config.save_every == 0:
             _save(model, tokenizer, config, out_dir, history, tokens_seen, digest,
-                  name=f"step_{step + 1}.pt", optimizer=optimizer)
+                  steps=completed_steps, name=f"step_{step + 1}.pt", optimizer=optimizer)
+
+        if config.max_seconds and time.time() - started >= config.max_seconds:
+            timed_out = True
+            print(json.dumps({
+                "time_limit": config.max_seconds,
+                "completed_steps": completed_steps,
+                "tokens_seen": tokens_seen,
+            }), flush=True)
+            break
 
     checkpoint = _save(
         model, tokenizer, config, out_dir, history, tokens_seen, digest,
-        name=config.checkpoint_name, optimizer=optimizer,
+        steps=completed_steps, name=config.checkpoint_name, optimizer=optimizer,
     )
     manifest = {
         "checkpoint": str(checkpoint),
@@ -309,8 +379,18 @@ def train(
         "parameters_non_embedding": model.num_parameters(non_embedding=True),
         "vocab_size": tokenizer.vocab_size,
         "tokens_seen": tokens_seen,
-        "steps": config.steps,
+        "steps": completed_steps,
+        "steps_this_run": completed_steps - start_step,
+        "start_step": start_step,
+        "timed_out": timed_out,
         "device": str(device),
+        "device_name": (
+            torch.cuda.get_device_name(device) if device.type == "cuda" else "cpu"
+        ),
+        "peak_vram_mb": (
+            round(torch.cuda.max_memory_allocated() / 1024**2, 1)
+            if device.type == "cuda" else 0.0
+        ),
         "duration_s": round(time.time() - started, 2),
         "corpus_sha256": digest,
         "config": asdict(config),
@@ -322,9 +402,9 @@ def train(
     return manifest
 
 
-def _save(model, tokenizer, config, out_dir, history, tokens_seen, digest, *, name, optimizer):
+def _save(model, tokenizer, config, out_dir, history, tokens_seen, digest, *, steps, name, optimizer):
     meta = CheckpointMeta(
-        steps=config.steps,
+        steps=steps,
         tokens_seen=tokens_seen,
         corpus_sha256=digest,
         training_history=history,

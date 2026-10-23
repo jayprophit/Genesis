@@ -17,6 +17,7 @@ from torch import nn
 import torch.nn.functional as F
 
 from .config import ModelConfig, VisionConfig
+from .tokenizer import EOS
 
 
 class RMSNorm(nn.Module):
@@ -304,7 +305,7 @@ class GenesisModel(nn.Module):
         temperature: float = 0.8,
         top_k: int | None = 50,
         top_p: float = 0.95,
-        eos_id: int = 2,
+        eos_id: int = EOS,
         images: torch.Tensor | None = None,
         forbidden_ids: list[int] | None = None,
     ) -> list[int]:
@@ -337,9 +338,11 @@ class GenesisModel(nn.Module):
                     cumulative = torch.cumsum(sorted_probs, dim=-1)
                     keep = cumulative - sorted_probs < top_p
                     keep[..., 0] = True
-                    filtered = torch.full_like(probs, -float("inf"))
-                    filtered.scatter_(1, sorted_idx, torch.where(keep, sorted_probs, torch.full_like(sorted_probs, -float("inf"))))
-                    probs = filtered
+                    # multinomial needs non-negative finite weights. Keep the
+                    # surviving probabilities, zero the rest, then renormalize.
+                    filtered = torch.zeros_like(probs)
+                    filtered.scatter_(1, sorted_idx, torch.where(keep, sorted_probs, torch.zeros_like(sorted_probs)))
+                    probs = filtered / filtered.sum(dim=-1, keepdim=True).clamp_min(1e-12)
                 next_id = int(torch.multinomial(probs, 1).item())
 
             generated.append(next_id)

@@ -47,8 +47,10 @@ class PackedTextDataset(Dataset):
     def __getitem__(self, index: int) -> tuple[torch.Tensor, torch.Tensor]:
         start = index * self.block_size
         chunk = self.tokens[start: start + self.block_size]
-        x = torch.tensor(chunk, dtype=torch.long)
-        y = torch.tensor(chunk[1:] + [EOS], dtype=torch.long)
+        # The chunk includes the next-token target; the input is one shorter.
+        # The caller passes seq_len + 1 as block_size, so x and y are seq_len.
+        x = torch.tensor(chunk[:-1], dtype=torch.long)
+        y = torch.tensor(chunk[1:], dtype=torch.long)
         return x, y
 
 
