@@ -1,0 +1,23 @@
+{
+  "name": "tiny",
+  "description": "CPU correctness preset. Not a useful assistant.",
+  "vocab_size": 4096,
+  "d_model": 128,
+  "n_layers": 2,
+  "n_heads": 4,
+  "n_kv_heads": 1,
+  "d_ff": 344,
+  "max_seq_len": 256,
+  "rope_theta": 10000.0,
+  "dropout": 0.0,
+  "tie_embeddings": true,
+  "norm_eps": 1e-06,
+  "vision": {
+    "image_size": 64,
+    "patch_size": 8,
+    "width": 64,
+    "layers": 1,
+    "heads": 4,
+    "dropout": 0.0
+  }
+}

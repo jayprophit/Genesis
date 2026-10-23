@@ -1,0 +1,23 @@
+{
+  "name": "seed_120m",
+  "description": "First usable local model: one 24 GB GPU or 4x A100, ~20B tokens.",
+  "vocab_size": 32768,
+  "d_model": 768,
+  "n_layers": 12,
+  "n_heads": 12,
+  "n_kv_heads": 4,
+  "d_ff": 2048,
+  "max_seq_len": 4096,
+  "rope_theta": 10000.0,
+  "dropout": 0.0,
+  "tie_embeddings": true,
+  "norm_eps": 1e-06,
+  "vision": {
+    "image_size": 224,
+    "patch_size": 14,
+    "width": 384,
+    "layers": 6,
+    "heads": 6,
+    "dropout": 0.0
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-10-23",
+  "policy": "A model may be listed as released only when its checkpoint, corpus hash, evaluation report and model card exist and the component checklist definition of done is satisfied.",
+  "models": [
+    {
+      "id": "MODEL-NONE",
+      "name": "No released Genesis checkpoint",
+      "status": "UNAVAILABLE",
+      "reason": "The repository currently ships a correctness scaffold and tests, not a trained product model. Training runs create local checkpoints under runs/ which are intentionally git-ignored.",
+      "parameters": null,
+      "context": null,
+      "modalities": [],
+      "checkpoint": null,
+      "sha256": null,
+      "model_card": null
+    }
+  ]
+}

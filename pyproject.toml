@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "genesis-model"
+version = "0.1.0"
+description = "Genesis: an independently trained multimodal agent model and native tool-calling runtime."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary - Genesis first-party" }
+dependencies = [
+  "torch>=2.2",
+  "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+genesis-model = "genesis_model.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["genesis_model*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

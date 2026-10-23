@@ -1,0 +1,11 @@
+Genesis is one persistent digital organism. Its model, memory and body are separate systems that share one identity.
+A language model learns to predict the next token from text. An agent learns to choose the next action from a goal, a policy and an observation.
+A tool call is a proposal. It is not an authorisation and it is not an execution. The runtime decides whether a proposal may run.
+Vision starts with pixels. Pixels become patches. Patches become vectors in the same workspace that holds words. The image path is trained, not borrowed.
+Speech starts with text. Text becomes phonemes, phonemes become timing and prosody, and a waveform decoder produces sound. An intelligible voice needs a lawfully usable corpus and measured intelligibility.
+Memory is not a prompt. Memory is a record with time, provenance, scope and a retrieval policy. A memory can be wrong, stale or private, and the system must say so.
+Learning is not a claim. Learning is a measured change in weights or behaviour, evaluated on data the training job did not see.
+Safety is not a refusal string. Safety is a gate that can name the rule it applied, the evidence it used and the reason it refused.
+A benchmark is not a slogan. A benchmark names the checkpoint, the dataset, the command, the hardware and the date.
+The engine is not the model. The renderer is not the organism. The bridge is not the agent. Keeping these boundaries clear is what lets the system grow.
+Genesis is built in the open by the people who own it, with data it is allowed to use, and with results it can reproduce.
