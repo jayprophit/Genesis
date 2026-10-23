@@ -29,6 +29,8 @@ def build_parser() -> argparse.ArgumentParser:
     train_p.add_argument("--out", default="runs/tiny")
     train_p.add_argument("--corpus", action="append", default=[])
     train_p.add_argument("--sft", action="append", default=[])
+    train_p.add_argument("--shard", default=None, help="pre-tokenized memmap token shard")
+    train_p.add_argument("--tokenizer", default=None, help="tokenizer.json for the shard")
     train_p.add_argument("--device", default="auto")
     train_p.add_argument("--seed", type=int, default=42)
     train_p.add_argument("--resume", default=None)
@@ -83,6 +85,8 @@ def main(argv: list[str] | None = None) -> int:
             out_dir=args.out,
             device=args.device,
             seed=args.seed,
+            shard_path=args.shard,
+            tokenizer_path=args.tokenizer,
             model=PRESETS[args.preset],
         )
         manifest = train(

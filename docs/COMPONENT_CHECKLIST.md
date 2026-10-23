@@ -6,7 +6,7 @@ Status legend: **DONE** (implemented and tested here), **PARTIAL**, **SPEC** (sp
 |---|---|---|---|---|
 | C01 | Corpus/provenance registry | PARTIAL | `docs/DATASET_REGISTRY.md`, `corpus_digest` | Add first real dataset records |
 | C02 | Byte-level BPE tokenizer | DONE | `genesis_model/tokenizer.py` | Train 32k vocab on the real corpus |
-| C03 | Data pipeline | PARTIAL | `genesis_model/data.py` | Memory-mapped shards, dedup, language tags |
+| C03 | Data pipeline | DONE (packed + memmap) | `genesis_model/data.py`, `scripts/tokenize_corpus.py` | Dedup, language tags, streaming web ingest |
 | C04 | Decoder backbone | DONE | `genesis_model/model.py` | Scale preset + throughput tuning |
 | C05 | Vision tower | DONE (synthetic) | `genesis_model/model.py` | Real licensed image-text data |
 | C06 | Native tool protocol | DONE | `genesis_model/tools.py` | Constrained JSON decoding |

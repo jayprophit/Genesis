@@ -27,6 +27,7 @@ from .checkpoint import CheckpointMeta, corpus_digest, save_checkpoint
 from .config import ModelConfig, VisionConfig
 from .data import (
     ChatSFTDataset,
+    MemmapTokenDataset,
     MultimodalCaptionDataset,
     PackedTextDataset,
     SyntheticShapes,
@@ -69,6 +70,11 @@ class TrainConfig:
     sft_weight: float = 0.5
     out_dir: str = "runs/tiny"
     checkpoint_name: str = "genesis.pt"
+    # Optional pre-tokenized corpus and tokenizer for real runs. When shard_path
+    # is set, training reads a flat memmap shard instead of holding every token
+    # in Python memory.
+    shard_path: str | None = None
+    tokenizer_path: str | None = None
     model: ModelConfig = field(default_factory=lambda: ModelConfig())
     notes: str = ""
 
@@ -112,11 +118,25 @@ def train(
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # -- corpus -------------------------------------------------------------
-    texts: list[str] = [DEFAULT_CORPUS]
-    resolved_paths = [Path(p) for p in (corpus_paths or [])]
-    for path in resolved_paths:
-        texts.append(path.read_text(encoding="utf-8", errors="replace"))
-    digest = corpus_digest(resolved_paths) if resolved_paths else "builtin"
+    texts: list[str] = []
+    if config.shard_path:
+        shard = Path(config.shard_path)
+        if not shard.exists():
+            raise FileNotFoundError(f"token shard not found: {shard}")
+        if not resume_from and not config.tokenizer_path:
+            raise ValueError("shard_path requires tokenizer_path (or resume_from)")
+        resolved_paths = [shard]
+        digest = corpus_digest(resolved_paths)
+    else:
+        texts = [DEFAULT_CORPUS]
+        resolved_paths = [Path(p) for p in (corpus_paths or [])]
+        if not resolved_paths:
+            bundled = Path(__file__).resolve().parents[1] / "data" / "corpus" / "genesis_seed.txt"
+            if bundled.exists():
+                resolved_paths = [bundled]
+        for path in resolved_paths:
+            texts.append(path.read_text(encoding="utf-8", errors="replace"))
+        digest = corpus_digest(resolved_paths) if resolved_paths else "builtin"
 
     # Captions are part of the tokenizer corpus so image words are not byte-fragments.
     shape_words = ["a red circle", "a green square", "a blue triangle", "a yellow circle"]
@@ -127,6 +147,13 @@ def train(
 
         model, tokenizer, _ = load_checkpoint(resume_from, map_location=device)
         model.to(device)
+        model.train()
+    elif config.tokenizer_path:
+        tokenizer = Tokenizer.load(config.tokenizer_path)
+        model_config = ModelConfig.from_dict(
+            {**config.model.to_dict(), "vocab_size": tokenizer.vocab_size}
+        )
+        model = GenesisModel(model_config).to(device)
         model.train()
     else:
         tokenizer = _build_tokenizer(texts, config.model.vocab_size)
@@ -142,14 +169,19 @@ def train(
         vision_weight = config.vision_weight
 
     # -- datasets -----------------------------------------------------------
-    all_token_ids: list[int] = []
-    for text in texts:
-        all_token_ids.extend(tokenizer.encode(text))
-        all_token_ids.append(tokenizer.id_of("<|eos|>"))
-    text_dataset = PackedTextDataset(all_token_ids, config.seq_len + 1)
-    if len(text_dataset) == 0:
-        all_token_ids = all_token_ids * 4
+    if config.shard_path:
+        text_dataset = MemmapTokenDataset(config.shard_path, config.seq_len)
+        if len(text_dataset) == 0:
+            raise ValueError("token shard is shorter than one training block")
+    else:
+        all_token_ids: list[int] = []
+        for text in texts:
+            all_token_ids.extend(tokenizer.encode(text))
+            all_token_ids.append(tokenizer.id_of("<|eos|>"))
         text_dataset = PackedTextDataset(all_token_ids, config.seq_len + 1)
+        if len(text_dataset) == 0:
+            all_token_ids = all_token_ids * 4
+            text_dataset = PackedTextDataset(all_token_ids, config.seq_len + 1)
 
     vision_dataset = None
     if model.config.vision is not None:
@@ -164,7 +196,8 @@ def train(
         sft_records.extend(read_jsonl(path))
     if not sft_records:
         sft_records = demo_sft_records()
-    sft_dataset = ChatSFTDataset(sft_records, tokenizer, config.seq_len)
+    candidate = ChatSFTDataset(sft_records, tokenizer, config.seq_len)
+    sft_dataset = candidate if len(candidate) else None
 
     text_loader = DataLoader(
         text_dataset, batch_size=config.batch_size, shuffle=True, drop_last=True,
@@ -177,9 +210,12 @@ def train(
         )
         if vision_dataset is not None else None
     )
-    sft_loader = DataLoader(
-        sft_dataset, batch_size=min(config.batch_size, max(1, len(sft_dataset))),
-        shuffle=True, drop_last=False, collate_fn=collate_text,
+    sft_loader = (
+        DataLoader(
+            sft_dataset, batch_size=min(config.batch_size, max(1, len(sft_dataset))),
+            shuffle=True, drop_last=False, collate_fn=collate_text,
+        )
+        if sft_dataset is not None else None
     )
 
     optimizer = torch.optim.AdamW(
@@ -194,7 +230,7 @@ def train(
     started = time.time()
     text_iter = _cycle(text_loader)
     vision_iter = _cycle(vision_loader) if vision_loader is not None else None
-    sft_iter = _cycle(sft_loader)
+    sft_iter = _cycle(sft_loader) if sft_loader is not None else None
 
     model.train()
     for step in range(config.steps):
@@ -204,6 +240,7 @@ def train(
 
         optimizer.zero_grad(set_to_none=True)
         totals = {"text": 0.0, "vision": 0.0, "sft": 0.0, "total": 0.0}
+        bad_batch = False
 
         for _ in range(config.grad_accum):
             x, y = next(text_iter)
@@ -212,11 +249,11 @@ def train(
                 _, text_loss = model(x, targets=y)
                 loss = text_loss
                 vision_loss = torch.zeros((), device=device)
-                if vision_iter is not None and config.vision_weight > 0:
+                if vision_iter is not None and vision_weight > 0:
                     vx, vy, images = next(vision_iter)
                     vx, vy, images = vx.to(device), vy.to(device), images.to(device)
                     _, vision_loss = model(vx, images=images, targets=vy)
-                    loss = loss + config.vision_weight * vision_loss
+                    loss = loss + vision_weight * vision_loss
                 sft_loss = torch.zeros((), device=device)
                 if sft_dataset is not None and config.sft_weight > 0:
                     sx, sy = next(sft_iter)
@@ -225,12 +262,20 @@ def train(
                     loss = loss + config.sft_weight * sft_loss
                 loss = loss / config.grad_accum
 
+            if not torch.isfinite(loss):
+                bad_batch = True
+                break
             scaler.scale(loss).backward()
             totals["text"] += float(text_loss.detach())
             totals["vision"] += float(vision_loss.detach())
             totals["sft"] += float(sft_loss.detach())
             totals["total"] += float(loss.detach()) * config.grad_accum
             tokens_seen += x.numel()
+
+        if bad_batch:
+            optimizer.zero_grad(set_to_none=True)
+            print(json.dumps({"step": step + 1, "skipped": "non_finite_loss"}), flush=True)
+            continue
 
         scaler.unscale_(optimizer)
         torch.nn.utils.clip_grad_norm_(model.parameters(), config.clip_grad)

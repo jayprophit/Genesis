@@ -330,7 +330,7 @@ Each component has an owner boundary, an interface, an implementation, an accept
 
 - **Purpose:** convert all supported scripts and control events to IDs without UNK.
 - **Interface:** `train(texts, vocab_size)`, `encode`, `decode`, `apply_chat_template`, `save/load`.
-- **Implementation:** byte-level BPE; 256 bytes + 16 control tokens + merges; deterministic merge order; exact round-trip.
+- **Implementation:** byte-level BPE; 256 bytes + 16 control tokens + merges; word-frequency merge training; deterministic merge order; exact round-trip.
 - **Acceptance:** multilingual round-trip exact; control-token round-trip exact; save/load identical; vocabulary never reordered.
 - **Reuse:** none (must be ours).
 - **Phase:** 0 — **implemented and tested**.

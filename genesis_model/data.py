@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Iterator, Sequence
 
+import numpy as np
 import torch
 from torch.utils.data import Dataset
 
@@ -51,6 +52,65 @@ class PackedTextDataset(Dataset):
         return x, y
 
 
+def tokenize_to_shard(
+    texts: Iterable[str],
+    tokenizer: Tokenizer,
+    path: str | Path,
+    *,
+    dtype: str = "uint32",
+    eos_id: int | None = None,
+    flush_tokens: int = 1_000_000,
+) -> int:
+    """Tokenize a document stream into a flat binary shard.
+
+    This is the format used for real training runs: a contiguous array of token
+    IDs, read with ``numpy.memmap`` so a 2B-token corpus does not need 16 GB of
+    Python integers in RAM. Documents are separated by EOS.
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    end_id = tokenizer.id_of("<|eos|>") if eos_id is None else eos_id
+    buffer: list[int] = []
+    total = 0
+    with path.open("wb") as handle:
+        for text in texts:
+            buffer.extend(tokenizer.encode(text))
+            buffer.append(end_id)
+            if len(buffer) >= flush_tokens:
+                np.asarray(buffer, dtype=np.dtype(dtype)).tofile(handle)
+                total += len(buffer)
+                buffer.clear()
+        if buffer:
+            np.asarray(buffer, dtype=np.dtype(dtype)).tofile(handle)
+            total += len(buffer)
+    return total
+
+
+class MemmapTokenDataset(Dataset):
+    """Fixed-length blocks over a flat token shard."""
+
+    def __init__(self, path: str | Path, block_size: int, dtype: str = "uint32") -> None:
+        if block_size < 1:
+            raise ValueError("block_size must be positive")
+        self.path = Path(path)
+        self.block_size = block_size
+        self.dtype = np.dtype(dtype)
+        self._array = np.memmap(self.path, dtype=self.dtype, mode="r")
+        self._blocks = max(0, (len(self._array) - 1) // block_size)
+
+    def __len__(self) -> int:
+        return self._blocks
+
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, torch.Tensor]:
+        if index < 0 or index >= self._blocks:
+            raise IndexError(index)
+        start = index * self.block_size
+        chunk = np.asarray(self._array[start: start + self.block_size + 1], dtype=np.int64)
+        x = torch.from_numpy(chunk[:-1].copy())
+        y = torch.from_numpy(chunk[1:].copy())
+        return x, y
+
+
 class ChatSFTDataset(Dataset):
     """Supervised fine-tuning on chat/tool traces.
 
@@ -82,8 +142,14 @@ class ChatSFTDataset(Dataset):
                     labels[i] = -100
             if len(ids) < 2:
                 continue
-            ids = ids[:block_size]
-            labels = labels[:block_size]
+            if len(ids) > block_size:
+                # Keep the tail: SFT is response-focused, and the assistant
+                # span is at the end of each turn. Dropping the head is better
+                # than truncating away every supervised token.
+                ids = ids[-block_size:]
+                labels = labels[-block_size:]
+            if all(label == -100 for label in labels):
+                continue
             self.samples.append((torch.tensor(ids), torch.tensor(labels)))
 
     def __len__(self) -> int:

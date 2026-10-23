@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Genesis: an independently trained multimodal agent model and native tool-calling runtime."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Proprietary - Genesis first-party" }
+license = { text = "TBD by the project owner" }
 dependencies = [
   "torch>=2.2",
   "numpy>=1.24",

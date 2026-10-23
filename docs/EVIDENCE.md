@@ -20,17 +20,18 @@ $env:PYTHONPATH = "C:\Users\jpowe\Desktop\Projects\Genesis-Model"
 python -m pytest tests -q --disable-warnings
 ```
 
-**Result:** `20 passed` (exit code 0).
+**Result:** `24 passed` (exit code 0).
 
 Coverage:
 
 | Area | Test |
 |---|---|
 | Tokenizer | multilingual exact round-trip, control tokens, save/load, chat template |
+| Data | packed blocks, memmap shard round-trip, out-of-range guard |
 | Model | forward shapes, vision prefix, gradients reach patch embedding, KV-cache equivalence, generation |
 | Tools | calculator, injection rejection, path escape, approval gate, schema validation, parsing |
 | Agent | tool call → result → answer, max-step stop, error surfaced to model |
-| Training | 6-step text + vision + SFT run, checkpoint reload, evaluation |
+| Training | 6-step text + vision + SFT run, checkpoint reload, evaluation, training from a memmap shard |
 
 **What this proves**
 
@@ -55,11 +56,11 @@ recorded below when it completes.
 
 ```text
 SMOKE OK
-vocab=307 params=132160 loss=4.9061
+vocab=302 params=131840 loss=5.0458
 EXIT=0
 ```
 
-The smoke model is 132,160 parameters (vocabulary 307 for the tiny corpus). It
+The smoke model is 131,840 parameters (vocabulary 302 for the tiny corpus). It
 verifies the full path — tokenizer, vision-prefixed forward, generation, tool
 call parsing and the agent loop — not language quality.
 

@@ -6,13 +6,16 @@ Why byte-level:
     emoji) is representable without an unknown token;
   * tool-call and modality boundaries are explicit reserved tokens.
 
-The tokenizer is deliberately dependency-free. Training is O(corpus x merges),
-which is appropriate for the 100M-1B token curriculum; a production trainer can
-stream and shard without changing the on-disk format.
+The tokenizer is deliberately dependency-free. Training is word-frequency BPE
+over unique chunks, which is practical for a few hundred thousand characters
+and a 4k-8k vocabulary. For a multi-gigabyte corpus and a 32k+ vocabulary, train
+with a fast Rust BPE implementation and import the resulting merge list with
+``Tokenizer(merges=...)``; the on-disk format is unchanged.
 """
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -59,6 +62,15 @@ BASE_VOCAB = 256
 SPECIAL_BASE = 256
 BASE_OFFSET = SPECIAL_BASE + len(SPECIAL_TOKENS)  # first merged-token id
 
+# A GPT-2-style pre-tokenization pattern: contractions, words with an optional
+# leading space, numbers, runs of other characters (CJK, punctuation, emoji),
+# and whitespace runs. This keeps merges from crossing word boundaries during
+# training while still allowing byte-level fallback at encode time.
+_WORD_PATTERN = re.compile(
+    r"'(?:[sdmt]|ll|ve|re)| ?[A-Za-z]+| ?\d+| ?[^\sA-Za-z\d]+|\s+",
+    re.UNICODE,
+)
+
 
 @dataclass
 class Tokenizer:
@@ -95,23 +107,38 @@ class Tokenizer:
         vocab_size: int = 4096,
         *,
         max_documents: int | None = None,
+        max_words: int = 200_000,
         verbose: bool = False,
     ) -> "Tokenizer":
         if vocab_size <= BASE_OFFSET:
             raise ValueError(f"vocab_size must be > {BASE_OFFSET}")
-        docs: list[list[int]] = []
+
+        # Word-frequency BPE. Counting unique chunks instead of every byte
+        # position makes training practical on a real corpus while keeping the
+        # same byte-pair merge format that encode() uses.
+        words: Counter[tuple[int, ...]] = Counter()
+        documents = 0
         for i, text in enumerate(texts):
             if max_documents is not None and i >= max_documents:
                 break
-            docs.append(list(text.encode("utf-8")))
-        if not docs:
+            documents += 1
+            for match in _WORD_PATTERN.finditer(text):
+                chunk = match.group(0).encode("utf-8")
+                if chunk:
+                    words[tuple(chunk)] += 1
+        if not words or documents == 0:
             raise ValueError("no training text supplied")
+        if max_words and len(words) > max_words:
+            words = Counter(dict(words.most_common(max_words)))
 
         merges: list[tuple[int, int]] = []
         for step in range(vocab_size - BASE_OFFSET):
             counts: Counter[tuple[int, int]] = Counter()
-            for doc in docs:
-                counts.update(zip(doc, doc[1:]))
+            for word, frequency in words.items():
+                if len(word) < 2:
+                    continue
+                for pair in zip(word, word[1:]):
+                    counts[pair] += frequency
             if not counts:
                 break
             pair, frequency = counts.most_common(1)[0]
@@ -119,7 +146,10 @@ class Tokenizer:
                 break
             merges.append(pair)
             new_id = BASE_OFFSET + len(merges) - 1
-            docs = [_merge_doc(doc, pair, new_id) for doc in docs]
+            merged: Counter[tuple[int, ...]] = Counter()
+            for word, weight in words.items():
+                merged[tuple(_merge_doc(list(word), pair, new_id))] += weight
+            words = merged
             if verbose and (step + 1) % 100 == 0:
                 print(f"merge {step + 1}: {pair} freq={frequency} id={new_id}")
         return cls(merges=merges)

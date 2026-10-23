@@ -58,6 +58,8 @@ def perplexity(
         return {"tokens": len(ids), "loss": None, "perplexity": None, "bits_per_byte": None}
     device = next(model.parameters()).device
     losses = []
+    total_nats = 0.0
+    total_tokens = 0
     bytes_count = 0
     for start in range(0, min(len(ids) - 1, block_size * max_blocks), block_size):
         chunk = ids[start: start + block_size + 1]
@@ -66,15 +68,26 @@ def perplexity(
         x = torch.tensor([chunk[:-1]], dtype=torch.long, device=device)
         y = torch.tensor([chunk[1:]], dtype=torch.long, device=device)
         _, loss = model(x, targets=y)
-        losses.append(float(loss))
+        value = float(loss)
+        losses.append(value)
+        total_nats += value * y.numel()
+        total_tokens += y.numel()
         bytes_count += len(tokenizer.decode(chunk))
-    mean_loss = sum(losses) / len(losses) if losses else None
+    mean_loss = total_nats / total_tokens if total_tokens else None
     return {
         "tokens": len(ids),
         "blocks": len(losses),
+        "scored_tokens": total_tokens,
+        "bytes": bytes_count,
         "loss": round(mean_loss, 6) if mean_loss is not None else None,
         "perplexity": round(math.exp(mean_loss), 4) if mean_loss is not None else None,
-        "bits_per_byte": round(mean_loss / math.log(2), 6) if mean_loss is not None else None,
+        # Cross-entropy is nats per token. Bits per byte needs the byte count of
+        # the same text, otherwise the number is not comparable across tokenizers.
+        "bits_per_byte": (
+            round(total_nats / math.log(2) / bytes_count, 6)
+            if mean_loss is not None and bytes_count
+            else None
+        ),
     }
 
 

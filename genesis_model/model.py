@@ -29,7 +29,7 @@ class RMSNorm(nn.Module):
         dtype = x.dtype
         x = x.float()
         x = x * torch.rsqrt(x.pow(2).mean(-1, keepdim=True) + self.eps)
-        return (x.to(dtype)) * self.weight
+        return x.to(dtype) * self.weight.to(dtype)
 
 
 def build_rope(
@@ -254,6 +254,11 @@ class GenesisModel(nn.Module):
     ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
         if tokens.ndim != 2 or tokens.dtype not in (torch.long, torch.int64):
             raise ValueError("tokens must be an int64 [B, T] tensor")
+        if cache is not None and cache.length > 0 and tokens.shape[1] > 1:
+            # A multi-token append after a prefill would need an explicit
+            # offset causal mask. Incremental decoding appends one token at a
+            # time, so refuse the ambiguous case rather than return wrong logits.
+            raise ValueError("incremental forward expects one token at a time")
 
         x = self.token_embedding(tokens)
         prefix_len = 0
@@ -280,9 +285,14 @@ class GenesisModel(nn.Module):
             return logits
 
         # Shift is handled by the caller: targets align with tokens.
-        loss = F.cross_entropy(
-            logits.reshape(-1, logits.shape[-1]), targets.reshape(-1), ignore_index=-100
-        )
+        if not torch.any(targets != -100):
+            # A fully masked sample carries no learning signal. Returning a
+            # differentiable zero is safer than cross-entropy's NaN.
+            loss = logits.sum() * 0.0
+        else:
+            loss = F.cross_entropy(
+                logits.reshape(-1, logits.shape[-1]), targets.reshape(-1), ignore_index=-100
+            )
         return logits, loss
 
     @torch.inference_mode()

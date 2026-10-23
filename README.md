@@ -11,7 +11,7 @@ This repository is the missing **model layer** of the Genesis estate. It is deli
 - `Aetherius-OS` (host/supervisor);
 - `IDE-Workspace` (UI).
 
-The full estate analysis, global model-landscape review and component-by-component specification are in [`docs/ECOSYSTEM_ANALYSIS_2026-10-23.md`](docs/ECOSYSTEM_ANALYSIS_2026-10-23.md).
+The full estate analysis, global model-landscape review and component-by-component specification are in [`docs/ECOSYSTEM_ANALYSIS_2026-10-23.md`](docs/ECOSYSTEM_ANALYSIS_2026-10-23.md). The regional deep-dive is in [`docs/GLOBAL_MODEL_LANDSCAPE.md`](docs/GLOBAL_MODEL_LANDSCAPE.md), and the hardware/cost plan is in [`docs/COMPUTE_PLAN.md`](docs/COMPUTE_PLAN.md).
 
 ---
 
@@ -19,12 +19,13 @@ The full estate analysis, global model-landscape review and component-by-compone
 
 | Component | Status | Evidence |
 |---|---|---|
-| Byte-level BPE tokenizer, 16 control tokens, multilingual round-trip | **Implemented** | `tests/test_tokenizer.py` |
+| Byte-level word-frequency BPE tokenizer, 16 control tokens, multilingual round-trip | **Implemented** | `tests/test_tokenizer.py` |
 | Decoder: RMSNorm, RoPE, GQA, SwiGLU, tied embeddings | **Implemented** | `tests/test_model.py` |
 | KV cache with full-forward equivalence | **Implemented** | `tests/test_model.py` |
 | From-scratch vision tower fused into the text sequence | **Implemented** | gradient + shape tests |
 | Native tool protocol (`<|tool_call|>`), schema validation, approvals | **Implemented** | `tests/test_tools.py` |
 | Native agent loop (plan → tool → observe → answer) | **Implemented** | `tests/test_agent.py` |
+| Data pipeline: packed text, memmap token shards, image captions, chat SFT | **Implemented** | `tests/test_data.py` |
 | Training loop: text + image caption + tool SFT, AMP, resume, manifests | **Implemented** | `tests/test_training.py` |
 | Checkpoint format with safe `weights_only` loading | **Implemented** | `tests/test_training.py` |
 | Local HTTP runtime (`/health`, `/v1/chat/completions`, `/v1/agent`, `/v1/tools`) | **Implemented (minimal)** | `genesis_model/server.py` |
@@ -142,4 +143,6 @@ The C++ Genesis authority/tool executor remains the production authority. This r
 
 ## Licence
 
-Proprietary — Genesis first-party. Third-party datasets and libraries retain their own licences; see the dataset registry before release.
+To be decided by the project owner. Until a licence is published, the default is
+all rights reserved. Third-party datasets and libraries retain their own
+licences; see the dataset registry before release.

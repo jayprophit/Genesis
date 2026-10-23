@@ -18,4 +18,4 @@ torch.set_num_threads(1)
 # diagnosable instead of silent.
 import faulthandler  # noqa: E402
 
-faulthandler.dump_traceback_later(30, repeat=True)
+faulthandler.dump_traceback_later(120, repeat=True)
