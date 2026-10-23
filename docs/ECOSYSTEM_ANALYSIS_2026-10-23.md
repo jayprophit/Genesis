@@ -19,7 +19,7 @@ MODEL-NONE   No bundled model   -   -   -   -   no inference route   0   UNAVAIL
 
 Everything labelled "AI" today falls into one of four categories:
 
-1. **C++ organism and agent control** — identity, life record, memory, cognition, development, authority, tool execution, persistence, runtime, security. Real code, real tests, ~29 translation units and 17 benchmark programs.
+1. **C++ organism and agent control** — identity, life record, memory, cognition, development, authority, tool execution, persistence, runtime, security. Real code, real tests, 53 translation units and 15 benchmark programs.
 2. **Agent-Bridge** — a large provider/tool/session/policy platform (600+ files, 2,221 passing tests reported). It routes to *other people's models* and *other people's tools*.
 3. **A Python seed** (`genesis_native_seed`, ~145k parameters) — a genuine from-random prototype: byte tokenizer, 2-layer transformer, 16×16 synthetic shapes, save/reload, HTTP API. It proves the gradient path; it is not a language model, a product, or a brand.
 4. **UI and host surfaces** — IDE-Workspace, Aetherius-OS, avatar events, renderer seams. The renderer binding is explicitly deferred and truthful about being a placeholder.
@@ -74,8 +74,8 @@ This separation matters because it lets Genesis:
 - `runtime/` — host runtime.
 - `security/` — key custody, crypto provider, platform inventory, open observation.
 - `provenance/`, `ledger/`, `requirements/` — evidence and requirement registries.
-- `benchmarks/` — 17 benchmark binaries including capability, continuity, learning, memory, perception, world model.
-- `tests/` — 24 C++ test translation units.
+- `benchmarks/` — 15 benchmark binaries including capability, continuity, learning, memory, perception, world model.
+- `tests/` — 23 C++ test translation units.
 - `registry/models.tsv` — **MODEL-NONE**. This is the gap.
 
 **What does not exist**

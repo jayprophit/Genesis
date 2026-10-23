@@ -20,7 +20,7 @@ First scaffold of the independent Genesis model layer.
 - Safe checkpoint format (`weights_only=True`).
 - Local HTTP runtime with `/health`, `/v1/models`, `/v1/tools`, `/v1/chat/completions`, `/v1/agent`.
 - Evaluation: bits-per-byte, tool-format accuracy, decode throughput.
-- 20 tests and an end-to-end smoke test.
+- 24 tests and an end-to-end smoke test.
 - Estate analysis and C01–C28 component specification.
 
 ### Not included
