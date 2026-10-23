@@ -57,6 +57,10 @@ python -m genesis_model.cli agent --checkpoint runs/tiny/genesis.pt --task "What
 python -m genesis_model.cli inspect --checkpoint runs/tiny/genesis.pt
 python -m genesis_model.cli eval --checkpoint runs/tiny/genesis.pt
 python -m genesis_model.cli serve --checkpoint runs/tiny/genesis.pt --port 8420
+
+# Real-run data path: tokenize once, then train from a memmap shard
+python scripts/tokenize_corpus.py --corpus data/corpus/genesis_seed.txt --out data/tokenized --vocab-size 8192
+python -m genesis_model.cli train --preset seed_30m --shard data/tokenized/shard_0000.bin --tokenizer data/tokenized/tokenizer.json --out runs/seed_30m
 ```
 
 The tiny preset exists to verify gradients, caching, checkpointing and the agent control flow. It is **not** a useful assistant. `seed_30m` and `seed_120m` are the first real training targets.

@@ -64,6 +64,32 @@ The smoke model is 131,840 parameters (vocabulary 302 for the tiny corpus). It
 verifies the full path — tokenizer, vision-prefixed forward, generation, tool
 call parsing and the agent loop — not language quality.
 
+### Token shard pipeline
+
+```powershell
+python scripts/tokenize_corpus.py `
+  --corpus data/corpus/genesis_seed.txt `
+  --out data/tokenized --vocab-size 512 --max-tokenizer-chars 100000
+```
+
+Observed on the 1,568-byte seed corpus: `vocab=469`, `tokens=614`,
+`shard_bytes=2456`, 0.27 s. The manifest records the source and shard SHA-256.
+The vocabulary stops below 512 because no pair remains with frequency >= 2.
+
+```powershell
+python -m genesis_model.cli train --preset tiny --steps 1 `
+  --batch-size 2 --seq-len 32 `
+  --shard data/tokenized/shard_0000.bin `
+  --tokenizer data/tokenized/tokenizer.json `
+  --out runs/shard_smoke --device cpu
+```
+
+Observed: `text_ce=6.2101`, `vision_ce=5.1467`, `sft_ce=4.8306`,
+`total=11.1987`, checkpoint written, `tokens_seen=64`, 0.21 s.
+
+This proves that the pre-tokenized path is wired through the CLI. It is a
+one-step plumbing check, not a training result.
+
 ## Next evidence required
 
 - 2B-token corpus manifest with hashes and licences.
