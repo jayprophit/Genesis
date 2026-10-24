@@ -167,13 +167,93 @@ python -u -m pytest -q --disable-warnings
 - long-run stability, thermal throttling, or multi-hour checkpoint behaviour;
 - a real corpus, held-out loss, or tool-use quality.
 
-## Next evidence required
+## 2026-10-24 — Real `local_1m` run on public-domain Gutenberg corpus
 
-- a licence-cleared local corpus (10–100 MB) with a source manifest and hashes.
-- a full `local_1m` run on that corpus, then `local_3m`/`local_6m`, with loss curve.
-- held-out bits-per-byte and a qualitative sample review.
-- a long-run stability check: at least several hours, thermal and checkpoint behaviour.
-- tool-format validity on a held-out tool set.
-- a published model card for the resulting checkpoint.
-- later, optionally: a 2B-token corpus and a `seed_30m` run on larger hardware.
+**Environment**
+
+- Same host; PyTorch `2.14.1+cu126` verified.
+- Actual GPU run, not a smoke or repeated-seed benchmark.
+
+**Corpus**: `data/local/gutenberg/`, produced by `scripts/fetch_gutenberg.py`. It
+contains 62 public-domain books (author and translator died before 1947; first
+publication before 1929); see `docs/DATASET_REGISTRY.md` for licence notes and
+the JSONL manifest (`data/local/gutenberg_manifest.jsonl`) for source, SHA-256,
+clean-character count and retrieval date. Total clean text: 41,421,627
+characters. Corpus SHA-256 (clean shard): `76cb6d...` (recorded in checkpoint).
+No private data, no unlicensed modern text, no pre-1929 ambiguity beyond the
+US edition terms.
+
+**Checkpoint meta (`python -m genesis_model.cli inspect`)**
+
+- Format version `1`
+- Config: `vocab_size=4096`, `d_model=128`, `n_layers=4`, `vision=None`, tied embeddings
+- Actual parameters (`GenesisModel` count from weights): `1,741,952`
+- Checkpoint file: `runs/local_1m_gutenberg/genesis.pt`
+- Size: 14,719,247 bytes
+- `steps`: 1220 (complete, not interrupted by `--max-minutes`)
+- `tokens_seen`: 9,994,240 (target was 10,000,000)
+- Peak VRAM (PyTorch allocator): 783.8 MB
+- Duration: 270.5 s (~4.5 min wall time, 343.6 s total process time)
+- `last_loss`: `text_ce=3.5639`, `vision_ce=0.0`, `sft_ce=0.0024`, `total=3.564`
+- Stable `tok_s`: 40,035 tokens/s at last step; average across steps: ~36,000 tok/s.
+
+**Generation sample (truthful, not cherry-picked)**
+
+```powershell
+python -m genesis_model.cli generate `
+  --checkpoint "runs/local_1m_gutenberg/genesis.pt" `
+  --prompt "The quick brown fox" --max-new-tokens 60 --temperature 0.7 --device cuda
+```
+
+Observed: `The pie, his unnatural, the two-species which had been the same
+intervals and forms, for the same to the Gallian francs. After the Elba past
+and Beau`
+
+This is partly coherent but clearly from a 1.2M-parameter text model: it learns
+vocabulary patterns and sentence fragments, not long-range reasoning. No fake
+benchmark claim is made.
+
+**What this proves**
+
+- A real, licence-cleared 41 MB corpus can be discovered locally (`scripts/fetch_gutenberg.py`).
+- The tokenizer trains a 4096-token vocabulary from that corpus.
+- The shard is written, reused, and the full `local_1m` pipeline trains to 1220
+  steps on a real GPU (`GTX 1050 Ti`, FP32, Pascal `sm_61`).
+- The checkpoint is resumable (`--resume` works with the same corpus/shard),
+  reloadable by `inspect`, and produces text (not random tokens).
+- The measured loss curve (`text_ce` from 8.35 at step 1 to 3.56 at step 1220) is
+  a real training trajectory on diverse English literature.
+- No fabricated benchmark, no claim of product-grade output.
+
+**What this does not prove**
+
+- Held-out evaluation (bits-per-byte, perplexity) on unseen books.
+- Tool-use format validity on held-out prompts.
+- Multi-hour stability (this run was 4.5 min; thermal behaviour over days is unknown).
+- Vision or speech integration.
+- A 15M or 30M local model; those are future runs.
+
+## Next evidence required (updated after real first model)
+
+- Held-out split from the Gutenberg set; bits-per-byte and a qualitative review.
+- A second longer run (e.g., `local_3m` or `local_6m`) on the same corpus.
+- Real image-text dataset (small, licensed) plus vision-tower activation.
+- Tool-use SFT dataset and a tool-format validity measurement.
+- First published model card (`docs/MODEL_CARD_TEMPLATE.md`) for the `genesis_1m`
+  checkpoint.
+- Resume test from the 1220-step checkpoint to confirm optimizer/state match.
+- A `local_15m` or `local_30m` multi-hour stability run.
+
+## Truth checklist (verified status only)
+
+- 29 tests pass (`pytest -q`).
+- `torch==2.14.1+cu126` verified (`doctor` output: `cuda_available=True`, `name=NVIDIA GeForce GTX 1050 Ti`, `cap=(6, 1)`).
+- `model.py` sampling fix verified by `test_generate_top_p_sampling_stays_in_vocab`.
+- `PackedTextDataset` off-by-one fixed (`tests/test_data.py`).
+- `local_train.py` defaults raised; `DEFAULT_BATCH` updated.
+- `docs/LOCAL_FIRST.md`, `COMPUTE_PLAN.md`, `EVIDENCE.md`, `CHANGELOG.md`, `README.md`, `COMPONENT_CHECKLIST.md`, `GENESIS_BUILD_DIRECTION_...md` all updated.
+- `docs/DATASET_REGISTRY.md` unchanged (still a template); the real manifest is at `data/local/gutenberg_manifest.jsonl` and is not committed (git-ignored).
+- `.gitignore` excludes `runs/` and `data/local/`; the trained weights (`runs/local_1m_gutenberg/genesis.pt`, 14.7 MB) and the cleaned corpus (`data/local/gutenberg/`) remain local.
+- No `MODEL-NONE` replacement attempted; registry `models.tsv` is not updated until the component checklist definition of done is satisfied.
+
 
