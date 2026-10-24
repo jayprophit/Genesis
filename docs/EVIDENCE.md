@@ -238,6 +238,7 @@ benchmark claim is made.
 - Held-out split from the Gutenberg set; bits-per-byte and a qualitative review.
 - A second longer run (e.g., `local_3m` or `local_6m`) on the same corpus.
 - Real image-text dataset (small, licensed) plus vision-tower activation.
+- Master prompt subset (10 Genesis-related files, 466,388 chars) prepared at `data/local/master-prompt-subset/` with manifest (`manifest.jsonl`, 10 entries with SHA-256). Not yet added to training.
 - Tool-use SFT dataset and a tool-format validity measurement.
 - First published model card (`docs/MODEL_CARD_TEMPLATE.md`) for the `genesis_1m`
   checkpoint.

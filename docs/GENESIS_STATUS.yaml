@@ -1,0 +1,48 @@
+# Genesis-Model status against requirements and data tracking
+# Updated after progressive incorporation of master prompt / data files
+# References: Aetherius-OS/docs/PROJECT-TODOS.yaml (TODO-GEN-006), docs/SOURCE-REGISTRY.yaml
+
+completed:
+  - Independent repo (Genesis-Model) with fresh build (no borrowed weights/tokenizer)
+  - Byte-level BPE tokenizer (4096 vocab, exact round-trip, multilingual)
+  - Decoder backbone: pre-norm, RMSNorm, RoPE, GQA, SwiGLU, tied embeddings
+  - KV cache with full-forward equivalence
+  - Vision tower (patch conv + ViT + projector) — synthetic gradient test passes
+  - Native tool protocol (`<|tool_call|>`) with JSON Schema validation and approval gates
+  - Agent loop (bounded, audit events) — implemented; C++ wiring is external/separate
+  - Training engine: text + image caption + tool SFT, AMP disabled for Pascal (FP32), resume, manifest, peak VRAM logging
+  - Checkpoint format (`genesis.pt`) with safe `weights_only` loading
+  - CLI: `doctor`, `chat`, `generate`, `agent`, `eval`, `serve`, `inspect`, `tokenize`
+  - One-command pipeline (`scripts/local_train.py`) with corpus discovery, tokenizer, shard, training, checkpoint
+  - Scripts: `tokenize_corpus.py`, `local_train.py`, `fetch_gutenberg.py`, `index_master_prompt.py`
+  - Tests: 29 passed (`pytest -q`)
+  - CUDA verification: `torch==2.14.1+cu126`, `cuda_available=True`, `GTX 1050 Ti (6,1)`, `fp32`
+  - Real first-model checkpoint (`local_1m`, Gutenberg corpus): 1,741,952 params, 1220 steps, 9,994,240 tokens, text_ce=3.5639, peak VRAM=783.8 MB, tok_s=40,035
+  - Evidence (`docs/EVIDENCE.md`) with exact commands, results, generation sample
+  - Docs: `LOCAL_FIRST.md`, `COMPUTE_PLAN.md`, `CHANGELOG.md`, `README.md`, `COMPONENT_CHECKLIST.md`, `EVIDENCE.md`
+  - Public-domain corpus: `data/local/gutenberg/` (62 files, 41,421,627 clean chars) + manifest (`gutenberg_manifest.jsonl`, SHA-256 per file)
+  - Master-prompt subset: `data/local/master-prompt-subset/` (10 Genesis-related files, 466,388 chars) + manifest (`manifest.jsonl`)
+  - Registry exclusion note added (`SOURCE-REGISTRY.yaml`) for generated data
+  - Project todos (`PROJECT-TODOS.yaml`) updated (`TODO-GEN-006` PARTIAL)
+  - `.gitignore` excludes `data/local/` and `runs/`
+
+partial:
+  - Master prompt full set (115 files, 10,862,227 chars) indexed but not registered in SOURCE-REGISTRY.yaml as sources; subset manifest exists but full registry entry missing
+  - Conversation transcripts / pasted chat text: not registered or explicitly excluded (remains untracked output)
+  - Tool-use SFT quality measurement (dataset exists; held-out validity measurement not run)
+  - Vision/text dataset beyond synthetic (tower exists; no licensed real-world image-text dataset integrated)
+  - Held-out bits-per-byte evaluation (not yet measured)
+  - Multi-hour stability / thermal test (first run was 4.5 min; longer runs planned)
+  - Model card (`docs/MODEL_CARD_TEMPLATE.md`) not filled
+  - `local_3m` / `local_6m` / `local_15m` / `local_30m` full-token-budget runs not completed (throughput measured on short runs only)
+  - Agent-Bridge / C++ organism wiring (`IModelRuntime` seam) remains external/spec, not modified in existing repos
+
+incomplete:
+  - `seed_30m` / `seed_120m` scale runs (optional later; requires larger hardware / longer time)
+  - Speech / acoustic model / vocoder integration (spec only)
+  - Native C++20 runtime (current is Python + PyTorch; eventual target)
+  - Speech from scratch, GRPO for tool use, distributed training, MoE/MLA experiments
+  - Registry `MODEL-NONE` replacement (`registry/models.tsv`) — blocked until component checklist done
+  - Real-world vision/text dataset at scale (small synthetic vision only)
+  - Full master-prompt integration into training pipeline (subset prepared, not yet fed to model)
+  - Pasted conversation corpus (chat transcripts) formalized and registered
