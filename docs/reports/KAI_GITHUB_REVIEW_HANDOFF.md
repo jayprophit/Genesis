@@ -12,7 +12,9 @@ SHA matches the local commit exactly.
 
 | Project | Local path | Repo (origin) | Review branch | Commit SHA | Compare |
 |---|---|---|---|---|---|
-| Genesis-Model | `C:\Users\jpowe\Desktop\Projects\Genesis\Genesis-Model` | `jayprophit/Genesis` | `review/genesis-ide-integration-20261025` | `f8484cb9afce` | https://github.com/jayprophit/Genesis/compare/review/genesis-ide-integration-20261025 |
+| Genesis-Model | `C:\Users\jpowe\Desktop\Projects\Genesis\Genesis-Model` | `jayprophit/Genesis` | `review/genesis-ide-integration-20261025` | `b5ec5df39021` | https://github.com/jayprophit/Genesis/compare/review/genesis-ide-integration-20261025 |
+
+(Genesis branch HEAD `b5ec5df` = integration commit `f8484cb9afce` + the `docs/reports/` evidence commit; the integration source — `server.py` `do_OPTIONS` and `aetherius_bridge.py` — is the `f8484cb` base commit linked by the compare view.)
 | Aetherius-OS IDE | `C:\Users\jpowe\Desktop\Projects\Aetherius-OS\apps\IDE-Workspace` | `jayprophit/IDE-Workspace` | `review/genesis-ide-integration-20261025` | `0a2519d7e2cb` | https://github.com/jayprophit/IDE-Workspace/compare/review/genesis-ide-integration-20261025 |
 | Agent-Bridge | `C:\Users\jpowe\Desktop\Projects\Agent-Bridge` | `jayprophit/Agent-Bridge` | `review/genesis-ide-integration-20261025` | `57304d08417d` | https://github.com/jayprophit/Agent-Bridge/compare/review/genesis-ide-integration-20261025 |
 | Aetherius-OS top-level | `C:\Users\jpowe\Desktop\Projects\Aetherius-OS` | `jayprophit/Aetherius-OS` | `review/genesis-ide-integration-20261025` | `83285063c276` | https://github.com/jayprophit/Aetherius-OS/compare/review/genesis-ide-integration-20261025 |

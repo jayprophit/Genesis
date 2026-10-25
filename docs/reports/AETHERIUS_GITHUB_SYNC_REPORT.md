@@ -56,12 +56,13 @@ top-level `Aetherius-OS` repository does not track the IDE source (no
 - `docs/Aetherius-OS-Programme-Status.md` (NEW — "Genesis CI PASSED")
 - 2 files
 
-### Genesis-Model — `f8484cb9afce` (already published)
-Branch created from `main`; contains the verified `genesis_model/server.py`
+### Genesis-Model — `b5ec5df39021` (integration `f8484cb9afce`, already published)
+Branch created from `main`; HEAD `b5ec5df` = integration commit `f8484cb` + the
+`docs/reports/` evidence commit. Contains the verified `genesis_model/server.py`
 (`do_OPTIONS`, `/health` None-safe, `/v1/agent` dispatch) and
 `genesis_model/aetherius_bridge.py` (`phase4.*` over `127.0.0.1:11434`).
-Plus repo docs (`docs/GENESIS_STATUS.yaml`, `docs/GAP_ANALYSIS.md`, …).
-A `docs/reports/` commit adding the acceptance report follows (see §5).
+Plus repo docs (`docs/GENESIS_STATUS.yaml`, `docs/GAP_ANALYSIS.md`, …) and all
+three reports in `docs/reports/` (see §5).
 
 ## 4. Files intentionally excluded from each push
 - `.vite/`, `__pycache__/`, `node_modules/`, `.venv-torch-probe/` — build/venv (gitignored or excluded).
