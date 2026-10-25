@@ -1,0 +1,29 @@
+/build/
+/build-host/
+/.genesis-local/
+*.log
+benchmark-results/
+__pycache__/
+*.pyc
+*.pyo
+
+# Local verification build directory (fresh configure per machine)
+/build-verify/
+
+# Absorbed projects. Each keeps its own repository and remote; the parent project must not track them.
+absorbed/VirtualAssistant/
+
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+runs/
+*.pt
+*.bin
+*.safetensors
+!tests/fixtures/*.pt
+.env
+.DS_Store
+Thumbs.db
