@@ -1,10 +1,11 @@
 import json
+import random
 from pathlib import Path
 
 import pytest
 import torch
 
-from genesis_model.tokenizer import BOS, EOS, Tokenizer
+from genesis_model.tokenizer import BASE_OFFSET, BOS, EOS, Tokenizer
 
 
 def test_round_trip_multilingual():
@@ -42,3 +43,64 @@ def test_chat_template_contains_roles():
 def test_rejects_bad_vocab():
     with pytest.raises(ValueError):
         Tokenizer.train(["x"], vocab_size=10)
+
+
+def _naive_encode_bytes(tokenizer: Tokenizer, data: bytes) -> list[int]:
+    """The reference rule: merge the lowest-ranked pair, all occurrences.
+
+    ``Tokenizer._encode_bytes`` is a linked-list and heap implementation of
+    this loop. Keeping the loop here means the fast path is pinned to the
+    definition rather than to itself.
+    """
+    ids = list(data)
+    while True:
+        best_rank = None
+        best_pair = None
+        for pair in zip(ids, ids[1:]):
+            rank = tokenizer._ranks.get(pair)
+            if rank is not None and (best_rank is None or rank < best_rank):
+                best_rank = rank
+                best_pair = pair
+        if best_pair is None:
+            return ids
+        first, second = best_pair
+        new_id = BASE_OFFSET + best_rank
+        merged: list[int] = []
+        i = 0
+        while i < len(ids):
+            if i + 1 < len(ids) and ids[i] == first and ids[i + 1] == second:
+                merged.append(new_id)
+                i += 2
+            else:
+                merged.append(ids[i])
+                i += 1
+        ids = merged
+
+
+def test_fast_encoder_matches_the_merge_rule():
+    tokenizer = Tokenizer.train(
+        ["the quick brown fox jumps over the lazy dog " * 40,
+         "aaaa bbbb abab abba " * 30,
+         "你好，世界。你好，世界。" * 20],
+        vocab_size=340,
+    )
+    cases = [
+        b"",
+        b"a",
+        b"the quick brown fox",
+        b"a" * 200,
+        b"ab" * 100,
+        b"abababab",
+        b"aaaa bbbb abab abba " * 10,
+        "café — naïve ✓ 日本語 🧬".encode("utf-8"),
+    ]
+    rng = random.Random(20261025)
+    alphabet = b"abc .,\n"
+    for _ in range(24):
+        cases.append(bytes(rng.choice(alphabet) for _ in range(rng.randint(1, 300))))
+
+    for data in cases:
+        assert tokenizer._encode_bytes(data) == _naive_encode_bytes(tokenizer, data)
+        assert tokenizer.decode(tokenizer._encode_bytes(data), skip_special=True) == data.decode(
+            "utf-8", errors="replace"
+        )

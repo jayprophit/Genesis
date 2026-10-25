@@ -1,0 +1,70 @@
+{
+  "checkpoint": "runs\\local_1m_clean\\genesis.pt",
+  "parameters": 1217664,
+  "vocab_size": 4096,
+  "device": "cuda",
+  "training": {
+    "steps": 2441,
+    "tokens_seen": 19996672,
+    "corpus_sha256": "9ea3c5dcb1461863f2f11ae5fce304ddc8f6683846fa9667de594c2761adedf0"
+  },
+  "overlap": {
+    "checked": true,
+    "overlaps": [],
+    "training_files": 57,
+    "excluded_files": [
+      "data\\local\\gutenberg\\pg1342.txt",
+      "data\\local\\gutenberg\\pg1399.txt"
+    ],
+    "heldout": {
+      "pg1342.txt": "48bba16ccc3accb733998bb2041499d5096240d624f270942b5c5e97a091f12c",
+      "pg1399.txt": "e89e4705303ae46f7fca4c103fe7e7719b7908125aab96fbfa8142cae0bb5121"
+    }
+  },
+  "heldout_files": [
+    "pg1342.txt",
+    "pg1399.txt"
+  ],
+  "per_file": {
+    "pg1342.txt": {
+      "bytes": 731482,
+      "chars": 728714,
+      "tokens": 231080,
+      "blocks": 903,
+      "scored_tokens": 231079,
+      "loss": 3.401453,
+      "perplexity": 30.0077,
+      "bits_per_byte": 1.550229
+    },
+    "pg1399.txt": {
+      "bytes": 1972422,
+      "chars": 1964766,
+      "tokens": 654368,
+      "blocks": 2557,
+      "scored_tokens": 654367,
+      "loss": 3.490284,
+      "perplexity": 32.7953,
+      "bits_per_byte": 1.67054
+    }
+  },
+  "combined": {
+    "tokens": 885448,
+    "blocks": 3459,
+    "scored_tokens": 885447,
+    "bytes": 2703954,
+    "loss": 3.467427,
+    "perplexity": 32.0542,
+    "bits_per_byte": 1.638118
+  },
+  "throughput": {
+    "generated_tokens": 32,
+    "seconds": 6.3522,
+    "tokens_per_second": 5.04,
+    "device": "cuda:0"
+  },
+  "notes": [
+    "Perplexity is comparable only on the same tokenizer and the same held-out text.",
+    "The overlap check compares content digests, not file names.",
+    "This is a small local model (see parameters above); the numbers are a baseline, not a product claim."
+  ]
+}

@@ -18,6 +18,7 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import time
@@ -36,6 +37,23 @@ from genesis_model.corpus import (  # noqa: E402
 from genesis_model.data import tokenize_to_shard  # noqa: E402
 from genesis_model.tokenizer import Tokenizer  # noqa: E402
 from genesis_model.train import TrainConfig, train  # noqa: E402
+
+
+def _corpus_digest(sources: list[dict]) -> str:
+    """Identity of a document set: each file name plus its content digest.
+
+    The directory is deliberately not part of it, because the same corpus
+    reached through a different working directory is the same corpus. A folder
+    that has gained or lost a document is not the same corpus, and that is the
+    question a reused shard has to answer.
+    """
+    digest = hashlib.sha256()
+    for source in sorted(sources, key=lambda item: Path(item["path"]).name):
+        digest.update(Path(source["path"]).name.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(source["sha256"].encode("ascii"))
+        digest.update(b"\n")
+    return digest.hexdigest()
 
 # Token budgets are ~20x parameters, capped where a local run would become a
 # multi-week project. They are targets, not claims about quality.
@@ -68,6 +86,10 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--corpus", action="append", required=True,
                         help="file or folder; repeat for multiple roots")
+    parser.add_argument("--exclude", action="append", default=[],
+                        help="file name, glob or path fragment to keep out of the "
+                             "corpus; repeatable. Use this to reserve a held-out "
+                             "split that the model never sees.")
     parser.add_argument("--preset", choices=sorted(TOKEN_BUDGETS), default="local_6m")
     parser.add_argument("--tokens", type=int, default=0,
                         help="target training tokens; 0 uses the preset budget")
@@ -86,14 +108,41 @@ def main() -> int:
     parser.add_argument("--resume", default=None)
     parser.add_argument("--reuse", action="store_true",
                         help="reuse tokenizer.json and corpus.bin if present")
+    parser.add_argument("--trust-shard", action="store_true",
+                        help="allow reusing a corpus.bin that has no provenance "
+                             "manifest; the plan records the shard as unverified")
     args = parser.parse_args()
 
     started = time.time()
     corpus = expand_paths(args.corpus)
+
+    def _excluded(path: Path) -> bool:
+        """A path is excluded when it matches a name, glob or path fragment."""
+        import fnmatch
+
+        text = str(path).replace("\\", "/")
+        for pattern in args.exclude:
+            normalised = pattern.replace("\\", "/")
+            if fnmatch.fnmatch(path.name, normalised):
+                return True
+            if fnmatch.fnmatch(text, normalised) or normalised in text:
+                return True
+        return False
+
+    excluded = [p for p in corpus if _excluded(p)]
+    corpus = [p for p in corpus if not _excluded(p)]
+    if not corpus:
+        raise SystemExit("every corpus file was excluded")
+    if excluded:
+        print(f"corpus: excluding {len(excluded)} held-out file(s):", flush=True)
+        for path in excluded:
+            print(f"  - {path}", flush=True)
+
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     tokenizer_path = out / "tokenizer.json"
     shard_path = out / "corpus.bin"
+    shard_manifest_path = out / "shard_manifest.json"
     preset = PRESETS[args.preset]
     vocab_size = args.vocab_size or preset.vocab_size
 
@@ -118,13 +167,73 @@ def main() -> int:
 
     if shard_path.exists() and (args.reuse or args.resume):
         token_count = shard_path.stat().st_size // 4
-        print(f"shard: reusing {shard_path} ({token_count:,} tokens)", flush=True)
+        current_sources = corpus_manifest(corpus)
+        current_digest = _corpus_digest(current_sources)
+        recorded: dict | None = None
+        if shard_manifest_path.exists():
+            recorded = json.loads(shard_manifest_path.read_text(encoding="utf-8"))
+        if recorded is None:
+            if not args.trust_shard:
+                raise SystemExit(
+                    f"{shard_path} exists but has no provenance manifest, so it "
+                    "cannot be shown to contain this corpus. Re-run without "
+                    "--reuse/--resume to rebuild it, or pass --trust-shard to "
+                    "reuse it and have the plan record it as unverified."
+                )
+            shard_provenance = "unverified"
+            print(
+                f"shard: reusing {shard_path} ({token_count:,} tokens) with NO "
+                "provenance manifest; the plan will say so",
+                flush=True,
+            )
+        elif recorded.get("corpus_digest") != current_digest:
+            recorded_names = {
+                Path(source["path"]).name for source in recorded.get("sources", [])
+            }
+            current_names = {path.name for path in corpus}
+            added = sorted(current_names - recorded_names)
+            removed = sorted(recorded_names - current_names)
+            raise SystemExit(
+                f"{shard_path} was built from a different corpus.\n"
+                f"  added since:   {added or 'none'}\n"
+                f"  gone since:    {removed or 'none'}\n"
+                "Re-run without --reuse/--resume to tokenize the current corpus. "
+                "Refusing to train on a shard that does not match the corpus "
+                "the plan would describe."
+            )
+        else:
+            current_tokenizer_sha = hashlib.sha256(tokenizer_path.read_bytes()).hexdigest()
+            if recorded.get("tokenizer_sha256") != current_tokenizer_sha:
+                raise SystemExit(
+                    f"{shard_path} was tokenized with a different tokenizer.json.\n"
+                    f"  shard:     {recorded.get('tokenizer_sha256')}\n"
+                    f"  on disk:   {current_tokenizer_sha}\n"
+                    "The two do not have to agree to be useful, but this run cannot "
+                    "prove they do. Re-run without --reuse/--resume."
+                )
+            shard_provenance = "verified"
+            print(f"shard: reusing {shard_path} ({token_count:,} tokens), corpus verified", flush=True)
     else:
         print(f"shard: tokenizing {len(corpus)} files...", flush=True)
         token_count = tokenize_to_shard(
             iter_documents(corpus), tokenizer, shard_path, dtype="uint32"
         )
         print(f"shard: {token_count:,} tokens -> {shard_path}", flush=True)
+        current_sources = corpus_manifest(corpus)
+        shard_manifest_path.write_text(
+            json.dumps(
+                {
+                    "token_count": token_count,
+                    "corpus_digest": _corpus_digest(current_sources),
+                    "tokenizer_sha256": hashlib.sha256(tokenizer_path.read_bytes()).hexdigest(),
+                    "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                    "sources": current_sources,
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        shard_provenance = "written"
 
     seq_len = args.seq_len or preset.max_seq_len
     if token_count < seq_len + 1:
@@ -168,9 +277,15 @@ def main() -> int:
     plan = {
         "preset": args.preset,
         "d_model": preset.d_model,
-        "corpus_files": len(corpus),
-        "corpus_bytes": sum(path.stat().st_size for path in corpus),
+        # These describe the SHARD, because corpus_tokens describes the shard.
+        # The old version re-enumerated the corpus folder here, so a run that
+        # reused an older shard wrote a plan claiming a corpus it had never
+        # tokenized (2026-10-25: a plan claiming 59 files and 43 MB, against a
+        # shard holding 13 files and 12.5 MB).
+        "corpus_files": len(current_sources),
+        "corpus_bytes": sum(source["bytes"] for source in current_sources),
         "corpus_tokens": token_count,
+        "shard_provenance": shard_provenance,
         "target_tokens": target_tokens,
         "tokens_per_step": tokens_per_step,
         "steps": steps,
@@ -180,7 +295,8 @@ def main() -> int:
         "device": args.device,
         "vocab_size": tokenizer.vocab_size,
         "sft": bool(sft_paths),
-        "sources": corpus_manifest(corpus),
+        "excluded_files": [str(path) for path in excluded],
+        "sources": current_sources,
     }
     (out / "local_plan.json").write_text(json.dumps(plan, indent=2), encoding="utf-8")
     print(json.dumps({k: plan[k] for k in (

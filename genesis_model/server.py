@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from .agent import GenesisAgent, GenesisModelBackend
+from .aetherius_bridge import AetheriusBackend, AgentBridgeToolExecutor, register_agent_bridge_tools
 from .checkpoint import load_checkpoint
 from .generate import generate_text
 from .tools import default_registry
@@ -28,18 +29,34 @@ from .tools import default_registry
 class GenesisRuntime:
     def __init__(
         self,
-        checkpoint: str | Path,
+        checkpoint: str | Path | None = None,
         *,
         workspace: str | Path = ".",
         device: str = "cpu",
         allow_network: bool = False,
+        backend=None,
+        agent_bridge: bool = False,
     ) -> None:
-        self.model, self.tokenizer, self.meta = load_checkpoint(checkpoint, map_location=device)
-        self.model.to(device)
         self.workspace = Path(workspace)
         self.registry = default_registry()
         self.allow_network = allow_network
         self.lock = threading.Lock()
+        self.backend_override = backend
+        self.agent_bridge_executor = None
+        if agent_bridge or isinstance(backend, AetheriusBackend):
+            self.agent_bridge_executor = AgentBridgeToolExecutor()
+            register_agent_bridge_tools(self.registry, self.agent_bridge_executor)
+            if self.backend_override is None:
+                self.backend_override = AetheriusBackend()
+        if self.backend_override is None:
+            if checkpoint is None:
+                raise ValueError("checkpoint is required unless an Aetherius backend is used")
+            self.model, self.tokenizer, self.meta = load_checkpoint(checkpoint, map_location=device)
+            self.model.to(device)
+        else:
+            self.model = None
+            self.tokenizer = None
+            self.meta = None
 
     def chat(
         self,
@@ -49,9 +66,12 @@ class GenesisRuntime:
         max_tokens: int = 256,
         tools: bool = True,
     ) -> dict[str, Any]:
-        backend = GenesisModelBackend(
-            self.model, self.tokenizer, temperature=temperature, max_new_tokens=max_tokens
-        )
+        if self.backend_override is not None:
+            backend = self.backend_override
+        else:
+            backend = GenesisModelBackend(
+                self.model, self.tokenizer, temperature=temperature, max_new_tokens=max_tokens
+            )
         with self.lock:
             text = backend.generate(messages, self.registry.schemas() if tools else [])
         return {
@@ -68,9 +88,12 @@ class GenesisRuntime:
         }
 
     def agent(self, task: str, *, max_steps: int = 6, temperature: float = 0.4) -> dict[str, Any]:
-        backend = GenesisModelBackend(
-            self.model, self.tokenizer, temperature=temperature, max_new_tokens=256
-        )
+        if self.backend_override is not None:
+            backend = self.backend_override
+        else:
+            backend = GenesisModelBackend(
+                self.model, self.tokenizer, temperature=temperature, max_new_tokens=256
+            )
         agent = GenesisAgent(
             backend, self.registry, workspace=self.workspace,
             max_steps=max_steps, allow_network=self.allow_network,
@@ -102,13 +125,21 @@ def make_handler(runtime: GenesisRuntime):
             raw = self.rfile.read(length) if length else b"{}"
             return json.loads(raw.decode("utf-8"))
 
+        def do_OPTIONS(self) -> None:  # noqa: N802
+            self.send_response(204)
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type")
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+
         def do_GET(self) -> None:  # noqa: N802
             if self.path == "/health":
                 self._send(200, {
                     "status": "ok",
                     "model": "genesis-local",
-                    "parameters": self.runtime.model.num_parameters(),
-                    "vocab_size": self.runtime.tokenizer.vocab_size,
+                    "parameters": (self.runtime.model.num_parameters() if self.runtime.model is not None else 0),
+                    "vocab_size": (self.runtime.tokenizer.vocab_size if self.runtime.tokenizer is not None else 0),
                     "tools": self.runtime.registry.names(),
                 })
             elif self.path == "/v1/models":
@@ -145,16 +176,24 @@ def make_handler(runtime: GenesisRuntime):
 
 
 def serve(
-    checkpoint: str | Path,
+    checkpoint: str | Path | None = None,
     *,
     host: str = "127.0.0.1",
     port: int = 8420,
     workspace: str | Path = ".",
     device: str = "cpu",
     allow_network: bool = False,
+    backend=None,
+    agent_bridge: bool = False,
 ) -> None:
+    import os
+    if agent_bridge or os.environ.get("GENESIS_AGENT_BRIDGE") == "1":
+        agent_bridge = True
+    if checkpoint is None:
+        checkpoint = os.environ.get("GENESIS_CHECKPOINT")
     runtime = GenesisRuntime(
-        checkpoint, workspace=workspace, device=device, allow_network=allow_network
+        checkpoint, workspace=workspace, device=device, allow_network=allow_network,
+        backend=backend, agent_bridge=agent_bridge,
     )
     server = ThreadingHTTPServer((host, port), make_handler(runtime))
     print(f"Genesis runtime listening on http://{host}:{port}")

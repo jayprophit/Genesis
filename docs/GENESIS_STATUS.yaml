@@ -3,46 +3,63 @@
 # References: Aetherius-OS/docs/PROJECT-TODOS.yaml (TODO-GEN-006), docs/SOURCE-REGISTRY.yaml
 
 completed:
-  - Independent repo (Genesis-Model) with fresh build (no borrowed weights/tokenizer)
-  - Byte-level BPE tokenizer (4096 vocab, exact round-trip, multilingual)
-  - Decoder backbone: pre-norm, RMSNorm, RoPE, GQA, SwiGLU, tied embeddings
-  - KV cache with full-forward equivalence
-  - Vision tower (patch conv + ViT + projector) — synthetic gradient test passes
-  - Native tool protocol (`<|tool_call|>`) with JSON Schema validation and approval gates
-  - Agent loop (bounded, audit events) — implemented; C++ wiring is external/separate
-  - Training engine: text + image caption + tool SFT, AMP disabled for Pascal (FP32), resume, manifest, peak VRAM logging
-  - Checkpoint format (`genesis.pt`) with safe `weights_only` loading
-  - CLI: `doctor`, `chat`, `generate`, `agent`, `eval`, `serve`, `inspect`, `tokenize`
-  - One-command pipeline (`scripts/local_train.py`) with corpus discovery, tokenizer, shard, training, checkpoint
-  - Scripts: `tokenize_corpus.py`, `local_train.py`, `fetch_gutenberg.py`, `index_master_prompt.py`
-  - Tests: 29 passed (`pytest -q`)
-  - CUDA verification: `torch==2.14.1+cu126`, `cuda_available=True`, `GTX 1050 Ti (6,1)`, `fp32`
-  - Real first-model checkpoint (`local_1m`, Gutenberg corpus): 1,741,952 params, 1220 steps, 9,994,240 tokens, text_ce=3.5639, peak VRAM=783.8 MB, tok_s=40,035
-  - Evidence (`docs/EVIDENCE.md`) with exact commands, results, generation sample
-  - Docs: `LOCAL_FIRST.md`, `COMPUTE_PLAN.md`, `CHANGELOG.md`, `README.md`, `COMPONENT_CHECKLIST.md`, `EVIDENCE.md`
-  - Public-domain corpus: `data/local/gutenberg/` (62 files, 41,421,627 clean chars) + manifest (`gutenberg_manifest.jsonl`, SHA-256 per file)
-  - Master-prompt subset: `data/local/master-prompt-subset/` (10 Genesis-related files, 466,388 chars) + manifest (`manifest.jsonl`)
-  - Registry exclusion note added (`SOURCE-REGISTRY.yaml`) for generated data
-  - Project todos (`PROJECT-TODOS.yaml`) updated (`TODO-GEN-006` PARTIAL)
-  - `.gitignore` excludes `data/local/` and `runs/`
+  - "Independent repo (Genesis-Model) with fresh build (no borrowed weights/tokenizer)"
+  - "Byte-level BPE tokenizer (4096 vocab, exact round-trip, multilingual)"
+  - "Decoder backbone: pre-norm, RMSNorm, RoPE, GQA, SwiGLU, tied embeddings"
+  - "KV cache with full-forward equivalence"
+  - "Vision tower (patch conv + ViT + projector) — synthetic gradient test passes"
+  - "Native tool protocol (`<|tool_call|>`) with JSON Schema validation and approval gates"
+  - "Agent loop (bounded, audit events) — implemented; C++ wiring is external/separate"
+  - "Training engine: text + image caption + tool SFT, AMP disabled for Pascal (FP32), resume, manifest, peak VRAM logging"
+  - "Checkpoint format (`genesis.pt`) with safe `weights_only` loading"
+  - "CLI: `doctor`, `train`, `chat`, `generate`, `agent`, `eval`, `inspect`, `tokenize`, `serve` (verified 2026-10-24; `train` exists, was unlisted)"
+  - "One-command pipeline (`scripts/local_train.py`) with corpus discovery, tokenizer, shard, training, checkpoint"
+  - "Scripts: `tokenize_corpus.py`, `local_train.py`, `fetch_gutenberg.py`, `index_master_prompt.py`"
+  - "Tests: 32 passed (`python -m pytest`, exit code 0, 2026-10-25)"
+  - "CUDA verification: `torch==2.14.1+cu126`, `cuda_available=True`, `GTX 1050 Ti (6,1)`, `fp32`"
+  - "Real first-model checkpoint (`local_1m`, Gutenberg corpus): 1,217,664 unique params, 1220 steps, 9,994,240 tokens, text_ce=3.5639, peak VRAM=783.8 MB, tok_s=40,035. See EVIDENCE.md correction: its shard held 13 books, not the whole folder."
+  - "Clean `local_1m` run (2026-10-25): 57 training files, 40,190,580 bytes, 12,633,141-token shard with provenance manifest; 2,441 steps, 19,996,672 tokens, text_ce=3.4716, peak VRAM=783.8 MB, tok_s=28,475, 866.2 s; checkpoint `runs/local_1m_clean/genesis.pt`."
+  - "Held-out split (`gutenberg_heldout`): `data/local/gutenberg_heldout/` holds 2 files, `2,800,585` bytes = `2,747,854` stored characters including CRLF = `2,693,480` characters after newline normalisation (`pg1342.txt` + `pg1399.txt`). Both are also present in `data/local/gutenberg/` and are excluded by name from every training run; `scripts/eval_heldout.py` compares content digests, not filenames, and refuses overlap."
+  - "Held-out evaluation (2026-10-25) on the clean checkpoint: pg1342 + pg1399, full text, zero content-digest overlap with the 57-file training plan; loss 3.467427, perplexity 32.0542, bits-per-byte 1.638118 on 885,447 scored tokens. Report: `docs/heldout_local_1m_clean.json`."
+  - "Evidence (`docs/EVIDENCE.md`) with exact commands, results, generation sample"
+  - "Model card (`docs/MODEL_CARD_TEMPLATE.md`) rewritten for `runs/local_1m_clean/genesis.pt`: 1,217,664 unique params, 2,441 steps, text_ce=3.4716, held-out bpb=1.638118, honest limitations"
+  - "Docs: `LOCAL_FIRST.md`, `COMPUTE_PLAN.md`, `CHANGELOG.md`, `README.md`, `COMPONENT_CHECKLIST.md`, `EVIDENCE.md`"
+  - "Public-domain corpus: `data/local/gutenberg/` (59 .txt files, 42,991,165 bytes on disk = 42,327,207 stored characters including CRLF = 41,421,627 characters after newline normalisation, which is what the tokenizer sees; the clean run trains on the 57 files left after excluding the held-out books) + manifest (`gutenberg_manifest.jsonl`, SHA-256 per file)"
+  - "Master-prompt subset: `data/local/master-prompt-subset/` (10 .txt files + `manifest.jsonl`, 457,387 chars on disk 2026-10-24; prior 466,388 slightly stale) + manifest (`manifest.jsonl`)"
+  - "Registry exclusion note: `SOURCE-REGISTRY.yaml` NOT present in Genesis-Model (verified 2026-10-24); live registry is `registry/models.json` + `docs/DATASET_REGISTRY.md`"
+  - "Project todos (`PROJECT-TODOS.yaml`) updated (`TODO-GEN-006` PARTIAL)"
+  - "`.gitignore` excludes `data/local/` and `runs/`"
 
 partial:
-  - Master prompt full set (115 files, 10,862,227 chars) indexed but not registered in SOURCE-REGISTRY.yaml as sources; subset manifest exists but full registry entry missing
-  - Conversation transcripts / pasted chat text: not registered or explicitly excluded (remains untracked output)
-  - Tool-use SFT quality measurement (dataset exists; held-out validity measurement not run)
-  - Vision/text dataset beyond synthetic (tower exists; no licensed real-world image-text dataset integrated)
-  - Held-out bits-per-byte evaluation (not yet measured)
-  - Multi-hour stability / thermal test (first run was 4.5 min; longer runs planned)
-  - Model card (`docs/MODEL_CARD_TEMPLATE.md`) not filled
-  - `local_3m` / `local_6m` / `local_15m` / `local_30m` full-token-budget runs not completed (throughput measured on short runs only)
-  - Agent-Bridge / C++ organism wiring (`IModelRuntime` seam) remains external/spec, not modified in existing repos
+  - "Master prompt full set (115 files, 10,862,227 chars) indexed but not registered in SOURCE-REGISTRY.yaml as sources; subset manifest exists but full registry entry missing"
+  - "Conversation transcripts / pasted chat text: not registered or explicitly excluded (remains untracked output)"
+  - "Tool-use SFT quality measurement (dataset exists; held-out validity measurement not run)"
+  - "Vision/text dataset beyond synthetic (tower exists; no licensed real-world image-text dataset integrated)"
+  - "Multi-hour stability / thermal test (longest run so far is 866.2 s = 14.4 min; longer runs planned)"
+  - "`local_3m` / `local_6m` / `local_15m` / `local_30m` full-token-budget runs not completed (`local_3m` smoke attempted: `--preset local_3m --steps 1 --batch-size 4 --seq-len 384 --max-minutes 10 --out runs/local_3m_stage5`; tokenizer on `5,359,343` chars exceeded timeout; previous resource contention possible)."
+  - "Agent-Bridge / C++ organism wiring (`IModelRuntime` seam) remains external/spec, not modified in existing repos"
 
 incomplete:
-  - `seed_30m` / `seed_120m` scale runs (optional later; requires larger hardware / longer time)
-  - Speech / acoustic model / vocoder integration (spec only)
-  - Native C++20 runtime (current is Python + PyTorch; eventual target)
-  - Speech from scratch, GRPO for tool use, distributed training, MoE/MLA experiments
-  - Registry `MODEL-NONE` replacement (`registry/models.tsv`) — blocked until component checklist done
-  - Real-world vision/text dataset at scale (small synthetic vision only)
-  - Full master-prompt integration into training pipeline (subset prepared, not yet fed to model)
-  - Pasted conversation corpus (chat transcripts) formalized and registered
+  - "`seed_30m` / `seed_120m` scale runs (optional later; requires larger hardware / longer time) — Stage 5: NOT EXECUTED"
+  - "Speech / acoustic model / vocoder integration (spec only) — future"
+  - "Native C++20 runtime (current is Python + PyTorch; eventual target)"
+  - "Speech from scratch, GRPO for tool use, distributed training, MoE/MLA experiments"
+  - "Registry `MODEL-NONE` replacement (`registry/models.tsv`) — blocked until component checklist done"
+  - "Real-world vision/text dataset at scale (small synthetic vision only)"
+  - "Full master-prompt integration into training pipeline (subset prepared, not yet fed to model)"
+  - "Pasted conversation corpus (chat transcripts) formalized and registered"
+
+
+phase12:
+  status: PHASE12_LIVE_RUNTIME_VERIFIED — IDE APPROVAL PENDING
+  http_agent_result: "phase4.add_numbers(47,58)=105, steps=2, answer contains 105, elapsed 262.52s"
+  followup_patch: "RUNTIME_FOLLOWUP_PATCH.patch (e6868131...) prepared+validated, applied 2026-10-25"
+  ide_integration: "isolated adapter only; real IDE not modified"
+  missing: [streaming, cancellation, session persistence, auth, CORS restriction]
+
+# --- Verification pass 2026-10-24 (Hermes) ---
+# File was INVALID YAML before this pass: list items used `Key: ` + a value starting
+# with a backtick, which cannot start a YAML token (PyYAML failed at line 15). Every
+# bullet is now a double-quoted scalar, so backticks/colons are safe. Quantitative
+# corpus/heldout figures re-measured from disk; CLI list corrected (added `train`);
+# SOURCE-REGISTRY.yaml reference corrected to the real registry files.

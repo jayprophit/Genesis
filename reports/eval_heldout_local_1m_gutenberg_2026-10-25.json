@@ -1,0 +1,79 @@
+{
+  "checkpoint": "runs\\local_1m_gutenberg\\genesis.pt",
+  "parameters": 1217664,
+  "vocab_size": 4096,
+  "device": "cpu",
+  "training": {
+    "steps": 1220,
+    "tokens_seen": 9994240,
+    "corpus_sha256": "76cb6d12ed0b9e267a72ec442de779b02a8786e8737eac19621900d5a8b40fe8"
+  },
+  "overlap": {
+    "checked": true,
+    "overlaps": [],
+    "training_files": 59,
+    "excluded_files": [],
+    "heldout": {
+      "pg34566.txt": "022dc9382cd4287731fd195c3ad254cbba8df9ebd13c20c1a438be74332b1f3c",
+      "pg5.txt": "d177168e3f4898213dced30fbbe60d74ad08e884ed5dd86bff94a1b8836b5982",
+      "pg753.txt": "84eb702e7fd5185ffcdcbe64cad000d82b1eff62b2e9e82457606b12d9dd9f58"
+    }
+  },
+  "heldout_files": [
+    "pg34566.txt",
+    "pg5.txt",
+    "pg753.txt"
+  ],
+  "per_file": {
+    "pg34566.txt": {
+      "bytes": 49133,
+      "chars": 71161,
+      "tokens": 24477,
+      "blocks": 64,
+      "scored_tokens": 16384,
+      "loss": 4.405124,
+      "perplexity": 81.8693,
+      "bits_per_byte": 2.119236
+    },
+    "pg5.txt": {
+      "bytes": 46278,
+      "chars": 47217,
+      "tokens": 16800,
+      "blocks": 64,
+      "scored_tokens": 16384,
+      "loss": 4.886525,
+      "perplexity": 132.4923,
+      "bits_per_byte": 2.495859
+    },
+    "pg753.txt": {
+      "bytes": 45842,
+      "chars": 378262,
+      "tokens": 132725,
+      "blocks": 64,
+      "scored_tokens": 16384,
+      "loss": 5.566759,
+      "perplexity": 261.585,
+      "bits_per_byte": 2.87034
+    }
+  },
+  "combined": {
+    "tokens": 174002,
+    "blocks": 64,
+    "scored_tokens": 16384,
+    "bytes": 49133,
+    "loss": 4.405124,
+    "perplexity": 81.8693,
+    "bits_per_byte": 2.119236
+  },
+  "throughput": {
+    "generated_tokens": 32,
+    "seconds": 0.4746,
+    "tokens_per_second": 67.42,
+    "device": "cpu"
+  },
+  "notes": [
+    "Perplexity is comparable only on the same tokenizer and the same held-out text.",
+    "The overlap check compares content digests, not file names.",
+    "This is a small local model (see parameters above); the numbers are a baseline, not a product claim."
+  ]
+}

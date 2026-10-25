@@ -14,6 +14,7 @@ with a fast Rust BPE implementation and import the resulting merge list with
 """
 from __future__ import annotations
 
+import heapq
 import json
 import re
 from collections import Counter
@@ -190,20 +191,94 @@ class Tokenizer:
         return pieces
 
     def _encode_bytes(self, data: bytes) -> list[int]:
+        """Apply the learned merges to a byte string.
+
+        The rule is the one the merge list defines: repeatedly take the
+        lowest-ranked adjacent pair and merge every non-overlapping occurrence
+        of it, left to right. That is what ``train`` learned, and the token
+        sequence must follow it exactly.
+
+        The obvious implementation rescans the whole sequence for every merge,
+        which is quadratic in the document length. It tokenized this project's
+        40 MB corpus at roughly one kilobyte per second, so a 5 MB book was
+        more than an hour of pure Python and the training shard took a third of
+        a day. This version keeps the sequence in a doubly linked list and a
+        heap of the ranks that are actually present, so each merge costs a
+        constant number of dictionary updates and the whole document is
+        O(n log V). ``tests/test_tokenizer.py`` pins it against the naive
+        algorithm so the faster path cannot quietly change the tokens.
+        """
         ids = list(data)
-        if not self.merges:
+        n = len(ids)
+        if n < 2 or not self.merges:
             return ids
-        while True:
-            best_rank = None
-            best_pair = None
-            for pair in zip(ids, ids[1:]):
-                rank = self._ranks.get(pair)
-                if rank is not None and (best_rank is None or rank < best_rank):
-                    best_rank = rank
-                    best_pair = pair
-            if best_pair is None:
-                return ids
-            ids = _merge_doc(ids, best_pair, BASE_OFFSET + best_rank)
+
+        nxt = list(range(1, n + 1))
+        nxt[-1] = -1
+        prv = list(range(-1, n - 1))
+        alive = bytearray(b"\x01") * n
+        head = 0
+
+        # rank -> left-node indices whose pair currently has that rank. A
+        # merge only rewrites the id of the left node and unlinks the right
+        # one, so an index stays a valid handle.
+        buckets: dict[int, list[int]] = {}
+        for i in range(n - 1):
+            rank = self._ranks.get((ids[i], ids[i + 1]))
+            if rank is not None:
+                buckets.setdefault(rank, []).append(i)
+
+        pair_of_rank = {rank: pair for pair, rank in self._ranks.items()}
+        heap = list(buckets)
+        heapq.heapify(heap)
+
+        while heap:
+            rank = heapq.heappop(heap)
+            positions = buckets.pop(rank, None)
+            if not positions:
+                # A stale heap entry for a rank whose occurrences are gone.
+                continue
+            # The naive pass merges left to right, which only matters when two
+            # candidates overlap.
+            positions.sort()
+            first, second = pair_of_rank[rank]
+            new_id = BASE_OFFSET + rank
+            for i in positions:
+                if not alive[i]:
+                    continue
+                j = nxt[i]
+                if j < 0 or not alive[j]:
+                    continue
+                if ids[i] != first or ids[j] != second:
+                    continue
+                left = prv[i]
+                right = nxt[j]
+                ids[i] = new_id
+                alive[j] = 0
+                nxt[i] = right
+                if right >= 0:
+                    prv[right] = i
+                if left < 0:
+                    head = i
+                # Only the two pairs touching the new token can be new. The
+                # merged pair itself cannot recur: the new id is fresh.
+                if left >= 0:
+                    new_rank = self._ranks.get((ids[left], new_id))
+                    if new_rank is not None:
+                        buckets.setdefault(new_rank, []).append(left)
+                        heapq.heappush(heap, new_rank)
+                if right >= 0:
+                    new_rank = self._ranks.get((new_id, ids[right]))
+                    if new_rank is not None:
+                        buckets.setdefault(new_rank, []).append(i)
+                        heapq.heappush(heap, new_rank)
+
+        out: list[int] = []
+        i = head
+        while i >= 0:
+            out.append(ids[i])
+            i = nxt[i]
+        return out
 
     def decode(self, ids: Iterable[int], *, skip_special: bool = False) -> str:
         out = bytearray()

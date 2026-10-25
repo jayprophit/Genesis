@@ -21,8 +21,8 @@ python -m pytest tests -q --disable-warnings
 ```
 
 **Result:** `24 passed` (exit code 0). This was the original CPU-only scaffold
-run. After the local-first changes and the sampling fix, the full suite is
-`29 passed` (see the GPU section below).
+run. After the local-first changes and the sampling fix the suite reached
+`29 passed`; the current suite is `32 passed` (2026-10-25, exit code 0).
 
 Coverage:
 
@@ -153,6 +153,15 @@ python -u -m pytest -q --disable-warnings
 
 **Result:** `29 passed`, exit code 0.
 
+**Full suite after the tokenizer and held-out guard changes (2026-10-25)**
+
+```powershell
+python -m pytest
+```
+
+**Result:** `32 passed`, exit code 0. This includes the exact linked-list
+tokenizer oracle and the held-out content-digest overlap guard.
+
 **What this proves**
 
 - the local CUDA wheel works on Pascal/sm_61;
@@ -175,19 +184,51 @@ python -u -m pytest -q --disable-warnings
 - Actual GPU run, not a smoke or repeated-seed benchmark.
 
 **Corpus**: `data/local/gutenberg/`, produced by `scripts/fetch_gutenberg.py`. It
-contains 62 public-domain books (author and translator died before 1947; first
+contains 59 public-domain books (author and translator died before 1947; first
 publication before 1929); see `docs/DATASET_REGISTRY.md` for licence notes and
 the JSONL manifest (`data/local/gutenberg_manifest.jsonl`) for source, SHA-256,
 clean-character count and retrieval date. Total clean text: 41,421,627
 characters. Corpus SHA-256 (clean shard): `76cb6d...` (recorded in checkpoint).
 No private data, no unlicensed modern text, no pre-1929 ambiguity beyond the
-US edition terms.
+US edition terms. Two further books, `pg1342` and `pg1399`, are held out in
+`data/local/gutenberg_heldout/` and are excluded from training by name.
+
+**Correction (2026-10-25): what this run actually tokenized**
+
+The paragraph above describes the folder, not the shard this checkpoint was
+trained on. Both were checked by decoding
+`runs/local_1m_gutenberg/corpus.bin` and matching every document against the
+files:
+
+- The folder has 59 `.txt` files (41,421,627 characters, 42,991,165 bytes); an
+  earlier version of this document said 62.
+- The shard holds the **first 13 books in path order** - 12,523,599 characters,
+  4,124,787 tokens - and stops before `pg1342`. It was built by an earlier run
+  and reused with `--reuse`.
+- `local_plan.json` for this run says `corpus_files: 59` and
+  `corpus_bytes: 42,991,165` because the plan re-enumerated the folder at the end
+  of the run instead of describing the shard.
+
+The checkpoint's parameters, steps, token count, loss and throughput stand. Its
+*corpus* claim did not: `local_1m` trained for 2.4 epochs over 13 books, not over
+the whole folder.
+
+`scripts/local_train.py` now writes `runs/<run>/shard_manifest.json` (file list,
+per-file SHA-256, corpus digest, tokenizer digest, token count) and refuses
+`--reuse`/`--resume` when the shard's digest does not match the corpus. A shard
+with no manifest needs an explicit `--trust-shard`, and the plan records it as
+`unverified`.
 
 **Checkpoint meta (`python -m genesis_model.cli inspect`)**
 
 - Format version `1`
 - Config: `vocab_size=4096`, `d_model=128`, `n_layers=4`, `vision=None`, tied embeddings
-- Actual parameters (`GenesisModel` count from weights): `1,741,952`
+- Actual parameters (`GenesisModel.num_parameters()`): `1,217,664` unique parameters
+  (`693,376` non-embedding + `524,288` token embedding). Summing `state_dict`
+  tensors gives `1,741,952` because `lm_head.weight` and `token_embedding.weight`
+  are the same tensor stored under two names; that sum double-counts the tied
+  embedding and is not the parameter count. Earlier revisions of this document
+  quoted the inflated `1,741,952`.
 - Checkpoint file: `runs/local_1m_gutenberg/genesis.pt`
 - Size: 14,719,247 bytes
 - `steps`: 1220 (complete, not interrupted by `--max-minutes`)
@@ -233,21 +274,111 @@ benchmark claim is made.
 - Vision or speech integration.
 - A 15M or 30M local model; those are future runs.
 
-## Next evidence required (updated after real first model)
+## 2026-10-25 — Clean `local_1m` run with a verified shard, and held-out evaluation
 
-- Held-out split from the Gutenberg set; bits-per-byte and a qualitative review.
-- A second longer run (e.g., `local_3m` or `local_6m`) on the same corpus.
+**Why this run exists.** The 2026-10-24 checkpoint was trained on a 13-book
+shard while its plan described the whole folder. This run rebuilt the shard from
+the declared 57-file training corpus and recorded its provenance, then evaluated
+the result on books the model never saw.
+
+**Training command (actual)**
+
+```powershell
+python -u scripts/local_train.py --corpus data/local/gutenberg `
+  --exclude pg1342.txt --exclude pg1399.txt `
+  --preset local_1m --tokens 20000000 --device cuda --out runs/local_1m_clean
+```
+
+**Shard (measured from `runs/local_1m_clean/shard_manifest.json`)**
+
+- 57 files, 40,190,580 bytes, 38,728,147 characters after newline
+  normalisation, 12,633,141 tokens.
+- Decoding the shard and matching the head, middle and tail of every source
+  file found **0 missing documents** across all 57 files, so this shard really
+  contains the declared training corpus (unlike the 13-book shard above).
+- `corpus.bin` is 50,532,564 bytes, SHA-256
+  `e5f8aaa6a9f25bc8bf384d54f570655e85c367651101f855b48d1eedbcdf237f`.
+- `shard_provenance: written`; the manifest stores each file's SHA-256, the
+  corpus digest, the tokenizer digest and the token count.
+- `pg1342.txt` and `pg1399.txt` were excluded by name and are listed in
+  `excluded_files`.
+
+**Training result (from `runs/local_1m_clean/training_manifest.json`)**
+
+- 2,441 steps, 19,996,672 tokens (target 20,000,000), completed without timeout.
+- `text_ce`: 8.3501 at step 1 to **3.4716** at step 2441; `total=3.4717`.
+- 866.23 s, **28,474.9 tok/s** at the last step, 783.8 MB peak VRAM on the
+  GTX 1050 Ti.
+- Checkpoint: 14,726,095 bytes, SHA-256
+  `076b23b22a62774853e0e8255a2217d1838bc9863cc0b8af894c3b1a7af5f9f2`.
+- Unique parameters: **1,217,664**. Summing `state_dict` tensors gives
+  1,741,952 because `lm_head.weight` and `token_embedding.weight` are the same
+  tied tensor under two names. The unique count is the one this document and the
+  model card use.
+
+**Held-out command (actual, full text rather than a sample)**
+
+```powershell
+python -u scripts/eval_heldout.py --checkpoint runs/local_1m_clean/genesis.pt `
+  --device cuda --max-blocks 0 --output docs/heldout_local_1m_clean.json
+```
+
+**Held-out result (`docs/heldout_local_1m_clean.json`)**
+
+- Overlap check: `checked: true`, `overlaps: []`, 57 training files, both
+  held-out files found in the plan's `excluded_files`. The check compares
+  content digests, so renaming a file cannot smuggle it past the guard.
+- Combined: 885,447 scored tokens in 3,459 blocks, loss **3.467427**,
+  perplexity **32.0542**, bits per byte **1.638118**.
+- `pg1342`: loss 3.401453, ppl 30.0077, bpb 1.550229 (231,079 tokens).
+- `pg1399`: loss 3.490284, ppl 32.7953, bpb 1.670540 (654,367 tokens).
+- Decode throughput measured by the same script: 5.04 tok/s (32 tokens in
+  6.35 s), single-stream generation on this GPU.
+
+**What this proves**
+
+- The shard really contains the 57 declared training books; the plan and the
+  manifest now describe the same bytes.
+- The corpus digest and tokenizer digest are recorded, and the reuse path refuses
+  a shard that does not match either.
+- `local_1m` trains on 20M tokens without error and reaches a lower training
+  loss than the 13-book run, on more text.
+- The held-out books are absent from the training plan by digest and the model
+  scores 1.638 bits per byte on them (perplexity 32.05 under this tokenizer).
+
+**What this does not prove**
+
+- Quality: a 1.22M-parameter model on classic literature produces local
+  fragments, not reasoning. The held-out loss being close to the training loss
+  is not a quality claim.
+- Tool reliability: tool-format validity on held-out prompts is still not
+  measured.
+- Serving performance: 5 tok/s decode is slow for interactive use.
+- Multi-hour stability, vision or speech, or any larger preset.
+
+## Next evidence required (updated 2026-10-25)
+
+- ~~Held-out split from the Gutenberg set; bits-per-byte and a qualitative
+  review.~~ Done for the clean checkpoint: 1.638118 bpb, ppl 32.0542, zero
+  digest overlap (`docs/heldout_local_1m_clean.json`). A qualitative review is
+  still worth recording.
+- A second longer run (e.g., `local_3m` or `local_6m`) on the same corpus and
+  tokenizer.
 - Real image-text dataset (small, licensed) plus vision-tower activation.
-- Master prompt subset (10 Genesis-related files, 466,388 chars) prepared at `data/local/master-prompt-subset/` with manifest (`manifest.jsonl`, 10 entries with SHA-256). Not yet added to training.
+- Master prompt subset (10 Genesis-related files, 466,388 chars) prepared at
+  `data/local/master-prompt-subset/` with manifest (`manifest.jsonl`, 10 entries
+  with SHA-256). Not yet added to training.
 - Tool-use SFT dataset and a tool-format validity measurement.
-- First published model card (`docs/MODEL_CARD_TEMPLATE.md`) for the `genesis_1m`
-  checkpoint.
-- Resume test from the 1220-step checkpoint to confirm optimizer/state match.
+- ~~First published model card (`docs/MODEL_CARD_TEMPLATE.md`) for the
+  `genesis_1m` checkpoint.~~ Filled in for `runs/local_1m_clean/genesis.pt`.
+- Resume test from the clean checkpoint to confirm optimizer/state match.
 - A `local_15m` or `local_30m` multi-hour stability run.
 
 ## Truth checklist (verified status only)
 
-- 29 tests pass (`pytest -q`).
+- 32 tests passed on 2026-10-25 (`python -m pytest`, exit code 0), after the
+  tokenizer rewrite and the held-out content-digest guard were added. The
+  earlier count was 29.
 - `torch==2.14.1+cu126` verified (`doctor` output: `cuda_available=True`, `name=NVIDIA GeForce GTX 1050 Ti`, `cap=(6, 1)`).
 - `model.py` sampling fix verified by `test_generate_top_p_sampling_stays_in_vocab`.
 - `PackedTextDataset` off-by-one fixed (`tests/test_data.py`).
