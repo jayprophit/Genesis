@@ -1,0 +1,17 @@
+# Genesis Native v0.6 review branch - .gitignore
+
+# Checkpoints (large binary files, not part of source handoff)
+checkpoints/
+
+# Cache directories
+__pycache__/
+*.pyc
+*.pyo
+
+# Data files (synthetic experiment manifests only, keep)
+data/*.txt
+data/*.json
+data/*.md
+
+# Ignore intermediate files
+*.backup-*.txt
