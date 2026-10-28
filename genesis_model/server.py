@@ -13,6 +13,8 @@ clients. It is a local research API, not a production multi-tenant server.
 from __future__ import annotations
 
 import json
+import os
+import secrets
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -24,6 +26,37 @@ from .aetherius_bridge import AetheriusBackend, AgentBridgeToolExecutor, registe
 from .checkpoint import load_checkpoint
 from .generate import generate_text
 from .tools import default_registry
+
+
+# -- Local configuration (env, consistent with serve()) ----------------------
+def _allowed_origins() -> list[str]:
+    """Browser origins permitted to read responses. Empty env -> loopback dev set."""
+    raw = os.environ.get("GENESIS_ALLOWED_ORIGINS", "")
+    if not raw:
+        return ["http://127.0.0.1:5199", "http://localhost:5199"]
+    return [o.strip() for o in raw.split(",") if o.strip()]
+
+
+def _origin_allowed(origin: str | None) -> bool:
+    """True only when an Origin header is present and on the allowlist."""
+    if not origin:
+        return False
+    return origin in _allowed_origins()
+
+
+# Shared secret for state-changing (POST) requests. Empty = open on loopback
+# (preserves the verified integration); set to require X-Genesis-Token.
+API_TOKEN = os.environ.get("GENESIS_API_TOKEN", "")
+MAX_BODY = int(os.environ.get("GENESIS_MAX_BODY_BYTES", "5000000"))
+
+
+class _PayloadError(Exception):
+    """Malformed or over-sized request body; carries its HTTP status code."""
+
+    def __init__(self, message: str, status: int = 400) -> None:
+        super().__init__(message)
+        self.message = message
+        self.status = status
 
 
 class GenesisRuntime:
@@ -109,27 +142,58 @@ def make_handler(runtime: GenesisRuntime):
         def log_message(self, format: str, *args) -> None:  # quieter logs
             return
 
+        def _cors_headers(self) -> dict[str, str]:
+            """Reflect ACAO only for allowlisted origins; always send Vary."""
+            origin = self.headers.get("Origin")
+            headers: dict[str, str] = {"Vary": "Origin"}
+            if _origin_allowed(origin):
+                headers["Access-Control-Allow-Origin"] = origin or ""
+                headers["Access-Control-Allow-Credentials"] = "true"
+            return headers
+
         def _send(self, status: int, payload: dict) -> None:
             body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
             self.send_response(status)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
-            self.send_header("Access-Control-Allow-Origin", "*")
+            for k, v in self._cors_headers().items():
+                self.send_header(k, v)
             self.end_headers()
             self.wfile.write(body)
 
         def _body(self) -> dict:
             length = int(self.headers.get("Content-Length", "0"))
-            if length > 5_000_000:
-                raise ValueError("request too large")
+            if length > MAX_BODY:
+                raise _PayloadError("payload too large", status=413)
             raw = self.rfile.read(length) if length else b"{}"
-            return json.loads(raw.decode("utf-8"))
+            try:
+                data = json.loads(raw.decode("utf-8"))
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                raise _PayloadError("invalid JSON body", status=400)
+            if not isinstance(data, dict):
+                raise _PayloadError("request body must be a JSON object", status=400)
+            return data
+
+        def _check_token(self) -> bool:
+            """POSTs require the shared secret when GENESIS_API_TOKEN is set.
+
+            Off by default so the verified integration is unaffected. The
+            secret is never embedded in browser JS or committed files: injected
+            via env and, in the local IDE, supplied by the dev harness through
+            window.__GENESIS_API_TOKEN__ (consumed by the IDE adapter only).
+            """
+            if not API_TOKEN:
+                return True
+            supplied = self.headers.get("X-Genesis-Token", "")
+            return bool(supplied) and secrets.compare_digest(supplied, API_TOKEN)
 
         def do_OPTIONS(self) -> None:  # noqa: N802
+            # Preflight only: never executes tools, never touches the runtime.
             self.send_response(204)
-            self.send_header("Access-Control-Allow-Origin", "*")
+            for k, v in self._cors_headers().items():
+                self.send_header(k, v)
             self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-            self.send_header("Access-Control-Allow-Headers", "Content-Type")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Genesis-Token")
             self.send_header("Content-Length", "0")
             self.end_headers()
 
@@ -141,6 +205,7 @@ def make_handler(runtime: GenesisRuntime):
                     "parameters": (self.runtime.model.num_parameters() if self.runtime.model is not None else 0),
                     "vocab_size": (self.runtime.tokenizer.vocab_size if self.runtime.tokenizer is not None else 0),
                     "tools": self.runtime.registry.names(),
+                    "agent_bridge_active": self.runtime.agent_bridge_executor is not None,
                 })
             elif self.path == "/v1/models":
                 self._send(200, {"data": [{"id": "genesis-local", "object": "model", "owned_by": "genesis"}]})
@@ -151,6 +216,9 @@ def make_handler(runtime: GenesisRuntime):
 
         def do_POST(self) -> None:  # noqa: N802
             try:
+                if not self._check_token():
+                    self._send(401, {"error": "unauthorized"})
+                    return
                 body = self._body()
                 if self.path == "/v1/chat/completions":
                     result = self.runtime.chat(
@@ -168,8 +236,12 @@ def make_handler(runtime: GenesisRuntime):
                     self._send(404, {"error": "not found"})
                     return
                 self._send(200, result)
-            except Exception as exc:
-                self._send(400, {"error": f"{type(exc).__name__}: {exc}"})
+            except _PayloadError as exc:
+                # Body-level client errors: 413 (too large) or 400 (bad JSON/shape).
+                self._send(exc.status, {"error": exc.message})
+            except Exception:
+                # Never leak tracebacks or local filesystem details to clients.
+                self._send(500, {"error": "internal error"})
 
     Handler.runtime = runtime
     return Handler
@@ -186,7 +258,6 @@ def serve(
     backend=None,
     agent_bridge: bool = False,
 ) -> None:
-    import os
     if agent_bridge or os.environ.get("GENESIS_AGENT_BRIDGE") == "1":
         agent_bridge = True
     if checkpoint is None:
@@ -197,4 +268,6 @@ def serve(
     )
     server = ThreadingHTTPServer((host, port), make_handler(runtime))
     print(f"Genesis runtime listening on http://{host}:{port}")
+    if API_TOKEN:
+        print("Authentication enabled (X-Genesis-Token).")
     server.serve_forever()
