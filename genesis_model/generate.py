@@ -57,11 +57,33 @@ def stream_text(
 ) -> str:
     """Generate and call on_token with each decoded chunk as it is produced.
 
-    Kept simple for the local runtime: a token is one byte-BPE piece, so chunks
-    can split a multi-byte character. The caller accumulates bytes and decodes
-    incrementally in the UI.
+    Uses the model's per-token callback for true streaming.
     """
-    text = generate_text(model, tokenizer, prompt, **kwargs)
-    for character in text:
-        on_token(character)
-    return text
+    messages = []
+    if kwargs.get("system"):
+        messages.append({"role": "system", "content": kwargs["system"]})
+    messages.append({"role": "user", "content": prompt})
+    ids = tokenizer.apply_chat_template(messages, add_generation_prompt=True)
+
+    collected: list[int] = []
+    def on_raw_token(token_id: int) -> None:
+        collected.append(token_id)
+        on_token(tokenizer.decode([token_id]))
+
+    model.generate_ids(
+        ids,
+        max_new_tokens=kwargs.get("max_new_tokens", 128),
+        temperature=kwargs.get("temperature", 0.8),
+        top_k=kwargs.get("top_k", 50),
+        top_p=kwargs.get("top_p", 0.95),
+        eos_id=EOS,
+        on_token=on_raw_token,
+    )
+    text = tokenizer.decode(collected)
+    cut = len(text)
+    for index, token in enumerate(collected):
+        if token in (EOS, tokenizer.id_of("<|end|>")):
+            cut = index
+            break
+    final = tokenizer.decode(collected[:cut])
+    return final.strip()

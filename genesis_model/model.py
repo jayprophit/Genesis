@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import Callable
 
 import torch
 from torch import nn
@@ -308,14 +309,16 @@ class GenesisModel(nn.Module):
         eos_id: int = EOS,
         images: torch.Tensor | None = None,
         forbidden_ids: list[int] | None = None,
+        on_token: Callable[[int], None] | None = None,
     ) -> list[int]:
         device = next(self.parameters()).device
+        if len(prompt_ids) > self.config.max_seq_len:
+            prompt_ids = prompt_ids[-self.config.max_seq_len:]
         cache = KVCache(self.config.n_layers)
         tokens = torch.tensor([prompt_ids], dtype=torch.long, device=device)
         out = tokens
 
         logits = self(tokens, images=images, cache=cache)
-        # The cache length includes any visual prefix, so positions stay aligned.
         offset = cache.length
         generated: list[int] = []
         for _ in range(max_new_tokens):
@@ -338,14 +341,14 @@ class GenesisModel(nn.Module):
                     cumulative = torch.cumsum(sorted_probs, dim=-1)
                     keep = cumulative - sorted_probs < top_p
                     keep[..., 0] = True
-                    # multinomial needs non-negative finite weights. Keep the
-                    # surviving probabilities, zero the rest, then renormalize.
                     filtered = torch.zeros_like(probs)
                     filtered.scatter_(1, sorted_idx, torch.where(keep, sorted_probs, torch.zeros_like(sorted_probs)))
                     probs = filtered / filtered.sum(dim=-1, keepdim=True).clamp_min(1e-12)
                 next_id = int(torch.multinomial(probs, 1).item())
 
             generated.append(next_id)
+            if on_token is not None:
+                on_token(next_id)
             out = torch.cat((out, torch.tensor([[next_id]], dtype=torch.long, device=device)), dim=1)
             if next_id == eos_id:
                 break

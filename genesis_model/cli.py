@@ -86,6 +86,7 @@ def build_parser() -> argparse.ArgumentParser:
     serve_p.add_argument("--port", type=int, default=8420)
     serve_p.add_argument("--workspace", default=".")
     serve_p.add_argument("--device", default="cpu")
+    serve_p.add_argument("--api-key", default=None)
     return parser
 
 
@@ -262,7 +263,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "serve":
         serve(args.checkpoint, host=args.host, port=args.port,
-              workspace=args.workspace, device=args.device)
+              workspace=args.workspace, device=args.device,
+              api_key=args.api_key)
         return 0
 
     return 1

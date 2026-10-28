@@ -37,6 +37,10 @@ class CheckpointMeta:
     corpus_sha256: str = ""
     training_history: list[dict] = field(default_factory=list)
     notes: str = ""
+    trained: str = ""
+    shift_fixed: bool = False
+    tool_call_acc: float = 0.0
+    base: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -48,6 +52,10 @@ class CheckpointMeta:
             "corpus_sha256": self.corpus_sha256,
             "training_history": self.training_history,
             "notes": self.notes,
+            "trained": self.trained,
+            "shift_fixed": self.shift_fixed,
+            "tool_call_acc": self.tool_call_acc,
+            "base": self.base,
         }
 
 
@@ -85,10 +93,29 @@ def save_checkpoint(
 
 def load_checkpoint(path: str | Path, map_location: str | torch.device = "cpu"):
     payload = torch.load(path, map_location=map_location, weights_only=True)
-    if payload.get("format_version") != FORMAT_VERSION:
-        raise ValueError(f"unsupported checkpoint format {payload.get('format_version')}")
-    config = ModelConfig.from_dict(payload["config"])
-    tokenizer = Tokenizer.from_dict(payload["tokenizer"])
+    fmt = payload.get("format_version")
+    if fmt == FORMAT_VERSION:
+        config = ModelConfig.from_dict(payload["config"])
+        tokenizer = Tokenizer.from_dict(payload["tokenizer"])
+    elif fmt == "genesis-ckpt-v1":
+        # Legacy compact checkpoint: n_head/n_embd/block_size keys, no tokenizer
+        raw = payload["config"]
+        n_head = raw.get("n_head", 8)
+        config = ModelConfig(
+            vocab_size=raw.get("vocab_size", 4096),
+            d_model=raw.get("n_embd", 256),
+            n_layers=raw.get("n_layer", 6),
+            n_heads=n_head,
+            n_kv_heads=1,
+            d_ff=raw.get("d_ff", 344),
+            max_seq_len=raw.get("block_size", 256),
+            rope_theta=10000.0,
+            tie_embeddings=True,
+            norm_eps=1e-6,
+        )
+        tokenizer = Tokenizer()  # default byte-level BPE with no merges
+    else:
+        raise ValueError(f"unsupported checkpoint format {fmt}")
     model = GenesisModel(config)
     model.load_state_dict(payload["state_dict"], strict=True)
     model.eval()
