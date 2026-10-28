@@ -1,0 +1,12 @@
+# Git Status — audit/genesis-v06-evaluation-repair branch
+ M data/sft/tool_use.jsonl
+ M genesis_model/data.py
+ M research/genesis_native_seed_v06/evaluation/canonical_evaluator.py
+ M research/genesis_native_seed_v06/evaluation/test_canonical_evaluator.py
+?? research/genesis_native_seed_v06/GENESIS_V06_CANONICAL_EVALUATOR_V3_REVIEW.md
+?? research/genesis_native_seed_v06/GENESIS_V06_V3_REVIEW_BUNDLE.zip
+?? research/genesis_native_seed_v06/test_execution_log.txt
+?? research/genesis_native_seed_v06/v2_to_v3_diff.txt
+
+# Notes: Changes not staged for commit: canonical_evaluator.py, test_canonical_evaluator.py (editorials)
+# Untracked: GENESIS_V06_CANONICAL_EVALUATOR_V3_REVIEW.md (and v2_to_v3_diff.txt, test_execution_log.txt)

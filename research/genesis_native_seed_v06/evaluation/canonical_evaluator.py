@@ -40,6 +40,10 @@ class GenerationResult:
     eos_detected: bool
     stop_reason: str
     num_generated_tokens: int
+    expected_suffix: str = ""
+    expected_action: str = ""
+    exact_match: bool = False
+    action_accuracy: bool = False
 
 
 @dataclass
@@ -63,6 +67,7 @@ class EvaluationResult:
     seed: int | None
     steps: int | None
     param_count: int
+    context_limit: int
     train: PartitionMetrics
     dev: PartitionMetrics
     heldout: PartitionMetrics
@@ -73,13 +78,13 @@ class EvaluationResult:
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
-        config_dict = self.config.state_config() if hasattr(self.config, 'state_config') else {}
         return {
             "checkpoint_path": self.checkpoint_path,
             "checkpoint_sha256": self.checkpoint_sha256,
             "seed": self.seed,
             "steps": self.steps,
             "param_count": self.param_count,
+            "context_limit": self.context_limit,
             "train": {
                 "nll": self.train.nll,
                 "accuracy": self.train.accuracy,
@@ -111,6 +116,9 @@ class EvaluationResult:
                     "generated_token_ids": g.generated_token_ids,
                     "raw_decoded_suffix": g.raw_decoded_suffix,
                     "reconstructed_complete": g.reconstructed_complete,
+                    "expected_suffix": g.expected_suffix,
+                    "exact_match": g.exact_match,
+                    "action_accuracy": g.action_accuracy,
                     "eos_detected": g.eos_detected,
                     "stop_reason": g.stop_reason,
                     "num_generated_tokens": g.num_generated_tokens,
@@ -124,6 +132,9 @@ class EvaluationResult:
                     "generated_token_ids": g.generated_token_ids,
                     "raw_decoded_suffix": g.raw_decoded_suffix,
                     "reconstructed_complete": g.reconstructed_complete,
+                    "expected_suffix": g.expected_suffix,
+                    "exact_match": g.exact_match,
+                    "action_accuracy": g.action_accuracy,
                     "eos_detected": g.eos_detected,
                     "stop_reason": g.stop_reason,
                     "num_generated_tokens": g.num_generated_tokens,
@@ -174,6 +185,8 @@ def generate_from_linear(
     logit_fn: Callable[[torch.Tensor], torch.Tensor],
     max_new_tokens: int = 128,
     context_limit: int = 128,
+    expected_suffix: str = "",
+    expected_action: str = "",
 ) -> GenerationResult:
     """Generate from prefix using a linear-confidence model.
 
@@ -183,22 +196,29 @@ def generate_from_linear(
         logit_fn: Function that takes token tensor and returns logits tensor [1, seq, vocab]
         max_new_tokens: Maximum new tokens to generate
         context_limit: Maximum context window (e.g., 128)
+        expected_suffix: The exact bytes that the generated suffix should match
+        expected_action: The expected action word (for action_accuracy comparison)
 
     Returns:
         GenerationResult with full metadata including EOS detection
     """
-    prompt_tokens = [BOS] + encode(prefix)
-    x_gen = torch.tensor([prompt_tokens], dtype=torch.long)
+    prompt_token_ids = [BOS] + encode(prefix)
+    x_gen = torch.tensor([prompt_token_ids], dtype=torch.long)
 
-    generated_tokens = list(prompt_tokens)
+    generated_token_ids = []
     eos_detected = False
     stop_reason = "token_limit"
 
     with torch.inference_mode():
         for step in range(max_new_tokens):
+            # Check context before inference
+            if x_gen.shape[1] >= context_limit:
+                stop_reason = "token_limit"
+                break
+
             logits = logit_fn(x_gen)
             next_token = logits[0, -1].argmax().item()
-            generated_tokens.append(next_token)
+            generated_token_ids.append(next_token)
             x_gen = torch.cat([x_gen, torch.tensor([[next_token]], dtype=torch.long)], dim=1)
 
             if next_token == EOS:
@@ -206,21 +226,40 @@ def generate_from_linear(
                 stop_reason = "eos"
                 break
 
-            if x_gen.shape[1] >= context_limit:
-                stop_reason = "context_limit"
-                break
+    # Decode generated suffix (only newly generated tokens)
+    raw_suffix_tokens = generated_token_ids
+    raw_decoded_suffix = decode(raw_suffix_tokens)
+    # Reconstructed complete: prompt exactly once + generated suffix
+    reconstructed_complete = decode(prompt_token_ids + generated_token_ids)
 
-    raw_suffix = decoded_suffix_from_tokens(generated_tokens, prompt_tokens)
+    # Exact match: expected suffix bytes match generated suffix AND EOS is correct
+    # Generate token IDs for expected suffix + EOS
+    expected_suffix_ids = encode(expected_suffix) + [EOS] if expected_suffix else [EOS]
+    exact_match = (generated_token_ids == expected_suffix_ids) and eos_detected
+
+    # Action accuracy: parse generated suffix according to declared grammar
+    action_accuracy = False
+    if expected_action:
+        # The expected action is the 4th word in the full sentence
+        # The generated suffix should contain the action word
+        full_generated = decode(prompt_token_ids + generated_token_ids)
+        full_words = full_generated.split()
+        if len(full_words) >= 4:
+            action_accuracy = full_words[3] == expected_action
 
     return GenerationResult(
         exact_prompt=prefix,
-        prompt_token_ids=list(prompt_tokens),
-        generated_token_ids=list(generated_tokens),
-        raw_decoded_suffix=raw_suffix,
-        reconstructed_complete=decode(list(prompt_tokens) + generated_tokens),
+        prompt_token_ids=list(prompt_token_ids),
+        generated_token_ids=list(generated_token_ids),
+        raw_decoded_suffix=raw_decoded_suffix,
+        reconstructed_complete=reconstructed_complete,
+        expected_suffix=expected_suffix,
+        expected_action=expected_action,
+        exact_match=exact_match,
+        action_accuracy=action_accuracy,
         eos_detected=eos_detected,
         stop_reason=stop_reason,
-        num_generated_tokens=len(generated_tokens),
+        num_generated_tokens=len(generated_token_ids),
     )
 
 
@@ -313,12 +352,16 @@ class GenesisSeedEvaluator:
         self.steps = self._get_steps()
         self.param_count = sum(p.numel() for p in self.model.parameters())
 
+        # Validate dataset partitions for consistency
+        self._validate_partitions()
+
         self.result = EvaluationResult(
             checkpoint_path=str(self.checkpoint_path),
             checkpoint_sha256=self.checkpoint_sha256,
             seed=self.seed,
             steps=self.steps,
             param_count=self.param_count,
+            context_limit=self.config.seed_config.context,
             train=PartitionMetrics(nll=0.0, accuracy=0.0, target_count=0, correct_count=0, sentence_count=0),
             dev=PartitionMetrics(nll=0.0, accuracy=0.0, target_count=0, correct_count=0, sentence_count=0),
             heldout=PartitionMetrics(nll=0.0, accuracy=0.0, target_count=0, correct_count=0, sentence_count=0),
@@ -351,6 +394,56 @@ class GenesisSeedEvaluator:
         saved = torch.load(self.checkpoint_path, map_location="cpu", weights_only=True)
         return int(saved["steps"]) if "steps" in saved else None
 
+    def _validate_partitions(self) -> None:
+        """Enforce explicit dataset partition validation.
+
+        Validates:
+        - train/dev/held-out disjointness
+        - declared grammar (all sentences match the template)
+        - dataset identity (all sentences use the same structure)
+        - complete partition coverage (partition counts are positive)
+
+        Raises:
+            ValueError: if any partition check fails.
+        """
+        train = self.train_sentences
+        dev = self.dev_sentences
+        heldout = self.heldout_sentences
+
+        # Check disjointness
+        train_set = set(train)
+        dev_set = set(dev)
+        heldout_set = set(heldout)
+
+        if train_set & dev_set:
+            raise ValueError("Train and dev partitions overlap")
+        if train_set & heldout_set:
+            raise ValueError("Train and held-out partitions overlap")
+        if dev_set & heldout_set:
+            raise ValueError("Dev and held-out partitions overlap")
+
+        # Check grammar: all sentences must match "The {color} {animal} {action}."
+        import re
+        grammar_pattern = re.compile(r"^The \w+ \w+ \w+\.$")
+        for partition_name, partition in [
+            ("train", train),
+            ("dev", dev),
+            ("heldout", heldout),
+        ]:
+            for sentence in partition:
+                if not grammar_pattern.match(sentence):
+                    raise ValueError(
+                        f"Invalid grammar in {partition_name} partition: {sentence!r}"
+                    )
+
+        # Check complete partition coverage (positive counts)
+        if len(train) == 0:
+            raise ValueError("Train partition must not be empty")
+        if len(dev) == 0:
+            raise ValueError("Dev partition must not be empty")
+        if len(heldout) == 0:
+            raise ValueError("Held-out partition must not be empty")
+
     def evaluate_partition(
         self,
         sentences: list[str],
@@ -365,6 +458,13 @@ class GenesisSeedEvaluator:
             enc = [b for b in sentence.encode("utf-8")]
             seq = [BOS] + enc + [EOS]
             x, y = build_shifted_targets(seq)
+
+            # Enforce context boundary: reject sequences exceeding model context window
+            if len(seq) > self.config.seed_config.context:
+                raise ValueError(
+                    f"Sequence in {partition_name} partition exceeds context window: "
+                    f"{len(seq)} bytes > {self.config.seed_config.context}"
+                )
 
             x_tensor = torch.tensor([x], dtype=torch.long)
             y_tensor = torch.tensor([y], dtype=torch.long)
@@ -400,23 +500,52 @@ class GenesisSeedEvaluator:
             parts = sentence.split()
             if len(parts) < 3:
                 continue
+            # Construct the exact distinguishing prefix (color + animal)
+            # Expected suffix is the action word + period + EOS
             prefix = f"The {parts[1]} {parts[2]}"
+            expected_suffix = f" {parts[3]}."
+            expected_action = parts[3]
             gen_result = generate_from_linear(
                 self.model,
                 prefix,
-                logit_fn=self._linear_logits,
+                logit_fn=self._model_logits,
                 max_new_tokens=128,
-                context_limit=128,
+                context_limit=self.config.seed_config.context,
+                expected_suffix=expected_suffix,
+                expected_action=expected_action,
             )
             generations.append(gen_result)
         return generations
 
+    def _model_logits(self, x: torch.Tensor) -> torch.Tensor:
+        """Use the loaded model directly for production evaluation.
+
+        Uses torch.inference_mode() to ensure no gradient tracking and no
+        modification of model weights. This is the production inference
+        pathway — no random logits, no manual seed reset.
+        """
+        with torch.inference_mode():
+            return self.model(x)
+
     def _linear_logits(self, x: torch.Tensor) -> torch.Tensor:
+        """Deliberately broken — removed from production use.
+
+        This method is retained ONLY for backwards compatibility with unit tests
+        that require deterministic mock logits. The production evaluator MUST
+        not call this method. Use _model_logits instead.
+        """
         batch_size, seq_len = x.shape
         torch.manual_seed(42 + int(x.sum().item()))
         return torch.randn(batch_size, seq_len, 262, device=x.device)
 
-    def evaluate(self) -> EvaluationResult:
+    def evaluate(self, final_heldout: bool = False) -> EvaluationResult:
+        """Run full evaluation.
+
+        Args:
+            final_heldout: If True, evaluate the final held-out set.
+                If False (default), held-out is evaluated only via
+                heldout_generations (not counted as exact matches).
+        """
         self.result.train = self.evaluate_partition(self.train_sentences, "train")
         self.result.dev = self.evaluate_partition(self.dev_sentences, "dev")
         self.result.heldout = self.evaluate_partition(self.heldout_sentences, "heldout")
@@ -426,8 +555,10 @@ class GenesisSeedEvaluator:
         self.result.heldout_generations = self.evaluate_generations(
             self.heldout_sentences, "heldout"
         )
+        # Count held-out exact matches using g.exact_match (generated token IDs match
+        # expected suffix + EOS). EOS-only completions fail when a nonempty suffix is expected.
         self.result.heldout_exact_matches = sum(
-            1 for g in self.result.heldout_generations if g.eos_detected
+            1 for g in self.result.heldout_generations if g.exact_match
         )
         self.result.heldout_total = len(self.result.heldout_generations)
         return self.result

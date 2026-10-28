@@ -142,6 +142,12 @@ class ChatSFTDataset(Dataset):
                     continue
                 if not in_assistant:
                     labels[i] = -100
+            # model.forward predicts token t+1 at position t, so the supervised
+            # target at position t must be the NEXT token (ids[t+1]).  Shift the
+            # masked labels left by one; without this the model was asked to
+            # predict the token it was already given, so sft_ce went to zero while
+            # no tool-call behaviour was actually learned.
+            labels = labels[1:] + [-100]
             if len(ids) < 2:
                 continue
             if len(ids) > block_size:
