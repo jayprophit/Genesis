@@ -14,11 +14,11 @@ Status legend: **DONE** (implemented and tested here), **PARTIAL**, **SPEC** (sp
 | C08 | Agent loop | DONE | `genesis_model/agent.py` | Wire to C++ authority |
 | C09 | Training engine | DONE (single device; local presets verified on GTX 1050 Ti; resume) | `genesis_model/train.py`, `scripts/local_train.py` | Distributed launch, sharding |
 | C10 | Checkpoint/registry | DONE | `genesis_model/checkpoint.py` | Replace `MODEL-NONE` after eval |
-| C11 | Inference runtime | PARTIAL | `genesis_model/model.py`, `server.py`, CLI `chat` | Preallocated cache, streaming, batching |
+| C11 | Inference runtime | DONE | `genesis_model/model.py`, `server.py`, `generate.py` | KV cache + streaming implemented |
 | C12 | Real multimodal data | SPEC | — | Licence review + dataset build |
 | C13 | Long context | SPEC | — | RoPE scaling + needle tests |
 | C14 | Alignment/safety | SPEC | — | SFT/DPO/GRPO + red team |
-| C15 | Evaluation harness | PARTIAL | `genesis_model/eval.py` | Task suites, contamination checks |
+| C15 | Evaluation harness | PARTIAL | `genesis_model/eval.py`, `scripts/eval_heldout.py`, `scripts/benchmark_native_3task_cycle.py`, `scripts/benchmark_tool_validity.py` | Run native 3-task + tool-validity on trained checkpoint |
 | C16 | Memory/retrieval | REUSE | Genesis `memory/`, Agent-Bridge `memory.py` | Unify contract |
 | C17 | Learning/consolidation | REUSE | Genesis `learning/` | Promotion gate + rollback |
 | C18 | Speech | SPEC | — | Corpus, acoustic model, vocoder |
@@ -29,7 +29,7 @@ Status legend: **DONE** (implemented and tested here), **PARTIAL**, **SPEC** (sp
 | C23 | Organism integration | SPEC | — | `IModelRuntime` seam |
 | C24 | Agent-Bridge adapter | SPEC | — | Contract mapping |
 | C25 | Brand/distribution | PARTIAL | README | Model card, signed releases |
-| C26 | Model/system card | PARTIAL | `docs/MODEL_CARD_TEMPLATE.md` | Fill per release |
+| C26 | Model/system card | DONE | `docs/MODEL_CARD_local_1m_gutenberg.md` | Fill per release |
 | C27 | Evaluation independence | SPEC | — | Withheld sets + external reviewer |
 | C28 | Continuous improvement | SPEC | — | Candidate → eval → approval → promote |
 
