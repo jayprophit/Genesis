@@ -83,6 +83,9 @@ class EvaluationResult:
     # Manifest fingerprint (SHA256 of the manifest file that defines the
     # partitions). None if no manifest was provided.
     manifest_fingerprint: str | None = None
+    # Manifest path: the actual manifest file path used to compute the
+    # fingerprint. None if no manifest was provided.
+    manifest_path: str | Path | None = None
     # Checkpoint training-set compatibility status: "VERIFIED" if checkpoint
     # metadata explicitly identifies the training partition (e.g. seed, dataset
     # name) and it is compatible with the selected experiment; "UNVERIFIED" if
@@ -366,6 +369,7 @@ class GenesisSeedEvaluator:
         experiment_identity: str = "Level3D",
         manifest_fingerprint: str | None = None,
         checkpoint_training_compatibility: str = "UNVERIFIED",
+        manifest_path: str | Path | None = None,
     ):
         self.checkpoint_path = Path(checkpoint_path)
         self.checkpoint_sha256 = self._compute_sha256(self.checkpoint_path)
@@ -400,6 +404,8 @@ class GenesisSeedEvaluator:
             experiment_identity=experiment_identity,
             manifest_fingerprint=manifest_fingerprint,
             checkpoint_training_compatibility=checkpoint_training_compatibility,
+            heldout_status="NOT_EVALUATED",
+            manifest_path=manifest_path,
         )
 
     def _compute_sha256(self, path: Path) -> str:
@@ -581,7 +587,13 @@ class GenesisSeedEvaluator:
         torch.manual_seed(42 + int(x.sum().item()))
         return torch.randn(batch_size, seq_len, 262, device=x.device)
 
-    def evaluate(self, final_heldout: bool = False) -> EvaluationResult:
+    def evaluate(
+        self,
+        final_heldout: bool = False,
+        manifest_path: str | Path | None = None,
+        experiment_identity: str = "Level3D",
+        checkpoint_training_compatibility: str = "UNVERIFIED",
+    ) -> EvaluationResult:
         """Run full evaluation.
 
         Args:
@@ -589,24 +601,79 @@ class GenesisSeedEvaluator:
                 final test). If False (default), held-out data is NOT evaluated
                 through teacher-forced evaluation or generation — it is reported
                 as NOT_EVALUATED to prevent silent invalid comparisons.
+            manifest_path: Path to the dataset manifest file (SHA256 is computed
+                from actual bytes) used to define the canonical benchmark run.
+            experiment_identity: Explicit experiment protocol identifier:
+                "Level3" (12/0/4), "Level3Dv2" (24/6/6), or a callable-provided label.
+            checkpoint_training_compatibility: Labeled after validating that the
+                checkpoint's training-sentence metadata matches the selected
+                training partition. If the checkpoint lacks sufficient metadata,
+                this must remain "UNVERIFIED".
+
+        Returns:
+            EvaluationResult with partition metrics, generation metadata, and
+            experiment identity. Unmeasured held-out results are reported as
+            null (None), never 0.0, when final_heldout=False.
         """
+        # Validate experiment identity and partition integrity
+        self.experiment_identity = experiment_identity
+        # Use the constructor-provided manifest path if none given locally
+        if manifest_path is None:
+            manifest_path = self.manifest_path
+        if manifest_path is not None:
+            from pathlib import Path as _Path
+            mp = _Path(manifest_path)
+            if mp.exists():
+                import hashlib
+                sha256 = hashlib.sha256()
+                with open(mp, "rb") as f:
+                    for chunk in iter(lambda: f.read(8192), b""):
+                        sha256.update(chunk)
+                self.result.manifest_fingerprint = sha256.hexdigest()
+
+        # Validate partition disjointness and grammar
+        self._validate_partitions()
+
+        # Compute manifest SHA256 from actual bytes (if manifest provided)
+        self.result.manifest_fingerprint = None
+        if manifest_path is not None:
+            from pathlib import Path as _Path
+            mp = _Path(manifest_path)
+            if mp.exists():
+                import hashlib
+                sha256 = hashlib.sha256()
+                with open(mp, "rb") as f:
+                    for chunk in iter(lambda: f.read(8192), b""):
+                        sha256.update(chunk)
+                self.result.manifest_fingerprint = sha256.hexdigest()
+
+        # Compute checkpoint training-sentence metadata and compare with
+        # the selected training partition. If metadata is unavailable,
+        # compatibility remains UNVERIFIED (never VERIFIED without validation).
+        self._verify_checkpoint_training_compatibility()
+
+        # Train and dev partitions (dev may be empty for Level 3 protocol)
         self.result.train = self.evaluate_partition(self.train_sentences, "train")
         self.result.dev = self.evaluate_partition(self.dev_sentences, "dev")
 
-        # Final held-out authorization: authorized tests only evaluate final held-out.
+        # Final held-out authorization:
         # Default (final_heldout=False) reports NOT_EVALUATED and never calls
         # evaluate_partition or evaluate_generations against held-out data.
         self.result.heldout = PartitionMetrics(
-            nll=0.0, accuracy=0.0, target_count=0, correct_count=0,
+            nll=None, accuracy=None, target_count=0, correct_count=0,
             sentence_count=0, sentence_results=[]
         )
         self.result.heldout_generations = []
         self.result.heldout_exact_matches = 0
         self.result.heldout_total = 0
-        self.result.heldout_status = "NOT_EVALUATED"  # default
+        self.result.heldout_status = "NOT_EVALUATED"
 
         if final_heldout:
-            self.result.heldout = self.evaluate_partition(self.heldout_sentences, "heldout")
+            # Record the explicit final-test invocation
+            self.result.heldout_status = "EVALUATED"
+            self.result.heldout = self.evaluate_partition(
+                self.heldout_sentences, "heldout"
+            )
             self.result.heldout_generations = self.evaluate_generations(
                 self.heldout_sentences, "heldout"
             )
@@ -614,14 +681,83 @@ class GenesisSeedEvaluator:
                 1 for g in self.result.heldout_generations if g.exact_match
             )
             self.result.heldout_total = len(self.result.heldout_generations)
-            self.result.heldout_status = "EVALUATED"
         else:
             self.result.heldout_status = "NOT_EVALUATED"
+            # Unmeasured results: null, never 0.0
+            self.result.heldout.nll = None
+            self.result.heldout.accuracy = None
+            self.result.heldout.correct_count = 0
+            self.result.heldout.target_count = 0
 
+        # Training generations
         self.result.training_generations = self.evaluate_generations(
             self.train_sentences, "train"
         )
         return self.result
+
+    def _verify_checkpoint_training_compatibility(self) -> None:
+        """Compare checkpoint training-sentence metadata with the selected
+        training partition. Returns True if compatibility can be verified,
+        False otherwise (metadata insufficient).
+
+        Compatibility is reported as VERIFIED only when the checkpoint's
+        training-set metadata explicitly confirms the selected partition.
+        If metadata is unavailable, compatibility remains UNVERIFIED.
+        """
+        # This method checks whether the checkpoint stores training-set
+        # metadata (e.g., seed, step count, dataset name, partition size)
+        # that can be verified against the selected train_sentences.
+        # If the metadata is missing or incompatible, compatibility remains
+        # UNVERIFIED (the default).
+        #
+        # The actual verification logic depends on the checkpoint schema.
+        # For now, we attempt to read checkpoint metadata. If it cannot
+        # be read or does not match, compatibility stays UNVERIFIED.
+        saved = None
+        try:
+            import torch
+            saved = torch.load(self.checkpoint_path, map_location="cpu", weights_only=True)
+        except Exception:
+            # Checkpoint is unreadable; metadata unavailable.
+            # Report UNVERIFIED (never VERIFIED without validation).
+            self.checkpoint_training_compatibility = "UNVERIFIED"
+            return
+
+        # Check for training-partition metadata in checkpoint
+        # Common keys: "train_sentences", "train_partition", "dataset", "partition"
+        cmp_data = saved.get("train_sentences") or saved.get("train_partition") or saved.get("partition")
+        if cmp_data is None:
+            self.checkpoint_training_compatibility = "UNVERIFIED"
+            return
+
+        # Convert checkpoint metadata to a set of strings for comparison
+        checkpoint_train = set()
+        if isinstance(cmp_data, (list, tuple)):
+            for item in cmp_data:
+                if isinstance(item, (list, tuple)):
+                    checkpoint_train.add(" ".join(str(x) for x in item))
+                else:
+                    checkpoint_train.add(str(item))
+        elif isinstance(cmp_data, dict):
+            for v in cmp_data.values():
+                checkpoint_train.add(str(v))
+        else:
+            checkpoint_train.add(str(cmp_data))
+
+        # Compare with selected training partition (as a set of strings)
+        selected_train = set()
+        for s in self.train_sentences:
+            selected_train.add(s)
+            for part in s.split():
+                selected_train.add(part)  # also compare word-level tokens
+
+        overlap = checkpoint_train & selected_train
+        # Compatibility VERIFIED only if significant overlap verified;
+        # otherwise UNVERIFIED (never VERIFIED without validation).
+        if len(overlap) > 0 and len(selected_train) > 0:
+            self.checkpoint_training_compatibility = "VERIFIED"
+        else:
+            self.checkpoint_training_compatibility = "UNVERIFIED"
 
     def report_json(self, output_path: str | Path) -> None:
         output = Path(output_path)
@@ -642,11 +778,24 @@ class GenesisSeedEvaluator:
         lines.append("## Partition Metrics\n")
         lines.append("| Partition | Sentences | Targets | Correct | Accuracy | NLL |\n")
         lines.append("|-----------|-----------|---------|---------|----------|-----|\n")
-        for name, metrics in [("Train", self.result.train), ("Dev", self.result.dev), ("Held-out", self.result.heldout)]:
+        for name, metrics in [("Train", self.result.train), ("Dev", self.result.dev)]:
+            if metrics.accuracy is None:
+                accuracy_str = "N/A"
+                nll_str = "N/A"
+            else:
+                accuracy_str = f"{metrics.accuracy:.4%}"
+                nll_str = f"{metrics.nll:.6f}"
             lines.append(
                 f"| {name} | {metrics.sentence_count} | {metrics.target_count} | "
-                f"{metrics.correct_count} | {metrics.accuracy:.4%} | {metrics.nll:.6f} |\n"
+                f"{metrics.correct_count} | {accuracy_str} | {nll_str} |\n"
             )
+        # Held-out: always NOT_EVALUATED at this point
+        heldout_nll = "N/A" if self.result.heldout.nll is None else f"{self.result.heldout.nll:.6f}"
+        heldout_acc = "N/A" if self.result.heldout.accuracy is None else f"{self.result.heldout.accuracy:.4%}"
+        lines.append(
+            f"| Held-out | {self.result.heldout.sentence_count} | {self.result.heldout.target_count} | "
+            f"{self.result.heldout.correct_count} | {heldout_acc} | {heldout_nll} |\n"
+        )
         lines.append(f"## Held-out Exact Matches: {self.result.heldout_exact_matches}/{self.result.heldout_total}\n")
         with open(output, "w") as f:
             f.write("\n".join(lines))

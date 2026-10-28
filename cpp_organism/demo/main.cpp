@@ -2,6 +2,7 @@
  * @brief Minimal demo: load weights, run one forward pass, print top-5 logits.
  */
 #include "genesis_organism/IModelRuntime.h"
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
@@ -9,6 +10,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 int main(int argc, char** argv) {

@@ -1,0 +1,39 @@
+{
+  "checkpoint": "runs\\sft_tool_retrain_seq256\\genesis.pt",
+  "parameters": 1217664,
+  "vocab_size": 272,
+  "tasks": [
+    {
+      "id": "calc",
+      "name": "Calculator",
+      "success": false,
+      "reason": "no_tool_call",
+      "tool_calls": [],
+      "answer": "",
+      "steps": 1,
+      "elapsed_s": 4.737
+    },
+    {
+      "id": "read",
+      "name": "Read File",
+      "success": false,
+      "reason": "no_tool_call",
+      "tool_calls": [],
+      "answer": "",
+      "steps": 1,
+      "elapsed_s": 0.049
+    },
+    {
+      "id": "now",
+      "name": "Current Time",
+      "success": false,
+      "reason": "no_tool_call",
+      "tool_calls": [],
+      "answer": "",
+      "steps": 1,
+      "elapsed_s": 0.047
+    }
+  ],
+  "passed": 0,
+  "total": 3
+}

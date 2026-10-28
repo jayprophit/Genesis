@@ -67,8 +67,9 @@ CASES = [
 
 
 def evaluate_case(agent: GenesisAgent, case: dict, workspace: Path) -> dict:
+    agent.max_steps = 2
     t0 = time.time()
-    result = agent.run(case["prompt"], max_steps=2)
+    result = agent.run(case["prompt"])
     elapsed = time.time() - t0
 
     tool_calls = [tc.name for tc in result.tool_calls]

@@ -31,7 +31,13 @@ test_returns_metrics (evaluation.test_canonical_evaluator.TestEvaluateSentence.t
 test_weights_identical_before_and_after (evaluation.test_canonical_evaluator.TestEvaluatorImmutability.test_weights_identical_before_and_after)
 Evaluator-loaded weights must be identical before and after evaluation. ... ok
 test_eval_defaults_to_not_evaluating_final_heldout (evaluation.test_canonical_evaluator.TestFinalHeldoutAuthorization.test_eval_defaults_to_not_evaluating_final_heldout)
-Default evaluate() does not count held-out as exact matches. ... ok
+Default evaluate() reports held-out as NOT_EVALUATED. ... ok
+test_expected_suffix_no_duplicated_period (evaluation.test_canonical_evaluator.TestFinalHeldoutAuthorization.test_expected_suffix_no_duplicated_period)
+Production regression: expected_suffix must not duplicate the period. ... ok
+test_heldout_evaluated_when_final_heldout_true (evaluation.test_canonical_evaluator.TestFinalHeldoutAuthorization.test_heldout_evaluated_when_final_heldout_true)
+evaluate(final_heldout=True) runs held-out evaluation exactly once. ... ok
+test_heldout_not_inferred_when_final_heldout_false (evaluation.test_canonical_evaluator.TestFinalHeldoutAuthorization.test_heldout_not_inferred_when_final_heldout_false)
+No teacher-forced held-out inference when final_heldout=False. ... ok
 test_context_limit_stop (evaluation.test_canonical_evaluator.TestGenerateFromLinear.test_context_limit_stop)
 Generation must stop at context limit. ... ok
 test_generate_returns_structured_result (evaluation.test_canonical_evaluator.TestGenerateFromLinear.test_generate_returns_structured_result)
@@ -48,6 +54,10 @@ test_generation_preserves_leading_whitespace (evaluation.test_canonical_evaluato
 Leading spaces in prefix must be preserved in generation. ... ok
 test_invalid_metadata (evaluation.test_canonical_evaluator.TestInvalidCheckpoint.test_invalid_metadata) ... ok
 test_missing_file (evaluation.test_canonical_evaluator.TestInvalidCheckpoint.test_missing_file) ... ok
+test_empty_dev_partition_allowed (evaluation.test_canonical_evaluator.TestLevel3HistoricalCompatibility.test_empty_dev_partition_allowed)
+Empty dev partition must not raise (Level 3 historical: 12/0/4). ... ok
+test_no_metadata_labels_compatibility_unverified (evaluation.test_canonical_evaluator.TestLevel3HistoricalCompatibility.test_no_metadata_labels_compatibility_unverified)
+Without checkpoint metadata, compatibility is UNVERIFIED. ... ok
 test_load (evaluation.test_canonical_evaluator.TestLoadCheckpoint.test_load) ... ok
 test_action_accuracy (evaluation.test_canonical_evaluator.TestOverlappingPartitionRejected.test_action_accuracy)
 Test that action_accuracy is correctly computed. ... ok
@@ -71,15 +81,15 @@ test_markdown_report_written (evaluation.test_canonical_evaluator.TestReportSeri
 Test that Markdown report is written with expected content. ... ok
 
 ----------------------------------------------------------------------
-Ran 39 tests in 28.782s
+Ran 44 tests in 37.573s
 
 OK
 
 ----------------------------------------------------------------------
-Ran 39 tests in 32.117s
+Ran 44 tests in 46.249s
 OK
 FINAL SUMMARY:
-Tests run: 39
-Passed: 39
+Tests run: 44
+Passed: 44
 Failures: 0
 Errors: 0

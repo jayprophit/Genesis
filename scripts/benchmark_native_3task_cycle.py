@@ -63,8 +63,11 @@ def run_task(agent: GenesisAgent, task: dict, workspace: Path) -> dict:
     if "setup" in task:
         task["setup"](workspace)
 
+    # Ensure max_steps is set on the agent for this task
+    agent.max_steps = 4
+
     t0 = time.time()
-    result = agent.run(task["prompt"], max_steps=4)
+    result = agent.run(task["prompt"])
     elapsed = time.time() - t0
 
     tool_calls = [tc.name for tc in result.tool_calls]
