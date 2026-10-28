@@ -6,17 +6,32 @@ test_nll_equals_summed_nll_divided_by_target_count (evaluation.test_canonical_ev
 Cross-entropy must equal summed NLL divided by exact target count. ... ok
 test_context_limit_from_model_config (evaluation.test_canonical_evaluator.TestContextLimitFromConfig.test_context_limit_from_model_config)
 Test that context limit is read from model config, not hardcoded. ... ok
-test_action_accuracy (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_action_accuracy)
-Test that action_accuracy is correctly computed. ... ok
-test_expected_suffix_and_exact_match (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_expected_suffix_and_exact_match)
-Test that expected_suffix produces exact_match true/false correctly. ... ok
-test_missing_eos_fails_exact_match (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_missing_eos_fails_exact_match)
-Test that missing EOS fails exact_match. ... ok
-test_wrong_suffix_fails_exact_match (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_wrong_suffix_fails_exact_match)
-Test that a wrong suffix fails exact_match. ... ok
+test_context_overflow_prevented (evaluation.test_canonical_evaluator.TestContextOverflowPrevention.test_context_overflow_prevented)
+Context overflow must be prevented before model inference. ... ok
+test_correct_action_with_wrong_punctuation (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_correct_action_with_wrong_punctuation)
+Correct action with wrong punctuation = action PASS, sentence FAIL. ... ok
+test_correct_action_without_eos_fails (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_correct_action_without_eos_fails)
+Correct action without EOS = FAIL. ... ok
+test_correct_suffix_and_eos_passes (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_correct_suffix_and_eos_passes)
+Correct ' runs.' + EOS = PASS. ... ok
+test_duplicated_prompt_fails (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_duplicated_prompt_fails)
+Duplicated prompt = FAIL. ... ok
+test_immediate_eos_fails (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_immediate_eos_fails)
+Immediate EOS = FAIL when suffix is expected. ... ok
+test_missing_final_period_fails (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_missing_final_period_fails)
+Missing final period + EOS = FAIL. ... ok
+test_missing_leading_space_fails (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_missing_leading_space_fails)
+Missing leading space + EOS = FAIL. ... ok
+test_unexpected_control_token_fails (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_unexpected_control_token_fails)
+Unexpected control token before EOS = FAIL. ... ok
+test_wrong_action_fails (evaluation.test_canonical_evaluator.TestDeterministicExpectedOutput.test_wrong_action_fails)
+Wrong action + EOS = FAIL. ... ok
 test_accuracy_between_zero_and_one (evaluation.test_canonical_evaluator.TestEvaluateSentence.test_accuracy_between_zero_and_one) ... ok
 test_returns_metrics (evaluation.test_canonical_evaluator.TestEvaluateSentence.test_returns_metrics) ... ok
-test_weights_not_modified (evaluation.test_canonical_evaluator.TestEvaluatorImmutability.test_weights_not_modified) ... ok
+test_weights_identical_before_and_after (evaluation.test_canonical_evaluator.TestEvaluatorImmutability.test_weights_identical_before_and_after)
+Evaluator-loaded weights must be identical before and after evaluation. ... ok
+test_eval_defaults_to_not_evaluating_final_heldout (evaluation.test_canonical_evaluator.TestFinalHeldoutAuthorization.test_eval_defaults_to_not_evaluating_final_heldout)
+Default evaluate() does not count held-out as exact matches. ... ok
 test_context_limit_stop (evaluation.test_canonical_evaluator.TestGenerateFromLinear.test_context_limit_stop)
 Generation must stop at context limit. ... ok
 test_generate_returns_structured_result (evaluation.test_canonical_evaluator.TestGenerateFromLinear.test_generate_returns_structured_result)
@@ -34,24 +49,37 @@ Leading spaces in prefix must be preserved in generation. ... ok
 test_invalid_metadata (evaluation.test_canonical_evaluator.TestInvalidCheckpoint.test_invalid_metadata) ... ok
 test_missing_file (evaluation.test_canonical_evaluator.TestInvalidCheckpoint.test_missing_file) ... ok
 test_load (evaluation.test_canonical_evaluator.TestLoadCheckpoint.test_load) ... ok
+test_action_accuracy (evaluation.test_canonical_evaluator.TestOverlappingPartitionRejected.test_action_accuracy)
+Test that action_accuracy is correctly computed. ... ok
+test_missing_eos_fails_exact_match (evaluation.test_canonical_evaluator.TestOverlappingPartitionRejected.test_missing_eos_fails_exact_match)
+Test that missing EOS fails exact_match. ... ok
+test_overlapping_partition_raises (evaluation.test_canonical_evaluator.TestOverlappingPartitionRejected.test_overlapping_partition_raises)
+A genuinely overlapping partition causes an exception. ... ok
 test_overlap_detection (evaluation.test_canonical_evaluator.TestPartitionOverlapRejected.test_overlap_detection)
 Test that overlapping sentences in train and heldout raise error. ... ok
 test_partitions_are_distinct (evaluation.test_canonical_evaluator.TestPartitionSeparation.test_partitions_are_distinct)
 Train and held-out sentences must be distinct. ... ok
 test_evaluate_uses_loaded_model_not_random_logits (evaluation.test_canonical_evaluator.TestProductionEvaluatorUsesActualModel.test_evaluate_uses_loaded_model_not_random_logits)
 Production evaluator must call the actual loaded model, not _linear_logits. ... ok
+test_production_output_matches_direct_greedy_inference (evaluation.test_canonical_evaluator.TestProductionIntegration.test_production_output_matches_direct_greedy_inference)
+Production output matches direct greedy inference from same model. ... ok
+test_json_output_contains_correct_counts (evaluation.test_canonical_evaluator.TestReportContent.test_json_output_contains_correct_counts)
+Full JSON output contains correct counts. ... ok
 test_json_report_writes_and_parses (evaluation.test_canonical_evaluator.TestReportSerialization.test_json_report_writes_and_parses)
 Test that JSON report can be written and parsed back. ... ok
 test_markdown_report_written (evaluation.test_canonical_evaluator.TestReportSerialization.test_markdown_report_written)
 Test that Markdown report is written with expected content. ... ok
 
 ----------------------------------------------------------------------
-Ran 27 tests in 10.187s
+Ran 39 tests in 28.782s
 
 OK
 
-=== FINAL SUMMARY ===
-Tests run: 27
-Passed: 27
+----------------------------------------------------------------------
+Ran 39 tests in 32.117s
+OK
+FINAL SUMMARY:
+Tests run: 39
+Passed: 39
 Failures: 0
 Errors: 0

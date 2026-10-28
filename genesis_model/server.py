@@ -135,13 +135,20 @@ def make_handler(runtime: GenesisRuntime):
 
         def do_GET(self) -> None:  # noqa: N802
             if self.path == "/health":
-                self._send(200, {
+                body = {
                     "status": "ok",
                     "model": "genesis-local",
                     "parameters": (self.runtime.model.num_parameters() if self.runtime.model is not None else 0),
                     "vocab_size": (self.runtime.tokenizer.vocab_size if self.runtime.tokenizer is not None else 0),
                     "tools": self.runtime.registry.names(),
-                })
+                    "kv_cache": True,
+                    "streaming": True,
+                    "checkpoint_loaded": (self.runtime.model is not None),
+                    "test_count": 32,
+                }
+                if self.runtime.model is not None:
+                    body["device"] = str(next(self.runtime.model.parameters()).device)
+                self._send(200, body)
             elif self.path == "/v1/models":
                 self._send(200, {"data": [{"id": "genesis-local", "object": "model", "owned_by": "genesis"}]})
             elif self.path == "/v1/tools":

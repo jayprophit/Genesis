@@ -75,6 +75,19 @@ class EvaluationResult:
     heldout_generations: list[GenerationResult]
     heldout_exact_matches: int = 0
     heldout_total: int = 0
+    heldout_status: str = "NOT_EVALUATED"
+    # Experiment identity recorded from explicit protocol selection (not from
+    # default examples). Values: "Level3" (12 train / 0 dev / 4 held-out),
+    # "Level3Dv2" (24 train / 6 dev / 6 held-out), or a callable-provided label.
+    experiment_identity: str = "Unknown"
+    # Manifest fingerprint (SHA256 of the manifest file that defines the
+    # partitions). None if no manifest was provided.
+    manifest_fingerprint: str | None = None
+    # Checkpoint training-set compatibility status: "VERIFIED" if checkpoint
+    # metadata explicitly identifies the training partition (e.g. seed, dataset
+    # name) and it is compatible with the selected experiment; "UNVERIFIED" if
+    # metadata is unavailable. Never silently assume compatibility.
+    checkpoint_training_compatibility: str = "UNVERIFIED"
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
@@ -85,6 +98,10 @@ class EvaluationResult:
             "steps": self.steps,
             "param_count": self.param_count,
             "context_limit": self.context_limit,
+            "heldout_status": self.heldout_status,
+            "experiment_identity": self.experiment_identity,
+            "manifest_fingerprint": self.manifest_fingerprint,
+            "checkpoint_training_compatibility": self.checkpoint_training_compatibility,
             "train": {
                 "nll": self.train.nll,
                 "accuracy": self.train.accuracy,
@@ -213,7 +230,7 @@ def generate_from_linear(
         for step in range(max_new_tokens):
             # Check context before inference
             if x_gen.shape[1] >= context_limit:
-                stop_reason = "token_limit"
+                stop_reason = "context_limit"
                 break
 
             logits = logit_fn(x_gen)
@@ -237,15 +254,23 @@ def generate_from_linear(
     expected_suffix_ids = encode(expected_suffix) + [EOS] if expected_suffix else [EOS]
     exact_match = (generated_token_ids == expected_suffix_ids) and eos_detected
 
-    # Action accuracy: parse generated suffix according to declared grammar
+    # Action accuracy: parse generated suffix according to declared grammar.
+    # Independent of punctuation and EOS correctness; full-sentence exact matching
+    # remains byte-exact. Use only the generated tokens (excluding EOS) to decode
+    # the suffix, avoiding the EOS (257) byte being decoded as a non-whitespace
+    # character that would incorrectly concatenate words (e.g. 'dog' + 'runs' +
+    # 'ā' = 'dogrunsā', breaking word counts).
     action_accuracy = False
     if expected_action:
-        # The expected action is the 4th word in the full sentence
-        # The generated suffix should contain the action word
-        full_generated = decode(prompt_token_ids + generated_token_ids)
-        full_words = full_generated.split()
-        if len(full_words) >= 4:
-            action_accuracy = full_words[3] == expected_action
+        generated_without_eos = [t for t in generated_token_ids if t != EOS]
+        decoded_suffix = decode(generated_without_eos) if generated_without_eos else ""
+        # Action is the first word of the generated suffix
+        stripped = decoded_suffix.lstrip(" ")
+        action_word = stripped.split()[0] if stripped else ""
+        # Remove trailing punctuation from the action word (e.g. 'runs.' -> 'runs')
+        while action_word and action_word[-1] in ".,!?;:\"'":
+            action_word = action_word[:-1]
+        action_accuracy = action_word == expected_action
 
     return GenerationResult(
         exact_prompt=prefix,
@@ -338,6 +363,9 @@ class GenesisSeedEvaluator:
         train_sentences: Optional[list[str]] = None,
         dev_sentences: Optional[list[str]] = None,
         heldout_sentences: Optional[list[str]] = None,
+        experiment_identity: str = "Level3D",
+        manifest_fingerprint: str | None = None,
+        checkpoint_training_compatibility: str = "UNVERIFIED",
     ):
         self.checkpoint_path = Path(checkpoint_path)
         self.checkpoint_sha256 = self._compute_sha256(self.checkpoint_path)
@@ -369,6 +397,9 @@ class GenesisSeedEvaluator:
             heldout_generations=[],
             heldout_exact_matches=0,
             heldout_total=0,
+            experiment_identity=experiment_identity,
+            manifest_fingerprint=manifest_fingerprint,
+            checkpoint_training_compatibility=checkpoint_training_compatibility,
         )
 
     def _compute_sha256(self, path: Path) -> str:
@@ -437,10 +468,11 @@ class GenesisSeedEvaluator:
                     )
 
         # Check complete partition coverage (positive counts)
+        # Train partition must not be empty
         if len(train) == 0:
             raise ValueError("Train partition must not be empty")
-        if len(dev) == 0:
-            raise ValueError("Dev partition must not be empty")
+        # Dev partition is allowed to be empty (e.g. Level 3 historical:
+        # 12 train / 0 dev / 4 held-out)
         if len(heldout) == 0:
             raise ValueError("Held-out partition must not be empty")
 
@@ -500,11 +532,22 @@ class GenesisSeedEvaluator:
             parts = sentence.split()
             if len(parts) < 3:
                 continue
-            # Construct the exact distinguishing prefix (color + animal)
-            # Expected suffix is the action word + period + EOS
+            # Parse the sentence using the declared grammar:
+            # "The {color} {animal} {action_word}."
+            # Determine the distinguishing prefix (color + animal) so each
+            # candidate sentence maps to a unique prompt for generation.
             prefix = f"The {parts[1]} {parts[2]}"
-            expected_suffix = f" {parts[3]}."
-            expected_action = parts[3]
+            # Extract the action word from the final token WITHOUT punctuation.
+            # The sentence's final token includes the trailing period (e.g.
+            # "runs."), so strip it before using the action word.
+            action_word = parts[3].rstrip(".").rstrip("!").rstrip("?").rstrip(",")
+            # Derive expected_suffix from the exact original sentence after the
+            # distinguishing prefix, preserving the leading space and final period.
+            # Do NOT duplicate punctuation (e.g. " runs." + "." would produce
+            # " runs.."). The action word already excludes punctuation, so the
+            # period is appended here once.
+            expected_suffix = f" {action_word}."
+            expected_action = action_word
             gen_result = generate_from_linear(
                 self.model,
                 prefix,
@@ -542,25 +585,42 @@ class GenesisSeedEvaluator:
         """Run full evaluation.
 
         Args:
-            final_heldout: If True, evaluate the final held-out set.
-                If False (default), held-out is evaluated only via
-                heldout_generations (not counted as exact matches).
+            final_heldout: If True, evaluate the final held-out set (authorized
+                final test). If False (default), held-out data is NOT evaluated
+                through teacher-forced evaluation or generation — it is reported
+                as NOT_EVALUATED to prevent silent invalid comparisons.
         """
         self.result.train = self.evaluate_partition(self.train_sentences, "train")
         self.result.dev = self.evaluate_partition(self.dev_sentences, "dev")
-        self.result.heldout = self.evaluate_partition(self.heldout_sentences, "heldout")
+
+        # Final held-out authorization: authorized tests only evaluate final held-out.
+        # Default (final_heldout=False) reports NOT_EVALUATED and never calls
+        # evaluate_partition or evaluate_generations against held-out data.
+        self.result.heldout = PartitionMetrics(
+            nll=0.0, accuracy=0.0, target_count=0, correct_count=0,
+            sentence_count=0, sentence_results=[]
+        )
+        self.result.heldout_generations = []
+        self.result.heldout_exact_matches = 0
+        self.result.heldout_total = 0
+        self.result.heldout_status = "NOT_EVALUATED"  # default
+
+        if final_heldout:
+            self.result.heldout = self.evaluate_partition(self.heldout_sentences, "heldout")
+            self.result.heldout_generations = self.evaluate_generations(
+                self.heldout_sentences, "heldout"
+            )
+            self.result.heldout_exact_matches = sum(
+                1 for g in self.result.heldout_generations if g.exact_match
+            )
+            self.result.heldout_total = len(self.result.heldout_generations)
+            self.result.heldout_status = "EVALUATED"
+        else:
+            self.result.heldout_status = "NOT_EVALUATED"
+
         self.result.training_generations = self.evaluate_generations(
             self.train_sentences, "train"
         )
-        self.result.heldout_generations = self.evaluate_generations(
-            self.heldout_sentences, "heldout"
-        )
-        # Count held-out exact matches using g.exact_match (generated token IDs match
-        # expected suffix + EOS). EOS-only completions fail when a nonempty suffix is expected.
-        self.result.heldout_exact_matches = sum(
-            1 for g in self.result.heldout_generations if g.exact_match
-        )
-        self.result.heldout_total = len(self.result.heldout_generations)
         return self.result
 
     def report_json(self, output_path: str | Path) -> None:
