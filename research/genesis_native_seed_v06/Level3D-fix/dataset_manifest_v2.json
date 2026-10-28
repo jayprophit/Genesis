@@ -1,0 +1,66 @@
+{
+  "colors": [
+    "amber",
+    "violet",
+    "silver",
+    "orange",
+    "brown",
+    "purple"
+  ],
+  "animals": {
+    "fox": "runs",
+    "owl": "hoots",
+    "bee": "buzzes",
+    "seal": "swims",
+    "goat": "bleats",
+    "duck": "quacks"
+  },
+  "template": "The {color} {animal} {action}.",
+  "total_combinations": 36,
+  "note": "Cyclic pair allocation: held-out animal index = i, dev animal index = (i+1)%6, training = remaining 4 animals. All 6 colors appear in training.",
+  "train": [
+    "The amber bee buzzes.",
+    "The amber seal swims.",
+    "The amber goat bleats.",
+    "The amber duck quacks.",
+    "The violet seal swims.",
+    "The violet goat bleats.",
+    "The violet duck quacks.",
+    "The violet fox runs.",
+    "The silver goat bleats.",
+    "The silver duck quacks.",
+    "The silver fox runs.",
+    "The silver owl hoots.",
+    "The orange duck quacks.",
+    "The orange fox runs.",
+    "The orange owl hoots.",
+    "The orange bee buzzes.",
+    "The brown fox runs.",
+    "The brown owl hoots.",
+    "The brown bee buzzes.",
+    "The brown seal swims.",
+    "The purple owl hoots.",
+    "The purple bee buzzes.",
+    "The purple seal swims.",
+    "The purple goat bleats."
+  ],
+  "dev": [
+    "The amber owl hoots.",
+    "The violet bee buzzes.",
+    "The silver seal swims.",
+    "The orange goat bleats.",
+    "The brown duck quacks.",
+    "The purple fox runs."
+  ],
+  "held_out": [
+    "The amber fox runs.",
+    "The violet owl hoots.",
+    "The silver bee buzzes.",
+    "The orange seal swims.",
+    "The brown goat bleats.",
+    "The purple duck quacks."
+  ],
+  "train_count": 24,
+  "dev_count": 6,
+  "held_out_count": 6
+}
