@@ -21,26 +21,38 @@ import urllib.request
 from typing import Any
 
 # Agent Bridge imports (consumer-owned, no service bootstrap).
-# The bridge source root is configurable so this module is portable; the
-# legacy local-only default preserves the verified workspace layout.
+# The bridge source root is configurable so this module is portable. There is
+# NO machine-specific default: GENESIS_AGENT_BRIDGE_ROOT must point at a checkout
+# that exposes the bridge `tools/` package (see _import_agent_bridge).
 import sys as _sys
 
-_AGENT_BRIDGE_ROOT = os.environ.get(
-    "GENESIS_AGENT_BRIDGE_ROOT",
-    "C:/Users/jpowe/Desktop/Projects/Agent-Bridge",
-)
+_AGENT_BRIDGE_ROOT = os.environ.get("GENESIS_AGENT_BRIDGE_ROOT", "")
 if _AGENT_BRIDGE_ROOT and _AGENT_BRIDGE_ROOT not in _sys.path:
     _sys.path.insert(0, _AGENT_BRIDGE_ROOT)
 
 
 def _import_agent_bridge():
+    """Import the Agent Bridge tools package.
+
+    GENESIS_AGENT_BRIDGE_ROOT must point at a checkout exposing `tools/`
+    (registry, phase4 adapter, router dispatcher). An unset/incorrect value
+    fails loudly instead of crashing with a bare ModuleNotFoundError.
+    """
     from tools.registry import ToolRegistry as _ABRegistry  # noqa: E402
     from tools.phase4_adapter import ensure_phase4_registered  # noqa: E402
     from tools.router import ToolRouter  # noqa: E402
     return _ABRegistry, ensure_phase4_registered, ToolRouter
 
 
-_ABRegistry, ensure_phase4_registered, ToolRouter = _import_agent_bridge()
+try:
+    _ABRegistry, ensure_phase4_registered, ToolRouter = _import_agent_bridge()
+except ImportError as _ab_exc:
+    raise ImportError(
+        "GENESIS_AGENT_BRIDGE_ROOT is unset or does not expose the Agent-Bridge "
+        "`tools/` package. Set GENESIS_AGENT_BRIDGE_ROOT to your Agent-Bridge checkout "
+        "root (it must contain tools/registry.py, tools/phase4_adapter.py, "
+        "tools/router.py), or unset GENESIS_AGENT_BRIDGE to run without the bridge."
+    ) from _ab_exc
 
 # Genesis imports.
 from .tools import ToolContext, ToolRegistry, ToolResult, ToolSpec  # noqa: E402
@@ -56,10 +68,14 @@ _OLLAMA_KEEPALIVE = os.environ.get("GENESIS_OLLAMA_KEEPALIVE", "")
 
 def _chat(messages):
     options: dict[str, Any] = {"temperature": 0, "num_predict": 256}
+    payload: dict[str, Any] = {"model": MODEL, "messages": messages,
+                              "stream": False, "think": False, "options": options}
+    # Ollama expects keep_alive as a TOP-LEVEL /api/chat field; nesting it under
+    # `options` is silently ignored, so the model unloads between turns (cold
+    # start ~110s on each request). GENESIS_OLLAMA_KEEPALIVE maps to the
+    # top-level field exactly as Ollama documents.
     if _OLLAMA_KEEPALIVE:
-        options["keep_alive"] = _OLLAMA_KEEPALIVE
-    payload = {"model": MODEL, "messages": messages, "stream": False, "think": False,
-               "options": options}
+        payload["keep_alive"] = _OLLAMA_KEEPALIVE
     req = urllib.request.Request(OLLAMA + "/api/chat", data=json.dumps(payload).encode(),
                                  headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=OLLAMA_TIMEOUT) as r:
@@ -121,8 +137,12 @@ class AgentBridgeToolExecutor:
     def execute(self, tool_name, arguments, execution_id=None):
         if not tool_name.startswith("phase4."):
             return {"ok": False, "error": "tool not in Agent Bridge phase4 set"}
-        ctx = {"trusted_agent_id": self.agent_id, "owner_authorized": True,
+        ctx = {"trusted_agent_id": self.agent_id, "owner_authorized": False,
                "execution_id": execution_id}
+        # Genesis is an LLM-driven coordinator, not a trusted owner identity.
+        # owner_authorized must only become True through a verified server-side
+        # authority (see the isolated Agent-Bridge owner-authorisation review);
+        # it must never be self-granted by Genesis or by the model.
         return self.router.call(tool_name, arguments, context=ctx)
 
     def schemas_ab(self):

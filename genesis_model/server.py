@@ -219,6 +219,17 @@ def make_handler(runtime: GenesisRuntime):
                 if not self._check_token():
                     self._send(401, {"error": "unauthorized"})
                     return
+                # Server-side CORS enforcement on state-changing POSTs: reflecting
+                # ACAO in the response does NOT stop a browser from SENDING a
+                # disallowed-origin request with side effects (the page simply
+                # can't read the response). Enforce the origin allowlist on POSTs
+                # here, in addition to the reflected headers. Requests with no
+                # Origin (loopback scripts/curl) are unaffected; the server is
+                # bound to 127.0.0.1 only (GENESIS_ALLOWED_ORIGINS gates reads).
+                origin = self.headers.get("Origin")
+                if origin is not None and not _origin_allowed(origin):
+                    self._send(403, {"error": "origin not allowed"})
+                    return
                 body = self._body()
                 if self.path == "/v1/chat/completions":
                     result = self.runtime.chat(

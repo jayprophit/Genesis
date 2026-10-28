@@ -115,7 +115,7 @@ not a dead daemon (`/api/ps` and `/api` returned 200 throughout).
 | Axis | Verdict |
 |---|---|
 | HTTP Phase-F (pasted `47+58` prompt → tool executes → 105) | ✅ PASS (6/6 warm runs, deterministic) |
-| IDE vitest + tsc | ✅ 481/481, rc=0 |
+| IDE vitest + tsc | ✅ 484/484, rc=0 (was 483/484 pre-correction — see §3 flake fix) |
 | IDE lifecycle (no background `/health` in non-genesis modes) | ✅ Fixed + tested |
 | Graphical E2E (`genesis_perf_e2e.js`) | ❌ Not performed — script not present in worktree (pruned scratch); no graphical IDE E2E run against the hardened build. Do **not** claim a graphical pass. |
 | 8471 self-restart / SIGKILL | Observed; root cause unproven (no OOM evidence); self-heals; does not affect verified results. |

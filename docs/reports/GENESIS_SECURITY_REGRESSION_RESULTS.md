@@ -56,8 +56,8 @@ New tests added in this pass (4): `test_phase4_schema_helper_builds_named_args`,
 
 | Scenario | Why untested | Risk |
 |---|---|---|
-| `GENESIS_API_TOKEN` set (auth-on) path | Run used token unset (loopback-open); no live token tested against `/v1/agent`. | Medium — token-gating logic exists (`_check_token`, `compare_digest`) and unit-tested in spirit, but the live 401-reject path is unverified against a real header. |
-| Token brute-force / replay | No timing-attack harness run. | Low — `secrets.compare_digest` used. |
+| `GENESIS_API_TOKEN` set (auth-on) path | RESOLVED — live `:8473` matrix (§B1) verified Missing→401, Invalid→401, Valid→200 (phase4→105). | Resolved (supersedes the earlier "unverified against a real header" note). |
+| Token brute-force / replay | No rate-limit/lockout or nonce/timestamp instrumentation. | `secrets.compare_digest` is a **constant-time compare** (timing mitigation on the token comparison only); it is **neither** brute-force protection (no rate limit/lockout) **nor** replay protection (no nonce/timestamp). The Low risk reflects the **loopback-only bind** (`127.0.0.1`), not the compare function. |
 | POST body just under `MAX_BODY` boundary (e.g. 4.9 vs 5.0 MB) | Only 6 MB (over) and normal payloads tested. | Low — boundary is a single integer compare. |
 | TLS / HTTPS | Server is plain HTTP on loopback only. | Out of scope (localhost loopback). |
 | Origin-spoofing beyond `evil.example` | Only two origins sampled (allowlisted + one disallowed). | Low — policy is exact-match against `GENESIS_ALLOWED_ORIGINS`. |
@@ -86,8 +86,7 @@ Security regressions: **19/19** automated + **6/6** live HTTP checks.
   -> pure IDE request 401. Minimal fix (no production edit): dev-harness pre-load
   injects window.__GENESIS_API_TOKEN__ + a fetch wrapper attaching X-Genesis-Token to
   /v1/agent POSTs (validated: 200, tool->105). No same-origin proxy required.
-- Brute-force/replay: secrets.compare_digest used (timing-safe); not otherwise
-  instrumented (out of scope).
+- Brute-force/replay | `secrets.compare_digest` is a constant-time compare (timing mitigation on the token comparison only); it is NOT brute-force protection (no rate-limit/lockout) nor replay protection (no nonce/timestamp). Not otherwise instrumented (out of scope).
 - Result: security regressions remain 19/19 automated + 6/6 live HTTP + 8/8 live
   auth scenarios.
 
