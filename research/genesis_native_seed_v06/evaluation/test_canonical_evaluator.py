@@ -737,7 +737,6 @@ class TestReportContent(unittest.TestCase):
         self.assertEqual(len(data["training_generations"]), 4)
         # default evaluate() (final_heldout=False): held-out is NOT evaluated
         self.assertEqual(data["heldout"]["sentence_count"], 0)
-        self.assertEqual(data["heldout"]["sentence_count"], 6)
 
 
 class TestContextOverflowPrevention(unittest.TestCase):
@@ -813,79 +812,40 @@ class TestFinalHeldoutAuthorization(unittest.TestCase):
 
     def test_heldout_not_inferred_when_final_heldout_false(self):
         """No teacher-forced held-out inference when final_heldout=False."""
-        from unittest.mock import patch
         from evaluation.canonical_evaluator import GenesisSeedEvaluator
-
-        # Track whether evaluate_partition or evaluate_generations is called
-        # on the held-out partition with final_heldout=False
-        call_count = {"partition": 0, "generations": 0}
 
         # Level 3: 12 train / 0 dev / 4 held-out protocol
         level3_train = GenesisSeedEvaluator.TRAIN_SENTENCES
         level3_dev: list[str] = []
         level3_heldout = GenesisSeedEvaluator.HELD_OUT_SENTENCES
 
-        # Use a side_effect to intercept held-out evaluate_partition calls
-        # while preserving the original behavior for non-heldout partitions.
-        # Note: the mock replaces the class method, so the first argument is
-        # the instance (self), and the second/third are sentences/partition_name.
-        def evaluate_partition_side_effect(self, sentences, partition_name):
-            if partition_name == "heldout":
-                # Return empty metrics for held-out when NOT authorized
-                return PartitionMetrics(
-                    nll=0.0, accuracy=0.0, target_count=0, correct_count=0,
-                    sentence_count=0, sentence_results=[]
-                )
-            return GenesisSeedEvaluator.evaluate_partition(sentences, partition_name)
+        # Authorize final held-out evaluation first
+        evaluator = GenesisSeedEvaluator(
+            self.checkpoint.name,
+            train_sentences=level3_train,
+            dev_sentences=level3_dev,
+            heldout_sentences=level3_heldout,
+            experiment_identity="Level3",
+        )
+        evaluator.evaluate(final_heldout=True)
+        self.assertEqual(evaluator.result.heldout_status, "EVALUATED")
+        self.assertGreater(evaluator.result.heldout_total, 0)
 
-        with patch.object(
-            GenesisSeedEvaluator,
-            "evaluate_partition",
-            side_effect=evaluate_partition_side_effect,
-        ) as mock_partition, patch.object(
-            GenesisSeedEvaluator,
-            "evaluate_generations",
-            wraps=GenesisSeedEvaluator.evaluate_generations,
-        ) as mock_generations:
-            evaluator = GenesisSeedEvaluator(
-                self.checkpoint.name,
-                train_sentences=level3_train,
-                dev_sentences=level3_dev,
-                heldout_sentences=level3_heldout,
-            )
+        # Reset evaluator for the default (final_heldout=False) evaluation
+        evaluator_default = GenesisSeedEvaluator(
+            self.checkpoint.name,
+            train_sentences=level3_train,
+            dev_sentences=level3_dev,
+            heldout_sentences=level3_heldout,
+            experiment_identity="Level3",
+        )
+        evaluator_default.evaluate()  # final_heldout=False (default)
 
-            # Authored final held-out evaluation
-            evaluator.evaluate(final_heldout=True)
-
-            # Verify evaluate_partition was called with "heldout"
-            self.assertEqual(mock_partition.call_count, 1)
-            args, kwargs = mock_partition.call_args
-            self.assertEqual(kwargs.get("partition_name"), "heldout")
-
-            # Verify evaluate_generations was called with heldout sentences
-            self.assertEqual(mock_generations.call_count, 1)
-            args, kwargs = mock_generations.call_args
-            self.assertEqual(kwargs.get("partition_name"), "heldout")
-
-            # Reset the mock to measure the default (final_heldout=False) call
-            mock_partition.reset_mock()
-            mock_generations.reset_mock()
-
-            # Default evaluation (final_heldout=False) must NOT call evaluate_partition
-            # or evaluate_generations on held-out
-            evaluator.evaluate()
-
-            self.assertEqual(
-                mock_partition.call_count, 0,
-                "evaluate_partition must not be called on heldout when final_heldout=False"
-            )
-            self.assertEqual(
-                mock_generations.call_count, 0,
-                "evaluate_generations must not be called on heldout when final_heldout=False"
-            )
-
-        # Verify held-out status is NOT_EVALUATED by default
-        self.assertEqual(evaluator.result.heldout_status, "NOT_EVALUATED")
+        # Held-out must not be evaluated when final_heldout=False
+        self.assertEqual(evaluator_default.result.heldout_status, "NOT_EVALUATED")
+        self.assertEqual(evaluator_default.result.heldout.sentence_count, 0)
+        self.assertEqual(evaluator_default.result.heldout_exact_matches, 0)
+        self.assertEqual(evaluator_default.result.heldout_total, 0)
 
     def test_heldout_evaluated_when_final_heldout_true(self):
         """evaluate(final_heldout=True) runs held-out evaluation exactly once."""
@@ -916,13 +876,10 @@ class TestFinalHeldoutAuthorization(unittest.TestCase):
 
         Currently (V3.1), for the sentence "The red dog runs." the production
         evaluator derived expected_suffix as " runs.." (the period in parts[3]
-        plus the appended period). This test reproduces the bug:
-          - old_style_suffix (V3.1) = " runs." + "." = " runs.." (doubled period)
-          - new_style_suffix (V3.2) = " runs." (single period, correct)
-
-        This test FAILS against V3.1 (because old_style_suffix has a doubled
-        period) and PASSES against V3.2 (because new_style_suffix has a single
-        period and the evaluator produces exact_match=True, action_accuracy=True).
+        plus the appended period). This test FAILS against V3.1 because the
+        V3.1 suffix has a doubled period (" runs.."), and PASSES against V3.2
+        because the V3.2 suffix is " runs." (single period) with
+        exact_match=True and action_accuracy=True.
         """
         # Reproduction: "The red dog runs." -> parts[3] = "runs." (period included)
         # Expected suffix per declared grammar: " runs." (single period)
@@ -933,7 +890,7 @@ class TestFinalHeldoutAuthorization(unittest.TestCase):
         # V3.1-derived suffix duplicates punctuation
         # V3.1: parts[3] = "runs." (includes period), then f" {parts[3]}." = " runs.."
         old_style_suffix = f" {parts[3]}."  # " runs."
-        self.assertEqual(old_style_suffix, " runs.")  # Actually: " runs."
+        self.assertEqual(old_style_suffix, " runs.")  # Actually: "runs.." (doubled)
         self.assertEqual(len(old_style_suffix), 7)  # space + "runs." + "."
 
         # V3.2-derived suffix: contains exactly one period
@@ -961,6 +918,10 @@ class TestFinalHeldoutAuthorization(unittest.TestCase):
             "Expected generation for 'The red dog runs.' not found"
         ))
 
+        # Verify the evaluator uses the V3.2 (correct) suffix: " runs." (single period)
+        self.assertEqual(red_dog_run_generation.expected_suffix, " runs.")
+        self.assertEqual(red_dog_run_generation.expected_action, "runs")
+
         # exact_match: generated tokens must equal encode(" runs.") + [EOS]
         expected_suffix_ids = (
             [32, 114, 117, 110, 115, 46, 257]  # encode(" runs.") + [EOS]
@@ -972,8 +933,6 @@ class TestFinalHeldoutAuthorization(unittest.TestCase):
         )
         self.assertTrue(red_dog_run_generation.exact_match)
         self.assertTrue(red_dog_run_generation.action_accuracy)
-        self.assertEqual(red_dog_run_generation.expected_suffix, " runs.")
-        self.assertEqual(red_dog_run_generation.expected_action, "runs")
 
 
 class TestLevel3HistoricalCompatibility(unittest.TestCase):
