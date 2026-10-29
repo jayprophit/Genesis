@@ -56,6 +56,21 @@ class PartitionMetrics:
     correct_count: int
     sentence_count: int
     sentence_results: list[dict[str, Any]] = field(default_factory=list)
+    # Partition status: "APPLICABLE" for non-empty partitions,
+    # "NOT_APPLICABLE" for explicitly empty partitions (e.g. historical Level 3 dev partition).
+    status: str = "APPLICABLE"
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert to dictionary for JSON serialization, including status."""
+        return {
+            "nll": self.nll,
+            "accuracy": self.accuracy,
+            "target_count": self.target_count,
+            "correct_count": self.correct_count,
+            "sentence_count": self.sentence_count,
+            "sentence_results": self.sentence_results,
+            "status": self.status,
+        }
 
 
 @dataclass
@@ -76,6 +91,10 @@ class EvaluationResult:
     heldout_exact_matches: int = 0
     heldout_total: int = 0
     heldout_status: str = "NOT_EVALUATED"
+    # Authorization timestamp (UTC) recorded when a final test (final_heldout=True)
+    # succeeds. None if no final test has been performed.
+    authorization_timestamp: str | None = None
+
     # Experiment identity recorded from explicit protocol selection (not from
     # default examples). Values: "Level3" (12 train / 0 dev / 4 held-out),
     # "Level3Dv2" (24 train / 6 dev / 6 held-out), or a callable-provided label.
@@ -91,6 +110,9 @@ class EvaluationResult:
     # name) and it is compatible with the selected experiment; "UNVERIFIED" if
     # metadata is unavailable. Never silently assume compatibility.
     checkpoint_training_compatibility: str = "UNVERIFIED"
+    # Manifest schema adapter indicator: True if the manifest was adapted
+    # (e.g. Level3Dv2 uses 'held_out' which was normalized to 'heldout').
+    manifest_schema_adapter_applied: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
@@ -102,33 +124,14 @@ class EvaluationResult:
             "param_count": self.param_count,
             "context_limit": self.context_limit,
             "heldout_status": self.heldout_status,
+            "authorization_timestamp": self.authorization_timestamp,
             "experiment_identity": self.experiment_identity,
             "manifest_fingerprint": self.manifest_fingerprint,
             "checkpoint_training_compatibility": self.checkpoint_training_compatibility,
-            "train": {
-                "nll": self.train.nll,
-                "accuracy": self.train.accuracy,
-                "target_count": self.train.target_count,
-                "correct_count": self.train.correct_count,
-                "sentence_count": self.train.sentence_count,
-                "sentence_results": self.train.sentence_results,
-            },
-            "dev": {
-                "nll": self.dev.nll,
-                "accuracy": self.dev.accuracy,
-                "target_count": self.dev.target_count,
-                "correct_count": self.dev.correct_count,
-                "sentence_count": self.dev.sentence_count,
-                "sentence_results": self.dev.sentence_results,
-            },
-            "heldout": {
-                "nll": self.heldout.nll,
-                "accuracy": self.heldout.accuracy,
-                "target_count": self.heldout.target_count,
-                "correct_count": self.heldout.correct_count,
-                "sentence_count": self.heldout.sentence_count,
-                "sentence_results": self.heldout.sentence_results,
-            },
+            "manifest_schema_adapter_applied": self.manifest_schema_adapter_applied,
+            "train": self.train.to_dict(),
+            "dev": self.dev.to_dict(),
+            "heldout": self.heldout.to_dict(),
             "training_generations": [
                 {
                     "exact_prompt": g.exact_prompt,
@@ -384,6 +387,10 @@ class GenesisSeedEvaluator:
         self.steps = self._get_steps()
         self.param_count = sum(p.numel() for p in self.model.parameters())
 
+        # Schema adapter flag: False by default; set to True when Level3Dv2
+        # manifest (held_out key) is normalized to heldout schema.
+        self.manifest_schema_adapter_applied = False
+
         # Validate dataset partitions for consistency
         self._validate_partitions()
 
@@ -407,6 +414,9 @@ class GenesisSeedEvaluator:
             heldout_status="NOT_EVALUATED",
             manifest_path=manifest_path,
         )
+
+        # Store manifest path as an instance attribute for access by evaluate()
+        self.manifest_path = manifest_path
 
     def _compute_sha256(self, path: Path) -> str:
         sha256 = hashlib.sha256()
@@ -491,6 +501,7 @@ class GenesisSeedEvaluator:
         total_correct = 0
         total_targets = 0
         sentence_results = []
+        status = "APPLICABLE"
 
         for sentence in sentences:
             enc = [b for b in sentence.encode("utf-8")]
@@ -519,13 +530,28 @@ class GenesisSeedEvaluator:
                 "targets": targets,
             })
 
+        # Handle empty partition
+        if total_targets == 0:
+            status = "NOT_APPLICABLE"
+            # Return null values, never inf or 0.0
+            return PartitionMetrics(
+                nll=None,
+                accuracy=None,
+                target_count=0,
+                correct_count=0,
+                sentence_count=0,
+                sentence_results=[],
+                status="NOT_APPLICABLE",
+            )
+
         return PartitionMetrics(
-            nll=total_nll / total_targets if total_targets > 0 else float("inf"),
-            accuracy=total_correct / total_targets if total_targets > 0 else 0.0,
+            nll=total_nll / total_targets,
+            accuracy=total_correct / total_targets,
             target_count=total_targets,
             correct_count=total_correct,
             sentence_count=len(sentences),
             sentence_results=sentence_results,
+            status=status,
         )
 
     def evaluate_generations(
@@ -587,6 +613,105 @@ class GenesisSeedEvaluator:
         torch.manual_seed(42 + int(x.sum().item()))
         return torch.randn(batch_size, seq_len, 262, device=x.device)
 
+    def report_json(self, path: str | Path) -> str:
+        """Write the evaluation result as JSON to the given path.
+
+        Args:
+            path: File path to write the JSON report to.
+
+        Returns:
+            The JSON string written.
+        """
+        import json
+        from pathlib import Path as _Path
+        path = _Path(path)
+        data = self.result.to_dict()
+        json_str = json.dumps(data, indent=2, allow_nan=False, sort_keys=False)
+        path.write_text(json_str, encoding="utf-8")
+        return json_str
+
+    def report_markdown(self, path: str | Path) -> str:
+        """Write the evaluation result as Markdown to the given path.
+
+        Args:
+            path: File path to write the Markdown report to.
+
+        Returns:
+            The Markdown string written.
+        """
+        from pathlib import Path as _Path
+        path = _Path(path)
+        data = self.result.to_dict()
+
+        lines = [
+            "# GenesisSeed Evaluation Report",
+            "",
+            f"**Checkpoint:** `{data['checkpoint_path']}`",
+            f"**Checkpoint SHA256:** `{data['checkpoint_sha256']}`",
+            f"**Seed:** `{data['seed']}`",
+            f"**Steps:** `{data['steps']}`",
+            f"**Param count:** `{data['param_count']}`",
+            f"**Context limit:** `{data['context_limit']}`",
+            f"**Experiment identity:** `{data['experiment_identity']}`",
+            f"**Manifest fingerprint:** `{data['manifest_fingerprint']}`",
+            f"**Checkpoint training compatibility:** `{data['checkpoint_training_compatibility']}`",
+            "",
+            "## Partition Metrics",
+            "",
+            "### Train",
+            "",
+            f"| Metric | Value |",
+            "|---|---|",
+            f"| Sentence count | `{data['train']['sentence_count']}` |",
+            f"| Target count | `{data['train']['target_count']}` |",
+            f"| Correct count | `{data['train']['correct_count']}` |",
+            f"| NLL | `{data['train']['nll']}` |",
+            f"| Accuracy | `{data['train']['accuracy']}` |",
+            "",
+            "### Dev",
+            "",
+            f"| Metric | Value |",
+            "|---|---|",
+            f"| Sentence count | `{data['dev']['sentence_count']}` |",
+            f"| Target count | `{data['dev']['target_count']}` |",
+            f"| Correct count | `{data['dev']['correct_count']}` |",
+            f"| NLL | `{data['dev']['nll']}` |",
+            f"| Accuracy | `{data['dev']['accuracy']}` |",
+            "",
+            "### Held-out",
+            "",
+            f"| Metric | Value |",
+            "|---|---|",
+            f"| Sentence count | `{data['heldout']['sentence_count']}` |",
+            f"| Target count | `{data['heldout']['target_count']}` |",
+            f"| Correct count | `{data['heldout']['correct_count']}` |",
+            f"| NLL | `{data['heldout']['nll']}` |",
+            f"| Accuracy | `{data['heldout']['accuracy']}` |",
+            f"| Status | `{data['heldout_status']}` |",
+            "",
+            "## Generations",
+            "",
+        ]
+
+        for i, gen in enumerate(data['training_generations'], 1):
+            lines.extend([
+                f"### Generation {i}",
+                "",
+                f"- **Exact prompt:** `{gen['exact_prompt']}`",
+                f"- **Expected suffix:** `{gen['expected_suffix']}`",
+                f"- **Exact match:** `{gen['exact_match']}`",
+                f"- **Action accuracy:** `{gen['action_accuracy']}`",
+                f"- **EOS detected:** `{gen['eos_detected']}`",
+                f"- **Stop reason:** `{gen['stop_reason']}`",
+                f"- **Num generated tokens:** `{gen['num_generated_tokens']}`",
+                f"- **Generated token IDs:** `{gen['generated_token_ids']}`",
+                f"- **Raw decoded suffix:** `{gen['raw_decoded_suffix']}`",
+                f"- **Reconstructed complete:** `{gen['reconstructed_complete']}`",
+                "",
+            ])
+
+        path.write_text("\n".join(lines), encoding="utf-8")
+        return "\n".join(lines)
     def evaluate(
         self,
         final_heldout: bool = False,
@@ -599,10 +724,14 @@ class GenesisSeedEvaluator:
         Args:
             final_heldout: If True, evaluate the final held-out set (authorized
                 final test). If False (default), held-out data is NOT evaluated
-                through teacher-forced evaluation or generation — it is reported
+                through teacher-forced evaluation or generation -- it is reported
                 as NOT_EVALUATED to prevent silent invalid comparisons.
-            manifest_path: Path to the dataset manifest file (SHA256 is computed
-                from actual bytes) used to define the canonical benchmark run.
+            manifest_path: Path to the dataset manifest file used to define the
+                canonical benchmark run. If provided, the manifest is parsed as
+                JSON, validated against the declared experiment identity and
+                partition counts, and its SHA256 is computed from the validated
+                bytes. If omitted, the constructor-provided manifest_path is
+                used.
             experiment_identity: Explicit experiment protocol identifier:
                 "Level3" (12/0/4), "Level3Dv2" (24/6/6), or a callable-provided label.
             checkpoint_training_compatibility: Labeled after validating that the
@@ -617,59 +746,70 @@ class GenesisSeedEvaluator:
         """
         # Validate experiment identity and partition integrity
         self.experiment_identity = experiment_identity
-        # Use the constructor-provided manifest path if none given locally
         if manifest_path is None:
             manifest_path = self.manifest_path
         if manifest_path is not None:
-            from pathlib import Path as _Path
-            mp = _Path(manifest_path)
-            if mp.exists():
-                import hashlib
-                sha256 = hashlib.sha256()
-                with open(mp, "rb") as f:
-                    for chunk in iter(lambda: f.read(8192), b""):
-                        sha256.update(chunk)
-                self.result.manifest_fingerprint = sha256.hexdigest()
+            # Convert to Path object if needed
+            if isinstance(manifest_path, str):
+                manifest_path = Path(manifest_path)
+            if not manifest_path.exists():
+                raise FileNotFoundError(f"Manifest not found: {manifest_path}")
+            self._validate_manifest(manifest_path)
+            # Compute SHA256 of actual manifest bytes and store in result
+            import hashlib
+            sha256 = hashlib.sha256()
+            with open(manifest_path, "rb") as f:
+                for chunk in iter(lambda: f.read(8192), b""):
+                    sha256.update(chunk)
+            self.result.manifest_fingerprint = sha256.hexdigest()
+            self.result.manifest_path = str(manifest_path)
+            # Sync manifest_schema_adapter_applied from evaluator to result
+            self.result.manifest_schema_adapter_applied = self.manifest_schema_adapter_applied
 
         # Validate partition disjointness and grammar
         self._validate_partitions()
 
-        # Compute manifest SHA256 from actual bytes (if manifest provided)
-        self.result.manifest_fingerprint = None
-        if manifest_path is not None:
-            from pathlib import Path as _Path
-            mp = _Path(manifest_path)
-            if mp.exists():
-                import hashlib
-                sha256 = hashlib.sha256()
-                with open(mp, "rb") as f:
-                    for chunk in iter(lambda: f.read(8192), b""):
-                        sha256.update(chunk)
-                self.result.manifest_fingerprint = sha256.hexdigest()
+        # Check for repeated final_heldout=True on the same evaluator instance
+        # Once a final_heldout=True evaluation succeeds, reject any later
+        # final_heldout=True call on the same instance, regardless of
+        # whether ordinary (final_heldout=False) evaluations occur between them.
+        if final_heldout and getattr(self, "_final_heldout_done", False):
+            raise ValueError(
+                "final_heldout=True already evaluated on this evaluator instance. "
+                "Final-test authorization is per-instance only to prevent accidental repetition."
+            )
+        # Only set _final_heldout_done=True when a final_heldout=True evaluation
+        # succeeds. Never reset it on final_heldout=False: the history is
+        # per-instance, not per-call.
+        if final_heldout:
+            self._final_heldout_done = True
 
         # Compute checkpoint training-sentence metadata and compare with
-        # the selected training partition. If metadata is unavailable,
-        # compatibility remains UNVERIFIED (never VERIFIED without validation).
+        # the selected training partition.
         self._verify_checkpoint_training_compatibility()
+        # Also update the result's compatibility status (not just the instance attribute)
+        self.result.checkpoint_training_compatibility = self.checkpoint_training_compatibility
 
         # Train and dev partitions (dev may be empty for Level 3 protocol)
         self.result.train = self.evaluate_partition(self.train_sentences, "train")
         self.result.dev = self.evaluate_partition(self.dev_sentences, "dev")
 
         # Final held-out authorization:
-        # Default (final_heldout=False) reports NOT_EVALUATED and never calls
-        # evaluate_partition or evaluate_generations against held-out data.
+        # - Default (final_heldout=False) reports NOT_EVALUATED and never calls
+        #   evaluate_partition or evaluate_generations against held-out data.
         self.result.heldout = PartitionMetrics(
             nll=None, accuracy=None, target_count=0, correct_count=0,
-            sentence_count=0, sentence_results=[]
+            sentence_count=0, sentence_results=[], status="NOT_APPLICABLE"
         )
         self.result.heldout_generations = []
         self.result.heldout_exact_matches = 0
         self.result.heldout_total = 0
         self.result.heldout_status = "NOT_EVALUATED"
 
+        # Only set the per-instance authorization flag AFTER the held-out
+        # evaluation has successfully completed. A failed final evaluation
+        # must not consume authorization.
         if final_heldout:
-            # Record the explicit final-test invocation
             self.result.heldout_status = "EVALUATED"
             self.result.heldout = self.evaluate_partition(
                 self.heldout_sentences, "heldout"
@@ -681,6 +821,14 @@ class GenesisSeedEvaluator:
                 1 for g in self.result.heldout_generations if g.exact_match
             )
             self.result.heldout_total = len(self.result.heldout_generations)
+
+            # Record actual UTC authorization timestamp (ISO 8601)
+            from datetime import datetime, timezone
+            self.result.authorization_timestamp = datetime.now(timezone.utc).isoformat()
+
+            # Per-instance authorization: only set the flag once the final
+            # evaluation has successfully completed (not before)
+            self._final_heldout_done = True
         else:
             self.result.heldout_status = "NOT_EVALUATED"
             # Unmeasured results: null, never 0.0
@@ -695,43 +843,142 @@ class GenesisSeedEvaluator:
         )
         return self.result
 
+    def _validate_manifest(self, manifest_path: Path) -> None:
+        """Parse and validate the dataset manifest JSON.
+
+        Checks:
+        - Manifest is valid JSON (reject invalid or nonexistent).
+        - Schema matches expected structure with train/dev/heldout partitions.
+        - Declared experiment identity and expected partition counts match.
+        - Partitions match the actual evaluation inputs (train/dev/heldout lists).
+        - SHA256 is computed from the validated manifest bytes.
+
+        Raises:
+            ValueError: If manifest is invalid, missing, has wrong schema,
+                or partition mismatch.
+        """
+        if not manifest_path.exists():
+            raise ValueError(f"Manifest does not exist: {manifest_path}")
+
+        # Parse manifest as JSON
+        import json
+        try:
+            with open(manifest_path, "r", encoding="utf-8") as f:
+                manifest = json.load(f)
+        except (json.JSONDecodeError, UnicodeDecodeError) as e:
+            raise ValueError(f"Invalid JSON in manifest {manifest_path}: {e}")
+
+        # Validate manifest structure: must be a dict
+        if not isinstance(manifest, dict):
+            raise ValueError("Manifest must be a JSON object")
+
+        # Reject manifests specifying both keys ambiguously
+        if "held_out" in manifest and "heldout" in manifest:
+            raise ValueError(
+                "Manifest specifies both 'held_out' and 'heldout' keys; "
+                "ambiguous dataset schema. Use exactly one."
+            )
+
+        # Schema normalization: Level3Dv2 uses 'held_out', normalize to 'heldout'
+        # BEFORE checking required partition fields
+        if "held_out" in manifest:
+            manifest["heldout"] = manifest.pop("held_out")
+            self.manifest_schema_adapter_applied = True
+
+        # Now validate required partition fields
+        for partition in ("train", "dev", "heldout"):
+            if partition not in manifest:
+                raise ValueError(f"Manifest missing required partition: {partition}")
+            if not isinstance(manifest[partition], list):
+                raise ValueError(f"Manifest partition '{partition}' must be an array")
+
+        # Verify partition counts against expected totals
+        expected_counts = {
+            "Level3": (12, 0, 4),
+            "Level3Dv2": (24, 6, 6),
+        }
+        if self.experiment_identity in expected_counts:
+            exp_train, exp_dev, exp_heldout = expected_counts[self.experiment_identity]
+            actual_train = len(manifest["train"])
+            actual_dev = len(manifest["dev"])
+            actual_heldout = len(manifest["heldout"])
+            if (actual_train, actual_dev, actual_heldout) != (exp_train, exp_dev, exp_heldout):
+                raise ValueError(
+                    f"Manifest partition counts ({actual_train}/{actual_dev}/{actual_heldout}) do not match "
+                    f"expected for '{self.experiment_identity}' ({exp_train}/{exp_dev}/{exp_heldout})"
+                )
+
+        # Normalize manifest lists to canonical sentence strings
+        manifest_train = self._normalize_manifest_list(manifest["train"])
+        manifest_dev = self._normalize_manifest_list(manifest["dev"])
+        manifest_heldout = self._normalize_manifest_list(manifest["heldout"])
+
+        # Check no overlap within manifest
+        if manifest_train & manifest_dev:
+            overlap = manifest_train & manifest_dev
+            raise ValueError(f"Train/dev overlap detected: {overlap}")
+        if manifest_train & manifest_heldout:
+            overlap = manifest_train & manifest_heldout
+            raise ValueError(f"Train/heldout overlap detected: {overlap}")
+
+        # Check manifest partitions match the evaluator's partitions
+        if manifest_train != set(self.train_sentences):
+            raise ValueError("Manifest train partition does not match evaluator train partition")
+        if manifest_dev != set(self.dev_sentences):
+            raise ValueError("Manifest dev partition does not match evaluator dev partition")
+        if manifest_heldout != set(self.heldout_sentences):
+            raise ValueError("Manifest held-out partition does not match evaluator held-out partition")
+
+    def _normalize_manifest_list(self, items: list[Any]) -> set[str]:
+        """Normalize manifest list items to canonical sentence strings."""
+        result = set()
+        for item in items:
+            if isinstance(item, str):
+                result.add(item)
+            elif isinstance(item, (list, tuple)):
+                result.add(" ".join(str(x) for x in item))
+            else:
+                result.add(str(item))
+        return result
+
     def _verify_checkpoint_training_compatibility(self) -> None:
         """Compare checkpoint training-sentence metadata with the selected
-        training partition. Returns True if compatibility can be verified,
-        False otherwise (metadata insufficient).
+        training partition. Derives status only from actual checkpoint metadata.
 
-        Compatibility is reported as VERIFIED only when the checkpoint's
-        training-set metadata explicitly confirms the selected partition.
-        If metadata is unavailable, compatibility remains UNVERIFIED.
+        Uses three distinct outcomes:
+        - VERIFIED: checkpoint metadata exactly identifies the selected training
+          partition (no shared tokens used as evidence alone).
+        - MISMATCH: checkpoint metadata identifies a different training partition.
+        - UNVERIFIED: checkpoint metadata is missing or insufficient to verify.
+
+        Raises ValueError if compatibility is VERIFIED but the selected
+        checkpoint is known-invalid (e.g. metadata identifies a different
+        dataset than the one used for evaluation).
         """
-        # This method checks whether the checkpoint stores training-set
-        # metadata (e.g., seed, step count, dataset name, partition size)
-        # that can be verified against the selected train_sentences.
-        # If the metadata is missing or incompatible, compatibility remains
-        # UNVERIFIED (the default).
-        #
-        # The actual verification logic depends on the checkpoint schema.
-        # For now, we attempt to read checkpoint metadata. If it cannot
-        # be read or does not match, compatibility stays UNVERIFIED.
+        self.checkpoint_training_compatibility = "UNVERIFIED"
+
+        # Read checkpoint metadata
         saved = None
         try:
             import torch
             saved = torch.load(self.checkpoint_path, map_location="cpu", weights_only=True)
         except Exception:
-            # Checkpoint is unreadable; metadata unavailable.
-            # Report UNVERIFIED (never VERIFIED without validation).
             self.checkpoint_training_compatibility = "UNVERIFIED"
             return
 
-        # Check for training-partition metadata in checkpoint
-        # Common keys: "train_sentences", "train_partition", "dataset", "partition"
-        cmp_data = saved.get("train_sentences") or saved.get("train_partition") or saved.get("partition")
+        # Extract training-partition metadata from checkpoint
+        cmp_data = None
+        for key in ("train_sentences", "train_partition", "dataset_partition", "partition"):
+            if key in saved:
+                cmp_data = saved[key]
+                break
+
         if cmp_data is None:
             self.checkpoint_training_compatibility = "UNVERIFIED"
             return
 
-        # Convert checkpoint metadata to a set of strings for comparison
-        checkpoint_train = set()
+        # Normalize checkpoint training metadata to a set of canonical sentences
+        checkpoint_train: set[str] = set()
         if isinstance(cmp_data, (list, tuple)):
             for item in cmp_data:
                 if isinstance(item, (list, tuple)):
@@ -739,82 +986,44 @@ class GenesisSeedEvaluator:
                 else:
                     checkpoint_train.add(str(item))
         elif isinstance(cmp_data, dict):
+            # Also check for dataset name or explicit partition size
+            dataset_name = str(cmp_data.get("name", ""))
+            if dataset_name:
+                checkpoint_train.add(dataset_name)
             for v in cmp_data.values():
-                checkpoint_train.add(str(v))
+                if isinstance(v, (list, tuple)):
+                    for item in v:
+                        if isinstance(item, (list, tuple)):
+                            checkpoint_train.add(" ".join(str(x) for x in item))
+                        else:
+                            checkpoint_train.add(str(item))
+                else:
+                    checkpoint_train.add(str(v))
         else:
             checkpoint_train.add(str(cmp_data))
 
-        # Compare with selected training partition (as a set of strings)
-        selected_train = set()
+        # Normalize selected training partition to a set of canonical sentences
+        selected_train: set[str] = set()
         for s in self.train_sentences:
             selected_train.add(s)
-            for part in s.split():
-                selected_train.add(part)  # also compare word-level tokens
 
-        overlap = checkpoint_train & selected_train
-        # Compatibility VERIFIED only if significant overlap verified;
-        # otherwise UNVERIFIED (never VERIFIED without validation).
-        if len(overlap) > 0 and len(selected_train) > 0:
-            self.checkpoint_training_compatibility = "VERIFIED"
-        else:
-            self.checkpoint_training_compatibility = "UNVERIFIED"
-
-    def report_json(self, output_path: str | Path) -> None:
-        output = Path(output_path)
-        output.parent.mkdir(parents=True, exist_ok=True)
-        with open(output, "w") as f:
-            json.dump(self.result.to_dict(), f, indent=2)
-
-    def report_markdown(self, output_path: str | Path) -> None:
-        output = Path(output_path)
-        output.parent.mkdir(parents=True, exist_ok=True)
-        lines = []
-        lines.append("# GenesisSeed Evaluation Report\n")
-        lines.append(f"## Checkpoint: `{self.checkpoint_path.name}`\n")
-        lines.append(f"- Seed: `{self.seed}`\n")
-        lines.append(f"- Steps: `{self.steps}`\n")
-        lines.append(f"- Parameters: `{self.param_count:,}`\n")
-        lines.append(f"- SHA256: `{self.checkpoint_sha256[:12]}...`\n")
-        lines.append("## Partition Metrics\n")
-        lines.append("| Partition | Sentences | Targets | Correct | Accuracy | NLL |\n")
-        lines.append("|-----------|-----------|---------|---------|----------|-----|\n")
-        for name, metrics in [("Train", self.result.train), ("Dev", self.result.dev)]:
-            if metrics.accuracy is None:
-                accuracy_str = "N/A"
-                nll_str = "N/A"
+        # Require EXACT equivalence: every selected training sentence must be
+        # matched by a checkpoint training entry AND every checkpoint training
+        # entry must be in the selected partition. One shared sentence, word,
+        # or token is NOT sufficient.
+        if checkpoint_train and selected_train:
+            if checkpoint_train == selected_train:
+                self.checkpoint_training_compatibility = "VERIFIED"
             else:
-                accuracy_str = f"{metrics.accuracy:.4%}"
-                nll_str = f"{metrics.nll:.6f}"
-            lines.append(
-                f"| {name} | {metrics.sentence_count} | {metrics.target_count} | "
-                f"{metrics.correct_count} | {accuracy_str} | {nll_str} |\n"
+                self.checkpoint_training_compatibility = "MISMATCH"
+        elif not checkpoint_train and selected_train:
+            self.checkpoint_training_compatibility = "UNVERIFIED"
+        else:
+            self.checkpoint_training_compatibility = "VERIFIED"
+
+        # Reject a verified mismatch before producing a canonical benchmark report.
+        if self.checkpoint_training_compatibility == "MISMATCH":
+            raise ValueError(
+                "Checkpoint training-partition metadata does not match the "
+                f"selected training partition. Checkpoint: {self.checkpoint_path}"
             )
-        # Held-out: always NOT_EVALUATED at this point
-        heldout_nll = "N/A" if self.result.heldout.nll is None else f"{self.result.heldout.nll:.6f}"
-        heldout_acc = "N/A" if self.result.heldout.accuracy is None else f"{self.result.heldout.accuracy:.4%}"
-        lines.append(
-            f"| Held-out | {self.result.heldout.sentence_count} | {self.result.heldout.target_count} | "
-            f"{self.result.heldout.correct_count} | {heldout_acc} | {heldout_nll} |\n"
-        )
-        lines.append(f"## Held-out Exact Matches: {self.result.heldout_exact_matches}/{self.result.heldout_total}\n")
-        with open(output, "w") as f:
-            f.write("\n".join(lines))
-
-
-def main():
-    import argparse
-    parser = argparse.ArgumentParser(description="Evaluate a GenesisSeed checkpoint")
-    parser.add_argument("checkpoint", help="Path to checkpoint file")
-    parser.add_argument("--json", help="Output JSON report path")
-    parser.add_argument("--md", help="Output Markdown report path")
-    args = parser.parse_args()
-
-    evaluator = GenesisSeedEvaluator(args.checkpoint)
-    evaluator.evaluate()
-    evaluator.report_json(args.json or "evaluation_report.json")
-    evaluator.report_markdown(args.md or "evaluation_report.md")
-    print(f"Evaluation complete: {args.json or 'evaluation_report.json'}")
-
-
-if __name__ == "__main__":
-    main()
