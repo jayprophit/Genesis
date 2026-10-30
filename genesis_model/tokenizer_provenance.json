@@ -1,0 +1,33 @@
+{
+  "registry_version": 1,
+  "keyed_by": "checkpoint_sha256",
+  "trust_anchor": "sha256(checkpoint file bytes) -- the loader hashes the checkpoint FILE and looks up this record by digest",
+  "trust_model_note": "Trust is derived from the registry CONTENTS (operator-controlled), not from the checkpoint file path or from caller-controlled metadata such as meta.base. A checksum manifest detects corruption or mismatch only when checked against a trusted reference; it is NOT cryptographic protection against an attacker who can rewrite both the manifest and the artifact.",
+  "description": "Trusted provenance for Genesis v0.6 legacy genesis-ckpt-v1 checkpoints. The loader hashes the checkpoint file, looks up by_checkpoint_sha256[sha], then cross-checks format/vocab/architecture/meta_base and requires co-located tokenizer.json whose canonical sha256 equals tokenizer_canonical_sha256. Modern format_version=1 checkpoints carry an embedded tokenizer and do not consult this registry.",
+  "by_checkpoint_sha256": {
+    "29b6e129388c005cb669eb818abc4d1a78ed25dcd4d06e56dc66031cbe60846d": {
+      "format": "genesis-ckpt-v1",
+      "vocab_size": 4096,
+      "architecture": {
+        "d_model": 128,
+        "n_layers": 4,
+        "n_heads": 4,
+        "n_kv_heads": 1,
+        "d_ff": 344,
+        "max_seq_len": 256,
+        "rope_theta": 10000.0,
+        "tie_embeddings": true,
+        "norm_eps": 1e-6
+      },
+      "parent_checkpoint_sha256": "a498f8d161202e2b518927f41cd34f4cdd58e05b24e7c0fdd13cf589e8230954",
+      "tokenizer_canonical_sha256": "a6585dbc305aa25331f90cc1faa01054615b3bc0689aef6dfef5092583b27493",
+      "special_token_layout": {
+        "count": 16,
+        "id_range": [256, 271],
+        "version": 1
+      },
+      "meta_base": "buggy_sft_tool_compact_seq256",
+      "notes": "Item-A sft_tool_compact_seq256, re-sft from parent a498f8d1 (vocab 4096, 3824 BPE merges). Canonical tokenizer restored from the parent-embedded bytes; file sha 8ac036e4 -> canonical a6585dbc."
+    }
+  }
+}
