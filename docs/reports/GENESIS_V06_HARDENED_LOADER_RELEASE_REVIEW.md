@@ -4,6 +4,7 @@
 
 **Review branch:** `review/genesis-v06-loader-hardening-20261030`
 **Base commit:** `0de6bb6525f60fea2d2dd64532fc652be7475ded` (branch `audit/genesis-v06-evaluation-repair`)
+**Review commit:** `1695ac84fc20c38dca3bd16b23d965247b593097` (verified on `origin/review/genesis-v06-loader-hardening-20261030`)
 
 ---
 
